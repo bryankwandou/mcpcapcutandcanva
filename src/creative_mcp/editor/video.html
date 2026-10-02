@@ -221,6 +221,94 @@ fieldset.sbody { border: 0; margin: 0; padding: 0; min-width: 0; }
   header .hide-sm { display: none; }
 }
 @media (max-width: 560px) { #export .lbl, #status, #demoTag, .rl span { display: none; } #mwrap { grid-template-columns: 64px minmax(0, 1fr); } #tlZoom { width: 70px !important; } #pctl .tc span { display: none; } #ratioSel { max-width: 74px; } }
+/* ---- pro dark theme (page-level token overrides) ---- */
+:root { --bg: #0b0c0f; --surface: #15161b; --surface-2: #1e2027; --well: #0a0b0d; --line: #262931; --fg: #e9e9ee; --muted: #8d8f9c; --accent: #3dd6e0; --accent-ink: #00191c; --select: #3dd6e0; }
+html, body { background: #0b0c0f; font-size: 12.5px; }
+body { background: #0b0c0f; }
+header { background: #0b0c0f; border-bottom: 0; }
+#media, #player, #insp, #tl { border: 0; background: var(--surface); box-shadow: inset 0 0 0 1px #ffffff0a; }
+#player { background: #101115; }
+#stageWrap { background: #0a0b0d; }
+.btn { font-size: 12.5px; }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+svg.i { width: 16px; height: 16px; }
+#mtabs button svg.i { width: 18px; height: 18px; }
+.phd { height: 30px; font-size: 12px; }
+.tier { font-size: 9.5px; padding: 1px 5px; }
+.tier.prev { background: #1d2a33; color: #8fd8e6; }
+.drop:hover, .drop.over { background: #3dd6e012; }
+.mitem { background: #1b1d23; border-color: #ffffff0d; border-radius: 8px; }
+.mitem:hover { border-color: #3dd6e066; }
+.mitem .th { background: #0e0f12; }
+.mitem .nm { font-size: 11.5px; padding: 5px 7px 6px; color: #d5d6dd; }
+.mitem .th .tier.pv { left: auto; top: auto; right: 4px; bottom: 4px; font-size: 8.5px; opacity: .9; }
+.mitem .th .fxo { position: absolute; inset: 0; pointer-events: none; }
+.mgrid.g3 { grid-template-columns: repeat(3, 1fr); }
+.mgrid.g3 .mitem .th { aspect-ratio: 1; }
+.shead { display: flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 700; color: var(--fg); margin: 2px 0 -2px; }
+.shead span { color: var(--muted); font-weight: 400; }
+.alist { display: grid; gap: 4px; }
+.arow { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 8px; align-items: center; background: #1b1d23; border: 1px solid #ffffff0d; border-radius: 8px; padding: 5px; cursor: pointer; }
+.arow:hover { border-color: #3dd6e066; }
+.arow .cv { width: 40px; height: 40px; border-radius: 6px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+.arow .cv button { position: absolute; inset: 0; background: #0005; border: 0; color: #fff; display: flex; align-items: center; justify-content: center; opacity: .9; }
+.arow .cv button svg.i { width: 16px; height: 16px; fill: currentColor; }
+.arow .t { min-width: 0; display: grid; line-height: 1.3; }
+.arow .t b { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.arow .t span { font-size: 10.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.arow .add { width: 26px; height: 26px; border-radius: 50%; border: 0; background: var(--accent); color: var(--accent-ink); display: flex; align-items: center; justify-content: center; padding: 0; }
+.arow .add svg.i { width: 14px; height: 14px; stroke-width: 2.6; }
+.arow.busy { opacity: .6; }
+.tprev span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; display: inline-block; }
+.tprev { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; padding: 6px; white-space: pre; line-height: 1.15; text-align: center; overflow: hidden; font-size: 13px; background: linear-gradient(135deg, #2a3442, #15181e); }
+textarea#script { min-height: 120px; width: 100%; }
+#scene { position: absolute; inset: 0; transform-origin: center; }
+.fxo { position: absolute; inset: 0; pointer-events: none; z-index: 15; }
+.vhs-tc { inset: auto auto 6% 6%; color: #fff; font: 700 12px var(--f-mono); text-shadow: 0 0 4px #000; }
+.bgblur { position: absolute; inset: -6%; background: center/cover; filter: blur(18px) brightness(.75); }
+.el .tint { position: absolute; inset: 0; mix-blend-mode: soft-light; pointer-events: none; }
+.el.text { line-height: 1.15; }
+.el.text .tx { display: inline-block; }
+#meter { position: absolute; right: 8px; top: 10px; bottom: 10px; width: 12px; display: flex; gap: 2px; z-index: 30; pointer-events: none; }
+#meter i { flex: 1; background: #ffffff10; border-radius: 2px; position: relative; overflow: hidden; }
+#meter i b { position: absolute; left: 0; right: 0; bottom: 0; height: 0; background: linear-gradient(to top, #3dd68c 0 60%, #e8d23a 60% 85%, #ef5b5b 85%); background-size: 100% var(--mh, 200px); background-position: bottom; }
+#shuttle { font: 600 11px var(--f-mono); color: var(--accent); min-width: 28px; }
+/* timeline */
+#tl { background: #121317; }
+#tlbar { border-bottom-color: #ffffff0a; }
+#ruler { height: 22px; background: #121317; border-bottom-color: #ffffff0f; }
+#ruler span { top: 3px; font-size: 9.5px; color: #6f7280; }
+#ruler i { background: #ffffff1f; height: 4px; }
+.track { border-bottom: 1px solid #ffffff06; --th: 40px; }
+.track.main { --th: 62px; background: #ffffff04; }
+.thead { background: #121317; border-right-color: #ffffff0d; }
+.seg { top: 3px; bottom: 3px; border-radius: 6px; border: 1px solid #00000059; padding: 2px 5px; font-size: 10.5px; }
+.seg.video, .seg.photo { background-color: #1d5a5c; } .seg.audio { background-color: #1f4a73; } .seg.text { background-color: #5d3f96; }
+.seg.sticker { background-color: #8a5f1c; } .seg.effect { background-color: #8a2f5c; } .seg.filter { background-color: #2f5f6e; }
+.seg.photo, .seg.video { background-size: auto 100%; }
+.seg .lb { background: #0009; border-radius: 3px; font-weight: 600; }
+.seg.sel { border: 1.5px solid #3dd6e0; box-shadow: 0 0 0 1px #000, 0 0 10px #3dd6e044; }
+.seg.sel .edge { background: #3dd6e0; }
+.seg .beat { position: absolute; top: 2px; width: 2px; height: 6px; margin-left: -1px; background: #ffe66d; border-radius: 1px; pointer-events: none; z-index: 1; }
+.seg .anb { position: absolute; top: 0; bottom: 0; pointer-events: none; background: linear-gradient(90deg, #ffffff30, transparent); }
+.seg .anb.o { background: linear-gradient(270deg, #ffffff30, transparent); }
+.seg .tag { font-size: 9px; background: #0009; color: #8fd8e6; border-radius: 3px; padding: 0 3px; }
+.snapline { width: 1px; background: #ffe66d; box-shadow: 0 0 6px #ffe66d; }
+.snapline b { position: absolute; top: 24px; left: 4px; font: 600 9.5px var(--f-mono); background: #ffe66d; color: #1a1600; padding: 1px 4px; border-radius: 3px; white-space: nowrap; }
+#playhead { left: 0; width: 1.5px; background: #fff; will-change: transform; }
+#playhead::before { border-top-color: #fff; }
+.trx { border-color: var(--accent); background: #15161b; }
+.chipg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
+.chipg button { background: #1b1d23; border: 1px solid #ffffff0f; color: var(--fg); border-radius: 7px; padding: 7px 4px; font-size: 11.5px; display: grid; justify-items: center; gap: 3px; }
+.chipg button.on { border-color: var(--accent); color: var(--accent); background: #3dd6e014; }
+.chipg button i { font-style: normal; font-size: 15px; line-height: 1; }
+.chipg.flt button { padding: 0 0 4px; overflow: hidden; }
+.chipg.flt button img { width: 100%; aspect-ratio: 16/10; object-fit: cover; display: block; }
+.note2 { margin: 0; color: var(--muted); font-size: 11.5px; }
+.mgrid.g3 .tier.pv { display: none; }
+.mgrid.g3 .mitem .th .tier { font-size: 8.5px; padding: 0 4px; top: 3px; left: 3px; }
+.mgrid.g3 .mitem .th img { padding: 20% 14% 10% !important; }
+@media (min-width: 901px) { body { grid-template-columns: 300px minmax(0, 1fr) 296px; } }
 </style>
 </head>
 <body>
@@ -244,9 +332,9 @@ fieldset.sbody { border: 0; margin: 0; padding: 0; min-width: 0; }
   <input type="file" id="fileIn" multiple accept="video/*,audio/*,image/*" hidden></aside>
 <section id="player">
   <div class="phd"><b>Pemutar</b><span class="grow"></span><button class="btn ghost icon sm" id="safeBtn" title="Panduan area aman" aria-label="Panduan area aman" aria-pressed="false"></button><span id="ratio" class="mono"></span></div>
-  <div id="stageWrap"><div id="stage"></div></div>
+  <div id="stageWrap"><div id="stage"></div><div id="meter" title="Level audio" aria-hidden="true"><i><b></b></i><i><b></b></i></div></div>
   <div id="pctl"><div class="side"><span class="tc"><b id="tcNow">00:00:00</b> <span>/ <span id="tcEnd">00:00:00</span></span></span></div>
-    <div class="mid"><button class="btn icon ghost" id="play" title="Putar (Spasi)" aria-label="Putar"></button></div>
+    <div class="mid"><button class="btn icon ghost" id="play" title="Putar (Spasi) · J/K/L shuttle" aria-label="Putar"></button><span id="shuttle" aria-live="polite"></span></div>
     <div class="side r"><label class="rl"><span>Rasio</span><select id="ratioSel" aria-label="Rasio kanvas" title="Rasio kanvas (pratinjau)"></select></label>
       <select id="zoomSel" aria-label="Zoom pemutar" title="Zoom pemutar"><option value="1">Fit</option><option value="0.75">75%</option><option value="0.5">50%</option></select>
       <button class="btn icon ghost" id="fs" title="Layar penuh" aria-label="Layar penuh"></button></div></div>
@@ -258,12 +346,14 @@ fieldset.sbody { border: 0; margin: 0; padding: 0; min-width: 0; }
   <div id="tlScroll"><div id="tlInner"><div id="ruler"></div><div id="tracks"></div><div id="playhead"></div></div></div>
 </section>
 <script src="studio.js"></script>
+<script src="video-rich.js"></script>
 <script>
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 ICONS.fullscreen = 'M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5'; ICONS.fsExit = 'M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5';
 ICONS.select = 'M5 3l14 7-6 2-2 6z'; ICONS.freeze = 'M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9M9.5 4.5L12 7l2.5-2.5M9.5 19.5L12 17l2.5 2.5';
 ICONS.axis = 'M12 3v18M8 7l4-4 4 4M5 12h3M16 12h3'; ICONS.keyboard = 'M3 6h18v12H3zM7 10h.01M11 10h.01M15 10h.01M7 14h10';
 ICONS.chev = 'M6 9l6 6 6-6'; ICONS.reset = 'M4 12a8 8 0 1 0 2.3-5.6M4 4v5h5';
+ICONS.ripple = 'M3 6h6v12H3zM15 6h6v12h-6zM11 12h3M12.5 10.5L14 12l-1.5 1.5'; ICONS.meter = 'M6 20V10M12 20V4M18 20v-7';
 ICONS.magnet = 'M6 4v7a6 6 0 0 0 12 0V4h-4v7a2 2 0 0 1-4 0V4zM6 8h4M14 8h4';
 const FPS = 30, HW = 110, KF_PROPS = ['x', 'y', 'scale', 'rotation', 'alpha'];
 document.body.style.setProperty('--hw', HW + 'px');
@@ -271,6 +361,9 @@ let S = null, DRAFT = PARAMS.draft || '', DEMO = false, sel = null, selTrx = nul
 let sub = {}, itab = {}, spMode = 'normal', safeOn = false, zoomF = 1, axisOn = false, linkOn = false; const closed = new Set();
 const undoS = [], redoS = [], media = {};
 let LIB = [], FILES = [];
+let rate = 1, rippleOn = false, beatSnap = true, previewAudio = null;
+const ORIG = [...RAKIT.STICKERS, ...RAKIT.EFFECTS, ...RAKIT.FILTERS, ...RAKIT.ADJUSTS, ...RAKIT.TRANS], ORIG_BY = Object.fromEntries(ORIG.map(i => [i.key, i]));
+const isPreviewOnly = key => /^demo:/.test(key || '');
 
 // ---------- boot ----------
 $('#home').innerHTML = icon('home'); $('#play').innerHTML = icon('play'); $('#fs').innerHTML = icon('fullscreen');
@@ -290,7 +383,7 @@ function openInfo() {
   Studio.modal(`<h3>Buka project</h3><p>Hubungkan komputer (jalankan <span class="mono">creative-mcp studio</span>) untuk membuka project CapCut Anda. Di mode demo hanya ada satu contoh project.</p><div class="actions"><button class="btn primary" data-close>Mengerti</button></div>`).el.querySelector('[data-close]').onclick = ev => ev.target.closest('.modal-back').remove();
 }
 function showKeys() {
-  const K = [['Putar / jeda', 'Spasi'], ['Potong di playhead', 'S / Ctrl+B'], ['Hapus', 'Delete'], ['Duplikat', 'Ctrl+D'], ['Tambah/hapus keyframe', 'K'], ['Urungkan', 'Ctrl+Z'], ['Ulangi', 'Ctrl+Y / Ctrl+Shift+Z'], ['Simpan', 'Ctrl+S'],
+  const K = [['Putar / jeda', 'Spasi'], ['Potong di playhead', 'S / Ctrl+B'], ['Hapus', 'Delete'], ['Duplikat', 'Ctrl+D'], ['Tambah/hapus keyframe', 'Alt+K'], ['Putar mundur / jeda / maju (tekan lagi = lebih cepat)', 'J / K / L'], ['Hapus ripple (tutup celah)', 'Shift+Delete'], ['Urungkan', 'Ctrl+Z'], ['Ulangi', 'Ctrl+Y / Ctrl+Shift+Z'], ['Simpan', 'Ctrl+S'],
     ['Mundur / maju 1 frame', '← / →'], ['Mundur / maju 1 detik', 'Shift+← / →'], ['Ke awal / akhir', 'Home / End'], ['Zoom timeline', 'Ctrl + gulir'], ['Batal pilih', 'Esc']];
   Studio.modal(`<h3>Pintasan keyboard</h3><div class="keys">${K.map(([a, b]) => `<span>${a}</span><kbd>${b}</kbd>`).join('')}</div><div class="actions"><button class="btn primary" data-close>Tutup</button></div>`).el.querySelector('[data-close]').onclick = ev => ev.target.closest('.modal-back').remove();
 }
@@ -303,7 +396,7 @@ async function boot() {
       $('#openRow').hidden = false; $('#openBtn').hidden = true; $('#draftSel').innerHTML = drafts.map(d => `<option>${esc(d.name)}</option>`).join('');
       if (!drafts.some(d => d.name === DRAFT)) DRAFT = drafts[0].name; $('#draftSel').value = DRAFT;
       $('#draftSel').onchange = e => { menu(false); DRAFT = e.target.value; $('#pnameT').textContent = DRAFT; sel = null; undoS.length = redoS.length = 0; load(); };
-      LIB = await Studio.api('/api/capcut-library').catch(() => []); FILES = await Studio.api('/api/library').catch(() => []);
+      LIB = [...await Studio.api('/api/capcut-library').catch(() => []), ...ORIG]; FILES = await Studio.api('/api/library').catch(() => []);
       await load(); setInterval(pollRemote, 1000);
     }
   } else DEMO = true;
@@ -338,20 +431,16 @@ function loadDemo() {
   DRAFT = 'demo';
   const pics = [['Pagi di pasar', '#D95D39', '#F4C95D'], ['Kopi tubruk', '#7A4A2A', '#E8B02A'], ['Senja di pantai', '#FF8C5A', '#2A1B3D'], ['Sampai jumpa', '#1F6FB2', '#36C5B1']].map(([l, a, b]) => ({l, src: demoImage(l, a, b, 1080, 1920)}));
   FILES = [...pics.map(p => ({type: 'photo', name: p.l + '.jpg', path: p.src})), {type: 'audio', name: 'Musik contoh.wav', path: toneWav(), dur: 12}];
-  LIB = [{key: 'demo:sticker:bintang', kind: 'sticker', name: 'Bintang', vip: false, preview: starPng()}, {key: 'demo:sticker:bintang-pro', kind: 'sticker', name: 'Bintang emas', vip: true, preview: starPng('#E8B02A')},
-    {key: 'demo:effect:shake', kind: 'effect', name: 'Getar', vip: false}, {key: 'demo:effect:glitch', kind: 'effect', name: 'Glitch', vip: true},
-    {key: 'demo:filter:hangat', kind: 'filter', name: 'Hangat', vip: false}, {key: 'demo:filter:film', kind: 'filter', name: 'Film klasik', vip: true},
-    {key: 'demo:adjust:terang', kind: 'adjust', name: 'Kecerahan +', vip: false}, {key: 'demo:adjust:kontras', kind: 'adjust', name: 'Kontras lembut', vip: false},
-    {key: 'demo:transition:fade', kind: 'transition', name: 'Larut', vip: false}, {key: 'demo:transition:zoom', kind: 'transition', name: 'Zoom putar', vip: true}];
+  LIB = [{key: 'demo:sticker:bintang', kind: 'sticker', name: 'Bintang', vip: false, orig: true, preview: starPng()}, {key: 'demo:sticker:bintang-pro', kind: 'sticker', name: 'Bintang emas', vip: true, orig: true, preview: starPng('#E8B02A')}, ...ORIG];
   let saved = null; try { saved = JSON.parse(ls('demoScene') || 'null'); } catch {}
   if (saved?.v === 3) { S = saved; S.elements = S.elements.filter(e => !/^blob:/.test(e.src || '')); } // session-only imports do not survive a reload
   else {
     const vt = uid(), tt = uid(), at = uid(), st = uid();
     const clip = (i, start, extra = {}) => ({id: uid(), track: vt, type: 'photo', src: pics[i].src, name: pics[i].l, start, duration: 3, x: 0, y: 0, scale: 1, rotation: 0, alpha: 1, volume: 1, speed: 1, source_start: 0, fade_in: 0, fade_out: 0, keyframes: {}, ...extra});
     S = {v: 3, draft: 'demo', width: 1080, height: 1920, tracks: [{id: st, type: 'sticker'}, {id: tt, type: 'text'}, {id: vt, type: 'video'}, {id: at, type: 'audio'}], elements: [
-      clip(0, 0, {keyframes: {scale: [{t: 0, v: 1}, {t: 3, v: 1.25}]}, transition: {key: 'demo:transition:fade', name: 'Larut', duration: .6}}), clip(1, 3, {transition: {key: 'demo:transition:fade', name: 'Larut', duration: .6}}), clip(2, 6), clip(3, 9),
-      {id: uid(), track: tt, type: 'text', text: 'Jalan-jalan\nakhir pekan', start: .3, duration: 2.6, x: 0, y: .45, scale: 1.2, rotation: 0, alpha: 1, volume: 1, color: '#FFFFFF', font_size: 11, speed: 1, source_start: 0, fade_in: 0, fade_out: 0, keyframes: {alpha: [{t: 0, v: 0}, {t: .5, v: 1}]}},
-      {id: uid(), track: tt, type: 'text', text: 'Ikuti untuk part 2', start: 9.3, duration: 2.5, x: 0, y: -.55, scale: 1, rotation: 0, alpha: 1, volume: 1, color: '#F4C95D', font_size: 9, speed: 1, source_start: 0, fade_in: 0, fade_out: 0, keyframes: {}},
+      clip(0, 0, {keyframes: {scale: [{t: 0, v: 1}, {t: 3, v: 1.25}]}, transition: {key: 'demo:transition:fade', name: 'Larut', duration: .6}}), clip(1, 3, {transition: {key: 'demo:transition:slideleft', name: 'Geser kiri', duration: .6}, look: 'demo:filter:hangat'}), clip(2, 6, {transition: {key: 'demo:transition:zoomin', name: 'Zoom masuk', duration: .6}}), clip(3, 9),
+      {id: uid(), track: tt, type: 'text', text: 'Jalan-jalan\nakhir pekan', start: .3, duration: 2.6, x: 0, y: .45, scale: 1.2, rotation: 0, alpha: 1, volume: 1, color: '#FFFFFF', font_size: 11, speed: 1, source_start: 0, fade_in: 0, fade_out: 0, keyframes: {}, tstyle: RAKIT.TS.title, anim: {in: {id: 'pop', d: .5}, out: {id: 'fade', d: .4}}},
+      {id: uid(), track: tt, type: 'text', text: 'Ikuti untuk part 2', start: 9.3, duration: 2.5, x: 0, y: -.55, scale: 1, rotation: 0, alpha: 1, volume: 1, color: '#F4C95D', font_size: 9, speed: 1, source_start: 0, fade_in: 0, fade_out: 0, keyframes: {}, tstyle: RAKIT.TS.highlight, anim: {in: {id: 'typewriter', d: 1.2}, loop: null}},
       {id: uid(), track: st, type: 'sticker', label: 'Bintang', lib: 'demo:sticker:bintang', preview: LIB[0].preview, start: 6.2, duration: 2.6, x: .55, y: .6, scale: .8, rotation: 12, alpha: 1, volume: 1, speed: 1, source_start: 0, fade_in: 0, fade_out: 0, keyframes: {rotation: [{t: 0, v: -10}, {t: 2.6, v: 20}]}},
       {id: uid(), track: at, type: 'audio', src: FILES[4].path, name: 'Musik contoh', start: 0, duration: 12, x: 0, y: 0, scale: 1, rotation: 0, alpha: 1, volume: .8, speed: 1, source_start: 0, fade_in: 1, fade_out: 2, keyframes: {}},
     ]};
@@ -408,7 +497,9 @@ const kindOf = type => type === 'photo' ? 'video' : type;
 const compatible = (trackType, elType) => trackType === kindOf(elType);
 const end = e => e.start + e.duration;
 const total = () => Math.max(1, ...S.elements.map(end));
-const mediaUrl = p => Studio.mediaUrl(p);
+const mediaUrl = p => /^gen:/.test(p || '') ? (RAKIT.audio.url(p.slice(4)) || '') : Studio.mediaUrl(p);
+const genReady = src => !/^gen:/.test(src || '') || !!RAKIT.audio.url(src.slice(4));
+function ensureGen(src) { if (genReady(src)) return; RAKIT.audio.ensure(src.slice(4)).then(() => { if (!dragging) { renderTimeline(); renderStage(); } }).catch(() => Studio.toast('Audio tidak bisa dibuat di browser ini.')); }
 const tc = s => { s = Math.max(0, s); const m = Math.floor(s / 60), sec = Math.floor(s % 60), f = Math.floor((s % 1) * FPS); return [m, sec, f].map(n => String(n).padStart(2, '0')).join(':'); };
 function val(e, k, tl = t - e.start) { // keyframe interpolation (linear, clamped)
   const kf = e.keyframes?.[k]; if (!kf?.length) return e[k] ?? (k === 'scale' || k === 'alpha' || k === 'volume' ? 1 : 0);
@@ -431,7 +522,7 @@ function visible(e) { // a transition lets the next clip fade in over the last h
 
 // ---------- player ----------
 let sw = 0, sh = 0;
-function fitStage() { const r = $('#stageWrap').getBoundingClientRect(), ar = S.width / S.height; sh = Math.max(50, Math.min(r.height - 20, (r.width - 20) / ar) * zoomF); sw = sh * ar; Object.assign($('#stage').style, {width: sw + 'px', height: sh + 'px'}); $('#ratio').textContent = `${S.width}×${S.height}`; renderRatio(); }
+function fitStage() { const r = $('#stageWrap').getBoundingClientRect(), ar = S.width / S.height; sh = Math.max(50, Math.min(r.height - 20, (r.width - 20) / ar) * zoomF); sw = sh * ar; Object.assign($('#stage').style, {width: sw + 'px', height: sh + 'px'}); $('#meter').style.setProperty('--mh', Math.max(40, r.height - 20) + 'px'); $('#ratio').textContent = `${S.width}×${S.height}`; renderRatio(); }
 const RATIOS = [['9:16', 1080, 1920], ['16:9', 1920, 1080], ['1:1', 1080, 1080], ['4:5', 1080, 1350]];
 function renderRatio() {
   const cur = RATIOS.find(([, w, h]) => w * S.height === h * S.width), sel = $('#ratioSel');
@@ -448,27 +539,81 @@ $('#fs').onclick = async () => {
 document.addEventListener('fullscreenchange', () => { const on = !!document.fullscreenElement; $('#fs').innerHTML = icon(on ? 'fsExit' : 'fullscreen'); $('#fs').title = on ? 'Keluar layar penuh' : 'Layar penuh'; render(); });
 const toPx = (x, y) => [(x + 1) / 2 * sw, (1 - y) / 2 * sh], fromPx = (px, py) => [px / sw * 2 - 1, 1 - py / sh * 2];
 const zOrder = e => { const order = ['audio', 'effect', 'filter', 'video', 'sticker', 'text'], k = trackOf(e); return order.indexOf(kindOf(e.type)) * 1000 + S.tracks.indexOf(k) * 10 + e.start / 1000; };
+const TRANS_BY = Object.fromEntries(RAKIT.TRANS.map(x => [x.key, x]));
+function trxState(e) { // role of a visual clip inside a transition window at time t
+  if (!['video', 'photo'].includes(e.type)) return null;
+  if (e.transition && S.elements.some(o => o.track === e.track && o.id !== e.id && Math.abs(o.start - end(e)) < .05)) { const d = e.transition.duration || .5;
+    if (t > end(e) - d / 2) return {p: Math.min(1, (t - (end(e) - d / 2)) / d), role: 'out', key: e.transition.key}; }
+  const pv = prevClip(e); if (pv?.transition) { const d = pv.transition.duration || .5; if (t < e.start + d / 2) return {p: Math.max(0, (t - (e.start - d / 2)) / d), role: 'in', key: pv.transition.key}; }
+  return null;
+}
+const trxLook = st => TRANS_BY[st.key] ? TRANS_BY[st.key].fn(st.p, st.role) : (st.role === 'in' ? {a: st.p} : {}); // library transitions: crossfade preview
+const lookCss = key => ORIG_BY[key]?.css || '';
+function drawFrame(m, maxW) { // returns a canvas with the current frame of an <img>/<video>, or null
+  const w = m.videoWidth || m.naturalWidth, h = m.videoHeight || m.naturalHeight; if (!w || !h) return null;
+  const f = Math.min(1, maxW / Math.max(w, h)), k = document.createElement('canvas'); k.width = Math.round(w * f); k.height = Math.round(h * f); k.getContext('2d').drawImage(m, 0, 0, k.width, k.height); return k;
+}
 function renderStage() {
-  const st = $('#stage'); st.innerHTML = ''; let fxRow = 0;
-  for (const e of [...S.elements].sort((a, b) => zOrder(a) - zOrder(b))) {
+  const st = $('#stage'); st.innerHTML = ''; st.style.background = S.bg?.color || '#000';
+  const sc = document.createElement('div'); sc.id = 'scene'; st.appendChild(sc);
+  let fxRow = 0, flash = 0; const gF = [], gT = [], fx = [], sorted = [...S.elements].sort((a, b) => zOrder(a) - zOrder(b));
+  for (const e of sorted) {
+    if (!['effect', 'filter'].includes(e.type) || trackOf(e)?.hidden || !visible(e)) continue;
+    const o = ORIG_BY[e.lib];
+    if (e.type === 'filter' && (o || e.adj)) { const c = [o?.css, RAKIT.adjCss(e.adj)].filter(Boolean).join(' '); if (c) gF.push(c); const ti = RAKIT.tintCss(e.adj); if (ti) gT.push(ti); }
+    else if (e.type === 'effect' && o?.fn) fx.push(o.fn(t - e.start, e.duration));
+    else st.insertAdjacentHTML('beforeend', `<div class="fxnote" style="top:${8 + fxRow++ * 26}px;z-index:25">${icon(e.type === 'effect' ? 'wand' : 'filter')} ${esc(e.label || e.type)}</div>`);
+  }
+  if (S.bg?.mode === 'blur') { const b = sorted.find(e => ['video', 'photo'].includes(e.type) && visible(e) && !trackOf(e)?.hidden && trackOf(e) === mainTrack());
+    if (b) { const m = mediaNode(b); let k = null; try { k = drawFrame(m, 64); } catch {} if (k) { k.className = 'bgblur'; k.style.width = k.style.height = '112%'; sc.appendChild(k); } } }
+  for (const e of sorted) {
     if (e.type === 'audio') { syncAudio(e); continue; }
-    if (trackOf(e)?.hidden) { media[e.id]?.pause?.(); continue; }
-    if (!visible(e)) { media[e.id]?.pause?.(); continue; }
-    if (e.type === 'effect' || e.type === 'filter') { st.insertAdjacentHTML('beforeend', `<div class="fxnote" style="top:${8 + fxRow++ * 26}px">${icon(e.type === 'effect' ? 'wand' : 'filter')} ${esc(e.label || e.type)}</div>`); continue; }
+    if (e.type === 'effect' || e.type === 'filter') continue;
+    if (trackOf(e)?.hidden || !visible(e)) { media[e.id]?.pause?.(); continue; }
+    const tl = t - e.start, A = RAKIT.animState(e, Math.max(0, Math.min(e.duration, tl))), tr = trxState(e), X = tr ? trxLook(tr) : {};
+    if (X.flash) flash = Math.max(flash, X.flash);
     const d = document.createElement('div'); d.className = `el ${e.type}${sel === e.id ? ' sel' : ''}`; d.dataset.id = e.id;
-    const scale = val(e, 'scale'); let alpha = val(e, 'alpha');
-    const tw = trxWindow(e); if (tw && t < e.start + tw / 2) alpha *= Math.max(0, Math.min(1, (t - (e.start - tw / 2)) / tw));
-    if (e.type === 'text') { d.textContent = e.text; d.style.textAlign = e.text_align || 'center'; d.style.color = e.color || '#fff'; d.style.fontSize = (e.font_size || 8) * sh / 300 * scale + 'px'; }
-    else if (e.type === 'sticker') { const s = 120 * scale * sh / 600; d.style.width = d.style.height = s + 'px';
+    const scale = val(e, 'scale'), alpha = val(e, 'alpha') * A.a * (X.a ?? 1), filt = [];
+    if (e.type === 'text') {
+      const fs = (e.font_size || 8) * sh / 300 * scale; let txt = e.countdown ? String(Math.max(1, Math.ceil(e.duration - Math.max(0, tl) - 1e-6))) : e.text, rest = '';
+      if (A.chars < 1) { const n = Math.floor(txt.length * A.chars); rest = txt.slice(n); txt = txt.slice(0, n); }
+      d.style.textAlign = e.text_align || 'center'; d.style.color = e.color || '#fff'; d.style.fontSize = fs + 'px';
+      d.innerHTML = `<span class="tx" style="${RAKIT.textCss(e.tstyle, fs)}">${esc(txt)}${rest ? `<span style="opacity:0">${esc(rest)}</span>` : ''}</span>`;
+    } else if (e.type === 'sticker') { const s = 120 * scale * sh / 600; d.style.width = d.style.height = s + 'px';
       d.innerHTML = e.preview ? `<img src="${esc(mediaUrl(e.preview))}" alt="">` : `<div class="ph">${icon('star')}<br>${esc(e.label || 'Stiker')}</div>`; }
-    else { d.style.width = sw * scale + 'px'; d.style.height = sh * scale + 'px'; d.appendChild(mediaNode(e)); }
-    st.appendChild(d);
-    const r = d.getBoundingClientRect(), [cx, cy] = toPx(val(e, 'x'), val(e, 'y'));
-    d.style.left = cx - r.width / 2 + 'px'; d.style.top = cy - r.height / 2 + 'px'; d.style.transform = `rotate(${val(e, 'rotation')}deg)`; d.style.opacity = alpha;
+    else { d.style.width = sw * scale + 'px'; d.style.height = sh * scale + 'px'; d.appendChild(mediaNode(e));
+      filt.push(lookCss(e.look), RAKIT.adjCss(e.adj), ...gF);
+      for (const ti of [RAKIT.tintCss(e.adj), ...gT]) if (ti) d.insertAdjacentHTML('beforeend', `<div class="tint" style="background:${ti}"></div>`); }
+    sc.appendChild(d);
+    const [cx, cy] = toPx(val(e, 'x'), val(e, 'y')), dx = (A.dx + (X.dx || 0)) * sw, dy = (A.dy + (X.dy || 0)) * sh, bl = (A.blur + (X.blur || 0)) * sh / 600;
+    d.style.left = cx - d.offsetWidth / 2 + 'px'; d.style.top = cy - d.offsetHeight / 2 + 'px';
+    d.style.transform = `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px) rotate(${val(e, 'rotation') + A.r + (X.r || 0)}deg) scale(${(A.s * (X.s ?? 1)).toFixed(4)})`;
+    if (bl > .05) filt.push(`blur(${bl.toFixed(2)}px)`); const f = filt.filter(Boolean).join(' '); if (f) d.style.filter = f;
+    const clip = Math.min(A.clip, X.wipe ?? 1); if (clip < 1) d.style.clipPath = `inset(0 ${((1 - clip) * 100).toFixed(2)}% 0 0)`;
+    d.style.opacity = Math.max(0, Math.min(1, alpha));
     if (sel === e.id && !playing) d.insertAdjacentHTML('beforeend', '<div class="h scale" data-h="scale"></div><div class="h rot" data-h="rot"></div>');
     d.onpointerdown = ev => stageDrag(ev, e, d);
   }
+  if (fx.length) { sc.style.transform = fx.map(f => f.transform).filter(Boolean).join(' '); sc.style.filter = fx.map(f => f.filter).filter(Boolean).join(' '); st.insertAdjacentHTML('beforeend', fx.map(f => f.overlay || '').join('')); }
+  if (flash > 0) st.insertAdjacentHTML('beforeend', `<div class="fxo" style="background:#fff;opacity:${flash.toFixed(3)}"></div>`);
   if (safeOn) st.insertAdjacentHTML('beforeend', '<div class="safe" title="Area aman"><i class="a"></i><i class="b"></i><i class="c"></i><i class="d"></i></div>');
+}
+// ---------- audio output: analyser for level meters ----------
+let actx = null, an = null; const mbuf = new Float32Array(512);
+function audioCtx() {
+  if (actx) return actx;
+  try { actx = new (window.AudioContext || window.webkitAudioContext)(); const bus = actx.createGain(); bus.channelCountMode = 'explicit'; bus.channelCount = 2; bus.connect(actx.destination);
+    const sp = actx.createChannelSplitter(2); bus.connect(sp); an = [0, 1].map(i => { const a = actx.createAnalyser(); a.fftSize = 512; sp.connect(a, i); return a; }); actx.bus = bus; } catch { actx = null; }
+  return actx;
+}
+function tap(m) { // only same-origin/data/blob media: tapping cross-origin media would silence it
+  if (!actx || m._tap) return; m._tap = 1;
+  try { const u = new URL(m.currentSrc || m.src, location.href); if (!/^(data|blob):/.test(u.protocol) && u.origin !== location.origin) return; actx.createMediaElementSource(m).connect(actx.bus); } catch {}
+}
+function meter() {
+  const bars = $$('#meter b'); if (!bars.length) return;
+  bars.forEach((b, i) => { let v = 0; if (an && playing) { an[i].getFloatTimeDomainData(mbuf); let s = 0; for (const x of mbuf) s += x * x; v = Math.min(1, Math.sqrt(s / mbuf.length) * 3.2); }
+    const cur = +b.dataset.v || 0, nv = playing ? (v > cur ? v : cur * .9) : 0; b.dataset.v = nv; b.style.height = (nv * 100).toFixed(1) + '%'; });
 }
 function mediaNode(e) {
   let m = media[e.id];
@@ -477,18 +622,19 @@ function mediaNode(e) {
     m.src = mediaUrl(e.src); m.dataset.src = e.src; media[e.id] = m;
   }
   if (e.type === 'video') {
-    const want = Math.max(0, e.source_start + (t - e.start) * e.speed); m.playbackRate = Math.max(.0625, Math.min(16, e.speed)); m.volume = Math.min(1, fadeVol(e)); m.muted = !!trackOf(e)?.muted;
-    if (Math.abs(m.currentTime - want) > .3) m.currentTime = want;
-    if (playing && m.paused && t >= e.start) m.play().catch(() => {}); if (!playing && !m.paused) m.pause();
+    const want = Math.max(0, e.source_start + (t - e.start) * e.speed), fwd = playing && rate > 0; m.playbackRate = Math.max(.0625, Math.min(16, e.speed * Math.abs(rate))); m.volume = Math.min(1, fadeVol(e)); m.muted = !!trackOf(e)?.muted;
+    if (Math.abs(m.currentTime - want) > (fwd ? .3 : .06)) m.currentTime = want;
+    if (fwd && m.paused && t >= e.start) { tap(m); m.play().catch(() => {}); } if (!fwd && !m.paused) m.pause();
   }
   return m;
 }
 function fadeVol(e) { const tl = t - e.start; let v = val(e, 'volume'); if (e.fade_in > 0 && tl < e.fade_in) v *= tl / e.fade_in; if (e.fade_out > 0 && end(e) - t < e.fade_out) v *= (end(e) - t) / e.fade_out; return Math.max(0, v); }
 function syncAudio(e) {
-  let a = media[e.id]; if (!a || a.dataset.src !== e.src) { a = media[e.id] = new Audio(mediaUrl(e.src)); a.dataset.src = e.src; }
-  if (!playing || t < e.start || t >= end(e) || trackOf(e)?.muted) { a.pause(); return; }
+  if (!genReady(e.src)) return ensureGen(e.src);
+  let a = media[e.id]; if (!a || a.dataset.src !== e.src) { a?.pause?.(); a = media[e.id] = new Audio(mediaUrl(e.src)); a.dataset.src = e.src; }
+  if (!playing || rate < 0 || t < e.start || t >= end(e) || trackOf(e)?.muted) { a.pause(); return; }
   const want = e.source_start + (t - e.start) * e.speed; if (Math.abs(a.currentTime - want) > .3) a.currentTime = want;
-  a.playbackRate = Math.max(.0625, Math.min(16, e.speed)); a.volume = Math.min(1, fadeVol(e)); if (a.paused) a.play().catch(() => {});
+  a.playbackRate = Math.max(.0625, Math.min(16, e.speed * rate)); a.volume = Math.min(1, fadeVol(e)); if (a.paused) { tap(a); a.play().catch(() => {}); }
 }
 function stageDrag(ev, e, node) {
   ev.preventDefault(); ev.stopPropagation(); if (playing) togglePlay();
@@ -507,16 +653,27 @@ function stageDrag(ev, e, node) {
   const up = () => { removeEventListener('pointermove', move); removeEventListener('pointerup', up); dragging = false; commit(); };
   addEventListener('pointermove', move); addEventListener('pointerup', up);
 }
-$('#stage').onpointerdown = ev => { if (ev.target.id === 'stage') { sel = null; selTrx = null; render(); } };
+$('#stage').onpointerdown = ev => { if (['stage', 'scene'].includes(ev.target.id) || ev.target.classList.contains('bgblur')) { sel = null; selTrx = null; render(); } };
 
 // ---------- playback ----------
 let last;
-function togglePlay() { playing = !playing; $('#play').innerHTML = icon(playing ? 'pause' : 'play'); last = performance.now(); if (playing) { if (t >= total() - .01) t = 0; requestAnimationFrame(tick); } else { renderStage(); renderInsp(); } }
-$('#play').onclick = togglePlay;
+function togglePlay(r = 1) {
+  playing = !playing; $('#play').innerHTML = icon(playing ? 'pause' : 'play'); last = performance.now();
+  if (playing) { rate = r; if (audioCtx()?.state === 'suspended') actx.resume().catch(() => {}); if (rate > 0 && t >= total() - .01) t = 0; requestAnimationFrame(tick); }
+  else { rate = 1; renderStage(); renderInsp(); meter(); }
+  shuttleLbl();
+}
+const shuttleLbl = () => { $('#shuttle').textContent = playing && rate !== 1 ? (rate < 0 ? '◀ ' : '▶ ') + Math.abs(rate) + '×' : ''; };
+function shuttle(dir) { // J/K/L: L forward (press again = faster), J backward, K stop
+  if (!dir) { if (playing) togglePlay(); return; }
+  if (!playing) return togglePlay(dir);
+  rate = Math.sign(rate) === dir ? Math.max(-8, Math.min(8, rate * 2)) : dir; last = performance.now(); shuttleLbl();
+}
+$('#play').onclick = () => togglePlay();
 function tick(now) {
-  if (!playing) return; t += (now - last) / 1000; last = now;
-  if (t >= total()) { t = total(); togglePlay(); }
-  renderStage(); renderPlayhead(); if (playing) requestAnimationFrame(tick);
+  if (!playing) return; t += (now - last) / 1000 * rate; last = now;
+  if (t >= total()) { t = total(); togglePlay(); } else if (t <= 0 && rate < 0) { t = 0; togglePlay(); }
+  renderStage(); renderPlayhead(); meter(); if (playing) requestAnimationFrame(tick);
 }
 function seek(v) { t = Math.max(0, Math.min(total(), v)); renderStage(); renderPlayhead(); renderInsp(); renderTimeline(); }
 
@@ -525,13 +682,16 @@ function fitTl() { const w = (document.body.clientWidth || 1200) - HW - 60; pxs 
 function renderTlbar() {
   const ib = (id, ic, tip, on, dis) => `<button class="btn ghost icon${on ? ' on' : ''}" id="${id}" title="${tip}" aria-label="${tip}"${on !== undefined ? ` aria-pressed="${!!on}"` : ''}${dis ? ' disabled' : ''}>${icon(ic)}</button>`;
   $('#tlbar').innerHTML = `<span class="grp">${ib('bUndo', 'undo', 'Urungkan (Ctrl+Z)')}${ib('bRedo', 'redo', 'Ulangi (Ctrl+Y)')}<span class="sep"></span>
-    ${ib('bSel', 'select', 'Pilih', true)}${ib('bSplit', 'scissors', 'Potong di playhead (S / Ctrl+B)')}${ib('bDel', 'trash', 'Hapus (Delete)')}${ib('bDup', 'copy', 'Duplikat (Ctrl+D)')}${ib('bKf', 'diamond', 'Tambah/hapus keyframe di playhead (K)')}${ib('bFreeze', 'freeze', 'Bekukan frame (segera)', undefined, true)}</span>
-    <span class="grow"></span><span class="grp">${ib('bSnap', 'magnet', 'Track utama: magnet & snap ke playhead/tepi klip', snapOn)}${ib('bLink', 'link', 'Tautkan klip (segera)', linkOn, true)}${ib('bAxis', 'axis', 'Sumbu pratinjau: arahkan kursor di timeline untuk melihat frame', axisOn)}<span class="sep"></span>
+    ${ib('bSel', 'select', 'Pilih', true)}${ib('bSplit', 'scissors', 'Potong di playhead (S / Ctrl+B)')}${ib('bDel', 'trash', 'Hapus (Delete)')}${ib('bDup', 'copy', 'Duplikat (Ctrl+D)')}${ib('bKf', 'diamond', 'Tambah/hapus keyframe di playhead (Alt+K)')}${ib('bFreeze', 'freeze', 'Bekukan frame: ambil frame di playhead jadi foto 3 detik')}</span>
+    <span class="grow"></span><span class="grp">${ib('bSnap', 'magnet', 'Snap ke playhead/tepi klip', snapOn)}${ib('bBeat', 'music', 'Snap ke ketukan musik', beatSnap)}${ib('bRipple', 'ripple', 'Hapus ripple: celah ditutup otomatis (Shift+Delete)', rippleOn)}${ib('bLink', 'link', 'Tautkan klip (segera)', linkOn, true)}${ib('bAxis', 'axis', 'Sumbu pratinjau: arahkan kursor di timeline untuk melihat frame', axisOn)}<span class="sep"></span>
     ${ib('bZo', 'zoomOut', 'Perkecil timeline')}<input type="range" id="tlZoom" min="8" max="240" value="${Math.round(pxs)}" style="width:100px" aria-label="Zoom timeline" title="Zoom timeline (Ctrl + gulir)">${ib('bZi', 'zoomIn', 'Perbesar timeline')}${ib('bFit', 'resize', 'Pas ke layar')}</span>`;
   $('#bUndo').onclick = undo; $('#bRedo').onclick = redo; $('#bUndo').disabled = !undoS.length; $('#bRedo').disabled = !redoS.length;
   $('#bSel').onclick = () => Studio.toast('Mode pilih: klik klip untuk memilih, seret untuk memindah, tarik ujungnya untuk memangkas.');
-  $('#bSplit').onclick = split; $('#bDel').onclick = del; $('#bDup').onclick = dup; $('#bKf').onclick = toggleKf;
+  $('#bSplit').onclick = split; $('#bDel').onclick = () => del(); $('#bDup').onclick = dup; $('#bKf').onclick = toggleKf;
   $('#bSnap').onclick = () => { snapOn = !snapOn; renderTlbar(); };
+  $('#bBeat').onclick = () => { beatSnap = !beatSnap; renderTlbar(); Studio.toast(beatSnap ? 'Snap ke ketukan aktif' : 'Snap ke ketukan mati'); };
+  $('#bRipple').onclick = () => { rippleOn = !rippleOn; renderTlbar(); Studio.toast(rippleOn ? 'Hapus ripple aktif: klip setelahnya ikut bergeser' : 'Hapus ripple mati'); };
+  $('#bFreeze').onclick = freeze;
   $('#bAxis').onclick = () => { axisOn = !axisOn; renderTlbar(); if (!axisOn) { $$('.axis').forEach(x => x.remove()); renderStage(); } };
   $('#tlZoom').oninput = e => { pxs = +e.target.value; renderTimeline(); };
   $('#bZo').onclick = () => { pxs = Math.max(8, pxs / 1.3); renderTlbar(); renderTimeline(); }; $('#bZi').onclick = () => { pxs = Math.min(240, pxs * 1.3); renderTlbar(); renderTimeline(); };
@@ -561,7 +721,7 @@ function loadThumbs(src) {
 }
 const PEAK_RATE = 100; // peak buckets per second of source audio
 async function loadPeaks(src) {
-  if (peaks[src]) return; peaks[src] = 'pending';
+  if (peaks[src]) return; if (!genReady(src)) return ensureGen(src); peaks[src] = 'pending';
   try {
     const r = await fetch(mediaUrl(src)); if (!r.ok) throw new Error(r.status);
     if (+r.headers.get('content-length') > 300e6) throw new Error('too large');
@@ -613,9 +773,12 @@ function renderTimeline() {
       if (e.type === 'photo') s.style.backgroundImage = `url("${mediaUrl(e.src)}")`;
       if (e.type === 'video' && e.src) { s.dataset.src = e.src; loadThumbs(e.src); if (typeof thumbs[e.src] === 'string' && thumbs[e.src].startsWith('data:')) s.style.backgroundImage = `url("${thumbs[e.src]}")`; }
       if ((e.type === 'audio' || e.type === 'video') && e.src) loadPeaks(e.src);
-      s.innerHTML = `<span class="lb">${e.speed !== 1 ? `${e.speed}× · ` : ''}${esc(segLabel(e))}<i>${e.duration.toFixed(1)}s</i></span>${e.type === 'audio' && !(peaks[e.src] instanceof Float32Array) ? '<div class="wave"></div>' : ''}
+      s.innerHTML = `<span class="lb">${e.speed !== 1 ? `${e.speed}× · ` : ''}${esc(segLabel(e))}<i>${e.duration.toFixed(1)}s</i>${e.look ? `<i>· ${esc(ORIG_BY[e.look]?.name || '')}</i>` : ''}</span>${e.type === 'audio' && !(peaks[e.src] instanceof Float32Array) ? '<div class="wave"></div>' : ''}
         ${e.fade_in ? `<div class="fade" style="left:0;width:${e.fade_in * pxs}px;clip-path:polygon(0 0,100% 0,0 100%)"></div>` : ''}${e.fade_out ? `<div class="fade" style="right:0;width:${e.fade_out * pxs}px;clip-path:polygon(0 0,100% 0,100% 100%)"></div>` : ''}
         <div class="edge l"></div><div class="edge r"></div>`;
+      for (const b of e.beats || []) { const x = (b - e.source_start) / e.speed; if (x >= 0 && x <= e.duration) s.insertAdjacentHTML('beforeend', `<span class="beat" style="left:${x * pxs}px"></span>`); }
+      if (e.anim?.in?.d) s.insertAdjacentHTML('beforeend', `<span class="anb" style="left:0;width:${Math.min(e.duration, e.anim.in.d) * pxs}px"></span>`);
+      if (e.anim?.out?.d) s.insertAdjacentHTML('beforeend', `<span class="anb o" style="right:0;width:${Math.min(e.duration, e.anim.out.d) * pxs}px"></span>`);
       const kts = new Set(Object.values(e.keyframes || {}).flat().map(p => +p.t.toFixed(2)));
       for (const kt of kts) s.insertAdjacentHTML('beforeend', `<span class="kfd" style="left:${kt * pxs}px"></span>`);
       if (e.type === 'audio' || e.type === 'video') drawWave(s, e);
@@ -638,17 +801,19 @@ function segLabel(e) {
   if (!e.src || /^(data|blob):/.test(e.src)) return {video: 'Video', photo: 'Foto', audio: 'Audio'}[e.type] || e.type;
   return e.src.split(/[\\/]/).pop();
 }
-function renderPlayhead() { $('#playhead').style.left = HW + t * pxs + 'px'; $('#tcNow').textContent = tc(t); $('#tcEnd').textContent = tc(total());
-  const sc = $('#tlScroll'), x = HW + t * pxs; if (playing && (x > sc.scrollLeft + sc.clientWidth - 40 || x < sc.scrollLeft + HW)) sc.scrollLeft = x - HW - 40; }
+function renderPlayhead() { const x = HW + t * pxs; $('#playhead').style.transform = `translateX(${x.toFixed(1)}px)`; $('#tcNow').textContent = tc(t); $('#tcEnd').textContent = tc(total());
+  const sc = $('#tlScroll'); if (!playing) return; // follow smoothly while playing
+  if (x > sc.scrollLeft + sc.clientWidth * .7) sc.scrollLeft = x - sc.clientWidth * .7; else if (x < sc.scrollLeft + HW) sc.scrollLeft = Math.max(0, x - HW - 40); }
 $('#playhead').insertAdjacentHTML('beforeend', '<div class="ph-head" title="Seret playhead"></div>');
 $('#playhead .ph-head').onpointerdown = ev => { ev.preventDefault(); ev.stopPropagation(); if (playing) togglePlay(); const ph = $('#playhead'); ph.classList.add('drag');
   const go = m => seek((m.clientX - $('#tlInner').getBoundingClientRect().left - HW) / pxs);
   const up = () => { ph.classList.remove('drag'); removeEventListener('pointermove', go); removeEventListener('pointerup', up); }; addEventListener('pointermove', go); addEventListener('pointerup', up); };
-$('#ruler').onpointerdown = ev => { const r = $('#ruler').getBoundingClientRect(); const go = m => seek((m.clientX - r.left) / pxs); go(ev);
-  const up = () => { removeEventListener('pointermove', go); removeEventListener('pointerup', up); }; addEventListener('pointermove', go); addEventListener('pointerup', up); };
-function snapPoints(exclude) { const pts = [0, t]; for (const e of S.elements) if (e.id !== exclude) pts.push(e.start, end(e)); return pts; }
+$('#ruler').onpointerdown = ev => { if (playing) togglePlay(); const r = $('#ruler').getBoundingClientRect(), ph = $('#playhead'); ph.classList.add('drag');
+  const go = m => { t = Math.max(0, Math.min(total(), (m.clientX - r.left) / pxs)); renderStage(); renderPlayhead(); }; go(ev); // live scrub preview
+  const up = () => { ph.classList.remove('drag'); removeEventListener('pointermove', go); removeEventListener('pointerup', up); seek(t); }; addEventListener('pointermove', go); addEventListener('pointerup', up); };
+function snapPoints(exclude) { const pts = [0, t]; for (const e of S.elements) if (e.id !== exclude) { pts.push(e.start, end(e)); if (beatSnap) for (const b of e.beats || []) { const x = (b - e.source_start) / e.speed; if (x >= 0 && x <= e.duration) pts.push(e.start + x); } } return pts; }
 function snapTo(v, pts) { if (!snapOn) return [v, null]; const T = 8 / pxs; let best = null; for (const p of pts) if (Math.abs(p - v) < T && (best === null || Math.abs(p - v) < Math.abs(best - v))) best = p; return best === null ? [v, null] : [best, best]; }
-function showSnap(at) { $$('.snapline').forEach(x => x.remove()); if (at !== null) $('#tlInner').insertAdjacentHTML('beforeend', `<div class="snapline" style="left:${HW + at * pxs}px"></div>`); }
+function showSnap(at) { $$('.snapline').forEach(x => x.remove()); if (at !== null) $('#tlInner').insertAdjacentHTML('beforeend', `<div class="snapline" style="left:${HW + at * pxs}px"><b>${tc(at)}</b></div>`); }
 function segDrag(ev, e) {
   ev.preventDefault(); ev.stopPropagation(); if (playing) togglePlay();
   if (sel !== e.id || selTrx) { sel = e.id; selTrx = null; render(); }
@@ -678,8 +843,11 @@ function resolveOverlap(e) { // like CapCut: a clip dropped onto an occupied spo
 }
 function newElement(data, at) {
   const base = {id: uid(), start: +at.toFixed(3), x: 0, y: 0, scale: 1, rotation: 0, alpha: 1, volume: 1, speed: 1, source_start: 0, fade_in: 0, fade_out: 0, keyframes: {}};
-  if (data.new === 'text') return {...base, type: 'text', text: data.text || 'Teks baru', duration: 3, color: data.color || '#FFFFFF', font_size: data.font_size || 8, y: data.y ?? 0};
-  if (data.lib) return {...base, type: data.kind === 'adjust' ? 'filter' : data.kind, label: data.name, lib: data.lib, vip: data.vip, preview: data.preview || '', duration: 3, scale: data.kind === 'sticker' ? .8 : 1};
+  if (data.new === 'text') { const x = {...base, type: 'text', text: data.text || 'Teks baru', duration: data.duration || 3, color: data.color || '#FFFFFF', font_size: data.font_size || 8, y: data.y ?? 0, x: data.x ?? 0};
+    if (data.tstyle) x.tstyle = data.tstyle; if (data.anim) x.anim = JSON.parse(JSON.stringify(data.anim)); if (data.countdown) x.countdown = true; if (data.text_align) x.text_align = data.text_align; return x; }
+  if (data.gen) return {...base, type: 'audio', src: 'gen:' + data.gen, lib: 'demo:' + data.gen, name: data.name, duration: data.dur || 5};
+  if (data.lib) { const x = {...base, type: data.kind === 'adjust' ? 'filter' : data.kind, label: data.name, lib: data.lib, vip: data.vip, preview: data.preview || '', duration: 3, scale: data.kind === 'sticker' ? .8 : 1};
+    if (data.kind === 'adjust') x.adj = {...(ORIG_BY[data.lib]?.adj || {})}; if (data.kind === 'sticker' && ORIG_BY[data.lib]?.anim) x.anim = JSON.parse(JSON.stringify(ORIG_BY[data.lib].anim)); return x; }
   return {...base, type: data.type, src: data.path, name: data.name, duration: data.type === 'photo' ? 3 : data.dur || 5};
 }
 function placeNew(e, k) {
@@ -691,7 +859,7 @@ function dropOnLane(ev, k) {
   ev.preventDefault(); let data; try { data = JSON.parse(ev.dataTransfer.getData('text/plain') || '{}'); } catch { return; }
   const r = ev.currentTarget.getBoundingClientRect(), at = Math.max(0, (ev.clientX - r.left) / pxs);
   if (data.kind === 'transition') { const target = S.elements.find(o => o.track === k?.id && at >= o.start && at <= end(o)); return target ? setTransition(target, data) : Studio.toast('Lepas transisi di atas sebuah klip.'); }
-  if (!data.new && !data.path && !data.lib) return;
+  if (!data.new && !data.path && !data.lib && !data.gen) return;
   snap(); placeNew(newElement(data, snapTo(at, snapPoints())[0]), k); commit();
 }
 function addAtPlayhead(data) { if (data.kind === 'transition') { const e = byId(sel); return e && ['video', 'photo'].includes(e.type) ? setTransition(e, data) : Studio.toast('Pilih klip video atau foto dulu, lalu klik transisi.'); }
@@ -701,13 +869,47 @@ function split() {
   let e = byId(sel); if (!e || t <= e.start + .05 || t >= end(e) - .05) e = S.elements.filter(o => kindOf(o.type) === 'video' && t > o.start + .05 && t < end(o) - .05).sort((a, b) => zOrder(b) - zOrder(a))[0];
   if (!e) return Studio.toast('Letakkan playhead di tengah klip yang ingin dipotong.');
   if (isLocked(e)) return lockToast();
-  snap(); const cut = +(t - e.start).toFixed(3), b = JSON.parse(JSON.stringify(e));
-  b.id = uid(); b.clone_of = e.clone_of || e.id; b.start = +t.toFixed(3); b.duration = +(e.duration - cut).toFixed(3); b.source_start = +(e.source_start + cut * e.speed).toFixed(3);
-  b.fade_in = 0; e.fade_out = 0; e.duration = cut; delete e.transition;
-  for (const [k, kf] of Object.entries(e.keyframes || {})) { e.keyframes[k] = kf.filter(p => p.t <= cut); b.keyframes[k] = kf.filter(p => p.t >= cut).map(p => ({t: +(p.t - cut).toFixed(3), v: p.v})); }
-  S.elements.push(b); sel = b.id; commit();
+  snap(); sel = splitEl(e).id; commit();
 }
-function del() { if (isLocked(byId(sel))) return lockToast(); if (selTrx) { const e = byId(selTrx); snap(); delete e.transition; selTrx = null; return commit(); } if (!sel) return; snap(); S.elements = S.elements.filter(e => e.id !== sel); sel = null; commit(); }
+function splitEl(e) { // cuts e at the playhead, returns the new right part
+  const cut = +(t - e.start).toFixed(3), b = JSON.parse(JSON.stringify(e));
+  b.id = uid(); b.clone_of = e.clone_of || e.id; b.start = +t.toFixed(3); b.duration = +(e.duration - cut).toFixed(3); b.source_start = +(e.source_start + cut * e.speed).toFixed(3);
+  b.fade_in = 0; e.fade_out = 0; e.duration = cut; delete e.transition; if (b.anim) delete b.anim.in; if (e.anim) delete e.anim.out;
+  for (const [k, kf] of Object.entries(e.keyframes || {})) { e.keyframes[k] = kf.filter(p => p.t <= cut); b.keyframes[k] = kf.filter(p => p.t >= cut).map(p => ({t: +(p.t - cut).toFixed(3), v: p.v})); }
+  S.elements.push(b); return b;
+}
+function freeze() { // CapCut-style freeze frame: the frame at the playhead becomes a 3 s photo, later clips move right
+  const cur = byId(sel), vis = o => ['video', 'photo'].includes(o.type) && t >= o.start && t < end(o) && !trackOf(o)?.hidden;
+  const e = cur && vis(cur) ? cur : S.elements.filter(vis).sort((a, b) => zOrder(b) - zOrder(a))[0];
+  if (!e) return Studio.toast('Letakkan playhead di atas klip video atau foto.'); if (isLocked(e)) return lockToast();
+  let url = null; try { const k = drawFrame(mediaNode(e), 720); url = k && k.toDataURL('image/jpeg', .85); } catch {}
+  if (!url) return Studio.toast('Frame belum siap atau sumbernya tidak bisa diambil browser. Coba lagi sebentar.');
+  const D = 3, at = +t.toFixed(3); snap();
+  if (t > e.start + .05 && t < end(e) - .05) splitEl(e);
+  for (const o of S.elements) if (o.track === e.track && o.id !== e.id && o.start >= at - .01) o.start = +(o.start + D).toFixed(3);
+  const fz = {id: uid(), track: e.track, type: 'photo', src: url, name: 'Bekukan frame', lib: 'demo:freeze', start: at, duration: D, x: val(e, 'x'), y: val(e, 'y'), scale: val(e, 'scale'), rotation: val(e, 'rotation'), alpha: 1, volume: 1, speed: 1, source_start: 0, fade_in: 0, fade_out: 0, keyframes: {}};
+  if (e.look) fz.look = e.look; if (e.adj) fz.adj = {...e.adj};
+  S.elements.push(fz); sel = fz.id; selTrx = null; commit(); Studio.toast('Frame dibekukan 3 detik (pratinjau saja, tidak ikut di-deploy).');
+}
+function captionsFromScript(text) { // one caption per line, spread evenly over the selected clip (or the whole video)
+  const lines = text.split(/\n+/).map(x => x.trim()).filter(Boolean); if (!lines.length) return Studio.toast('Tulis naskah dulu, satu kalimat per baris.');
+  const e = byId(sel), a = e && e.type !== 'text' ? e.start : 0, b = e && e.type !== 'text' ? end(e) : total(), per = (b - a) / lines.length;
+  snap(); const k = {id: uid(), type: 'text'}; S.tracks.push(k);
+  lines.forEach((l, i) => { const x = newElement({new: 'text', text: l, font_size: 6.5, y: -.62, tstyle: RAKIT.TS.sub, anim: {in: {id: 'fade', d: Math.min(.2, per / 4)}, out: {id: 'fade', d: Math.min(.2, per / 4)}}}, a + i * per);
+    x.duration = +per.toFixed(3); x.track = k.id; S.elements.push(x); });
+  sel = null; commit(); Studio.toast(`${lines.length} teks dibuat dari naskah${e && e.type !== 'text' ? ' di atas klip terpilih' : ''}.`);
+}
+function detectBeats(e) { // energy-onset peaks of the waveform → beat markers (in source seconds)
+  const P = peaks[e.src]; if (!(P instanceof Float32Array)) { loadPeaks(e.src); return Studio.toast('Gelombang audio sedang dibaca. Coba lagi sebentar.'); }
+  const n = P.length, on = new Float32Array(n); for (let i = 3; i < n; i++) on[i] = Math.max(0, P[i] - P[i - 3]);
+  let m = 0, v = 0; for (const x of on) m += x / n; for (const x of on) v += (x - m) ** 2 / n; const thr = m + 1.2 * Math.sqrt(v), out = [];
+  for (let i = 1; i < n - 1; i++) if (on[i] > thr && on[i] >= on[i - 1] && on[i] >= on[i + 1] && (!out.length || i / PEAK_RATE - out[out.length - 1] > .22)) out.push(+(i / PEAK_RATE).toFixed(3));
+  snap(); e.beats = out; commit(); Studio.toast(out.length ? `${out.length} ketukan ditandai. Klip lain akan snap ke ketukan.` : 'Tidak ada ketukan yang jelas di audio ini.');
+}
+function del(ripple) { if (isLocked(byId(sel))) return lockToast(); if (selTrx) { const e = byId(selTrx); snap(); delete e.transition; selTrx = null; return commit(); } if (!sel) return;
+  const e = byId(sel); snap(); S.elements = S.elements.filter(o => o.id !== sel); sel = null;
+  if (ripple === true || rippleOn) for (const o of S.elements) if (o.track === e.track && o.start >= end(e) - .01) o.start = +Math.max(0, o.start - e.duration).toFixed(3);
+  commit(); }
 function dup() { const e = byId(sel); if (!e) return; if (isLocked(e)) return lockToast(); snap(); const c = JSON.parse(JSON.stringify(e)); c.id = uid(); delete c.clone_of; c.start = end(e); delete c.transition; S.elements.push(c); resolveOverlap(c); sel = c.id; commit(); }
 function toggleKf() {
   const e = byId(sel); if (!e) return Studio.toast('Pilih klip dulu.'); if (isLocked(e)) return lockToast(); const tl = +(t - e.start).toFixed(3);
@@ -719,6 +921,8 @@ function toggleKf() {
 }
 
 // ---------- inspector ----------
+let animSub = 'in';
+const PREV_NOTE = '<p class="note2"><span class="tier prev">Pratinjau saja</span> Item Rakit orisinal: gratis, tampil di pemutar Studio, tidak ikut di-deploy ke CapCut.</p>';
 const PNAMES = {x: 'Posisi X', y: 'Posisi Y', scale: 'Skala', rotation: 'Rotasi', alpha: 'Opacity', volume: 'Volume'};
 function inspTabs(e) {
   if (e.type === 'video') return [['video', 'Video'], ['anim', 'Animasi'], ['speed', 'Kecepatan'], ['audio', 'Audio']];
@@ -736,7 +940,12 @@ function renderInsp(live) {
     I.innerHTML = `<h3>${DEMO ? 'Contoh project' : esc(DRAFT)}</h3><div class="sec"><div class="label">Project</div>
       <div class="prop" style="grid-template-columns:110px 1fr"><span>Kanvas</span><span class="mono">${S.width}×${S.height}</span><span>Durasi</span><span class="mono">${tc(dur)}</span><span>Track</span><span class="mono">${S.tracks.length}</span><span>Elemen</span><span class="mono">${S.elements.length}</span></div></div>
       <div class="sec"><div class="label">Cara pakai</div><p style="margin:0;color:var(--muted)">Seret media dari panel kiri ke timeline, atau klik ＋ pada kartu untuk menaruhnya di playhead. Pilih klip untuk membuka tab Video, Animasi, Kecepatan, dan Audio di sini. Spasi = putar, S = potong, Delete = hapus.</p></div>
+      <div class="sec"><div class="label">Latar kanvas</div><div class="subtabs" id="bgMode">${[['color', 'Warna'], ['blur', 'Kabur']].map(([k, l]) => `<button type="button" data-bg="${k}" class="${(S.bg?.mode || 'color') === k ? 'on' : ''}">${l}</button>`).join('')}</div>
+        <div class="prop" style="grid-template-columns:66px 1fr"><span>Warna</span><input type="color" id="bgColor" value="${S.bg?.color || '#000000'}"></div>
+        <p class="note2">Mengisi area kosong saat klip lebih kecil dari kanvas. Kabur = versi buram klip utama. Pratinjau saja.</p></div>
       ${DEMO ? '<div class="sec"><p style="margin:0;color:var(--muted)">Ini contoh project yang dibuat Studio. Hubungkan komputer untuk mengedit project CapCut asli.</p></div>' : ''}`;
+    I.querySelectorAll('[data-bg]').forEach(b => b.onclick = () => { snap(); S.bg = {...(S.bg || {}), mode: b.dataset.bg}; commit(); });
+    const bc = $('#bgColor'); bc.oninput = () => { snap(); S.bg = {...(S.bg || {}), color: bc.value}; renderStage(); }; bc.onchange = commit;
     return;
   }
   const locked = isLocked(e);
@@ -744,8 +953,10 @@ function renderInsp(live) {
     N.innerHTML = '<span class="ttl">Transisi</span>';
     I.innerHTML = `<div class="sec"><div class="row"><b class="grow">${esc(e.transition.name)}</b>${e.transition.vip ? '<span class="tier pro">PRO</span>' : '<span class="tier free">Gratis</span>'}</div>
       <div class="prop" style="grid-template-columns:74px 1fr 58px"><span>Durasi</span><input type="range" id="trD" min="0.1" max="3" step="0.1" value="${e.transition.duration}"><input type="number" id="trDn" step="0.1" value="${e.transition.duration}"></div>
-      <p style="margin:0;color:var(--muted);font-size:12px">Pratinjau di sini berupa crossfade sederhana. Gerakan asli transisi dirender oleh CapCut setelah deploy.</p>
+      <div class="chipg">${LIB.filter(i => i.kind === 'transition').map(i => `<button type="button" data-trk="${esc(i.key)}" class="${i.key === e.transition.key ? 'on' : ''}">${esc(i.name)}${i.vip ? ' <span class="tier pro">PRO</span>' : ''}</button>`).join('')}</div>
+      ${isPreviewOnly(e.transition.key) ? PREV_NOTE : '<p class="note2">Pratinjau di sini berupa crossfade sederhana. Gerakan asli transisi dirender oleh CapCut setelah deploy.</p>'}
       <button class="btn" id="trDel">${icon('trash')} Hapus transisi</button></div>`;
+    I.querySelectorAll('[data-trk]').forEach(b => b.onclick = () => { if (locked) return lockToast(); const i = LIB.find(x => x.key === b.dataset.trk); snap(); e.transition = {...e.transition, key: i.key, name: i.name, vip: i.vip}; commit(); });
     const setD = v => { if (locked) return lockToast(); snap(); e.transition.duration = Math.max(.1, +v); commit(); };
     $('#trD').onchange = ev => setD(ev.target.value); $('#trDn').onchange = ev => setD(ev.target.value); $('#trDel').onclick = del; return;
   }
@@ -756,15 +967,25 @@ function renderInsp(live) {
     <button class="kf${e.keyframes?.[k]?.length ? ' has' : ''}${kfAt(e, k) ? ' at' : ''}" data-kf="${k}" title="Keyframe ${l.toLowerCase()} di playhead" aria-label="Keyframe ${l.toLowerCase()}">${icon('diamond')}</button></div>`;
   const sec = (id, title, body, reset = true) => `<div class="sec${closed.has(id) ? ' closed' : ''}" data-sec="${id}"><div class="shd"><button class="stog" aria-expanded="${!closed.has(id)}">${icon('chev')}${title}</button><span class="grow"></span>${reset ? `<button class="btn ghost icon sm" data-reset="${id}" title="Atur ulang ${title.toLowerCase()}" aria-label="Atur ulang ${title.toLowerCase()}">${icon('reset')}</button>` : ''}</div><fieldset class="sbody"${locked ? ' disabled' : ''}>${body}</fieldset></div>`;
   const names = {video: 'Video', photo: 'Foto', audio: 'Audio', text: 'Teks', sticker: 'Stiker', effect: 'Efek', filter: 'Filter'};
-  let h = `<div class="row"><h3 class="grow" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${names[e.type]}: ${esc(segLabel(e))}</h3>${e.vip ? '<span class="tier pro">PRO</span>' : e.lib ? '<span class="tier free">Gratis</span>' : ''}</div>`;
+  let h = `<div class="row"><h3 class="grow" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${names[e.type]}: ${esc(segLabel(e))}</h3>${e.vip ? '<span class="tier pro">PRO</span>' : e.lib ? '<span class="tier free">Gratis</span>' : ''}${isPreviewOnly(e.lib) && !DEMO ? '<span class="tier prev" title="Tidak ikut di-deploy ke CapCut">Pratinjau saja</span>' : ''}</div>`;
   if (locked) h += `<div class="lockmsg">${icon('lock')} Track dikunci — buka kunci di kepala track untuk mengedit.</div>`;
   const timing = sec('waktu', 'Waktu', `<div class="prop" style="grid-template-columns:52px 1fr 52px 1fr"><span>Mulai</span><input type="number" id="pStart" step="0.1" value="${e.start.toFixed(2)}"><span>Durasi</span><input type="number" id="pDur" step="0.1" value="${e.duration.toFixed(2)}"></div>`, false);
   const basic = `${prop('x', 'Posisi X', -1.5, 1.5, .01)}${prop('y', 'Posisi Y', -1.5, 1.5, .01)}${prop('scale', 'Skala', .05, 5, .01)}${prop('rotation', 'Rotasi', -180, 180, 1)}${prop('alpha', 'Opacity', 0, 1, .01)}`;
+  const adjSliders = a => [['b', 'Kecerahan'], ['c', 'Kontras'], ['s', 'Saturasi'], ['temp', 'Suhu']].map(([k, l]) => `<div class="prop" style="grid-template-columns:66px minmax(0,1fr) 40px"><span>${l}</span><input type="range" data-adj="${k}" min="-1" max="1" step="0.05" value="${a?.[k] || 0}"><span class="mono" style="font-size:11px;text-align:right">${Math.round((a?.[k] || 0) * 100)}</span></div>`).join('');
   const audioSec = () => sec('audio', e.type === 'audio' ? 'Dasar' : 'Audio', `${prop('volume', 'Volume', 0, 2, .01)}
     <div class="prop" style="grid-template-columns:58px 1fr 58px 1fr"><span>Fade in</span><input type="number" id="pFi" min="0" step="0.1" value="${e.fade_in}"><span>Fade out</span><input type="number" id="pFo" min="0" step="0.1" value="${e.fade_out}"></div>
-    ${trackOf(e)?.muted ? '<p style="margin:0;color:var(--accent);font-size:12px">Track ini sedang dibisukan.</p>' : ''}`);
+    ${trackOf(e)?.muted ? '<p style="margin:0;color:var(--accent);font-size:12px">Track ini sedang dibisukan.</p>' : ''}`)
+    + (e.type === 'audio' ? sec('beats', 'Ketukan', `<div class="row"><button type="button" class="btn" id="pBeat">${icon('meter')} Deteksi ketukan</button>${e.beats?.length ? `<button type="button" class="btn ghost" id="pBeatClr">Hapus tanda</button>` : ''}</div>
+      <label class="row" style="gap:6px;font-size:12px"><input type="checkbox" id="pBeatSnap" ${beatSnap ? 'checked' : ''}> Snap ke ketukan</label>
+      <p class="note2">${e.beats?.length ? `${e.beats.length} ketukan ditandai (garis kuning di klip).` : 'Mencari puncak energi di gelombang audio lalu menandainya sebagai ketukan.'}</p>`, false) : '');
   if (cur === 'video') {
-    h += timing + sec('dasar', 'Dasar', `${basic}<div class="prop" style="grid-template-columns:66px 1fr"><span>Campuran</span><select disabled title="Mode campuran (segera)"><option>Normal (segera)</option></select></div>`);
+    h += timing + sec('dasar', 'Dasar', `${basic}<div class="prop" style="grid-template-columns:66px 1fr"><span>Campuran</span><select disabled title="Mode campuran (segera)"><option>Normal (segera)</option></select></div>
+      ${['video', 'photo'].includes(e.type) ? `<div class="row"><button type="button" class="btn" id="pPip" title="Taruh klip di pojok kanan bawah, skala 0,35">${icon('layers')} Gambar dalam gambar</button></div>` : ''}`);
+    if (['video', 'photo'].includes(e.type)) {
+      const smp = RAKIT.sampleImg();
+      h += sec('look', 'Filter klip', `<div class="chipg flt"><button type="button" data-look="" class="${!e.look ? 'on' : ''}"><img src="${smp}" alt="">Tanpa</button>${RAKIT.FILTERS.map(i => `<button type="button" data-look="${i.key}" class="${e.look === i.key ? 'on' : ''}"><img src="${smp}" alt="" style="filter:${i.css}">${esc(i.name)}</button>`).join('')}</div>${e.look ? PREV_NOTE : ''}`);
+      h += sec('adj', 'Penyesuaian', adjSliders(e.adj) + '<p class="note2">Pratinjau saja (tidak ikut di-deploy).</p>');
+    }
     if (['video', 'photo'].includes(e.type)) { const trs = LIB.filter(i => i.kind === 'transition');
       h += sec('trans', 'Transisi ke klip berikutnya', `<select id="pTr"><option value="">Tanpa transisi</option>${trs.map(i => `<option value="${esc(i.key)}" ${e.transition?.key === i.key ? 'selected' : ''}>${esc(i.name)}${i.vip ? ' (PRO)' : ''}</option>`).join('')}</select>
         ${trs.length ? '' : '<p style="margin:0;color:var(--muted);font-size:12px">Belum ada transisi di library. Scan project CapCut Anda dari Beranda → Library CapCut.</p>'}`); }
@@ -779,13 +1000,22 @@ function renderInsp(live) {
     h += sec('kf', 'Keyframe', `${rows.length ? `<div class="kfl">${rows.map(r => `<div class="kfr${Math.abs(r.t - (t - e.start)) < .04 ? ' at' : ''}">${icon('diamond')}<span class="mono">${tc(e.start + r.t)}</span><span>${PNAMES[r.k] || r.k} = <span class="mono">${(+r.v).toFixed(r.k === 'rotation' ? 0 : 2)}</span></span>
       <button type="button" class="btn ghost icon sm" data-kj="${r.k}|${r.t}" title="Lompat ke keyframe" aria-label="Lompat ke keyframe">${icon('position')}</button><button type="button" class="btn ghost icon sm" data-kd="${r.k}|${r.t}" title="Hapus keyframe" aria-label="Hapus keyframe">${icon('trash')}</button></div>`).join('')}</div>`
       : '<p style="margin:0;color:var(--muted);font-size:12px">Belum ada keyframe. Klik ikon ◆ di samping properti (tab Video/Teks) atau tombol keyframe di timeline.</p>'}`)
-      + sec('animin', 'Animasi masuk/keluar', '<p style="margin:0;color:var(--muted);font-size:12px">Preset animasi masuk, keluar, dan kombo akan tersedia di sini (segera). Saat ini pakai keyframe.</p>', false);
+      ;
+    const slot = {in: 'in', out: 'out', loop: 'loop'}[animSub], cur = e.anim?.[slot], lib = slot === 'loop' ? RAKIT.LOOP : RAKIT.IO;
+    const glyph = {fade: '◐', slideUp: '↑', slideDown: '↓', slideLeft: '←', slideRight: '→', pop: '✷', zoomIn: '⤢', zoomOut: '⤡', spin: '↻', blur: '◌', bounce: '⤒', wipe: '▶', typewriter: '⌨', pulse: '♥', shake: '〰', float: '☁', swing: '⟲', flicker: '✦'};
+    const presets = Object.entries(lib).filter(([, v]) => !v[2] || v[2] === e.type);
+    const ap = sec('animpre', 'Animasi', `<div class="subtabs" role="tablist">${[['in', 'Masuk'], ['out', 'Keluar'], ['loop', 'Kombo']].map(([k, l]) => `<button type="button" data-as="${k}" class="${animSub === k ? 'on' : ''}" aria-selected="${animSub === k}">${l}</button>`).join('')}</div>
+      <div class="chipg"><button type="button" data-an="" class="${!cur ? 'on' : ''}"><i>⊘</i>Tidak ada</button>${presets.map(([k, v]) => `<button type="button" data-an="${k}" class="${cur?.id === k ? 'on' : ''}"><i>${glyph[k] || '•'}</i>${v[0]}</button>`).join('')}</div>
+      ${cur ? `<div class="prop" style="grid-template-columns:66px 1fr 52px"><span>${slot === 'loop' ? 'Periode' : 'Durasi'}</span><input type="range" id="anD" min="0.1" max="${slot === 'loop' ? 4 : Math.max(.2, Math.min(5, e.duration)).toFixed(1)}" step="0.1" value="${cur.d}"><span class="mono" style="font-size:11px">${cur.d.toFixed(1)}s</span></div>` : ''}
+      <p class="note2">${slot === 'loop' ? 'Kombo berulang selama klip tampil.' : slot === 'in' ? 'Diputar di awal klip.' : 'Diputar di akhir klip.'} Animasi preset tampil di pemutar Studio (pratinjau saja).</p>`, false);
+    const ki = h.lastIndexOf('<div', h.indexOf('data-sec="kf"')); h = h.slice(0, ki) + ap + h.slice(ki);
   } else if (cur === 'speed') {
     h += `<div class="subtabs" role="tablist"><button class="on" aria-selected="true">Normal</button><button disabled title="Segera">Kurva · segera</button></div>`
       + sec('speed', 'Kecepatan', `<div class="chips">${[.5, 1, 1.5, 2, 3].map(sp => `<button type="button" class="btn${e.speed === sp ? ' on' : ''}" data-sp="${sp}">${sp}×</button>`).join('')}</div>
       <div class="prop" style="grid-template-columns:52px 1fr 58px"><span>Kustom</span><input type="range" id="pSp" min="0.1" max="10" step="0.1" value="${e.speed}"><input type="number" id="pSpn" min="0.1" max="10" step="0.1" value="${e.speed}"></div>
       <p style="margin:0;color:var(--muted);font-size:12px">Durasi ${e.duration.toFixed(1)} dtk — menyesuaikan kecepatan.</p>`);
   } else if (cur === 'audio') h += (e.type === 'audio' ? timing : '') + audioSec();
+  else if (isPreviewOnly(e.lib)) h += timing + (e.type === 'filter' ? sec('adj', 'Penyesuaian', adjSliders(e.adj)) : '') + `<div class="sec">${PREV_NOTE}<p class="note2">${e.type === 'effect' ? 'Efek' : 'Filter'} berlaku untuk semua klip di bawahnya selama segmen ini. Tarik ujung segmen untuk mengubah durasi.</p></div>`;
   else h += timing + `<div class="sec"><p style="margin:0;color:var(--muted)">${e.type === 'effect' ? 'Efek' : 'Filter'} ini berasal dari library CapCut Anda. Tampilan aslinya dirender oleh CapCut; di sini ditandai dengan label di pojok player.</p></div>`;
   h += `<div class="sec"><div class="row"><button class="btn" id="pSplit">${icon('scissors')} Potong</button><button class="btn" id="pDup">${icon('copy')} Duplikat</button><button class="btn" id="pDel">${icon('trash')} Hapus</button></div></div>`;
   I.innerHTML = h;
@@ -817,13 +1047,24 @@ function renderInsp(live) {
   const setSpeed = v => { snap(); v = Math.max(.1, Math.min(10, +v)); const src = e.duration * e.speed; e.speed = +v.toFixed(2); e.duration = +(src / e.speed).toFixed(3); commit(); };
   I.querySelectorAll('[data-sp]').forEach(b => b.onclick = () => setSpeed(b.dataset.sp)); const sp = $('#pSp'); if (sp) sp.onchange = () => setSpeed(sp.value); const spn = $('#pSpn'); if (spn) spn.onchange = () => setSpeed(spn.value);
   const tr = $('#pTr'); if (tr) tr.onchange = () => { snap(); const i = LIB.find(x => x.key === tr.value); if (i) e.transition = {key: i.key, name: i.name, duration: e.transition?.duration || .5, vip: i.vip}; else delete e.transition; commit(); };
-  $('#pSplit').onclick = split; $('#pDup').onclick = dup; $('#pDel').onclick = del;
+  $('#pSplit').onclick = split; $('#pDup').onclick = dup; $('#pDel').onclick = () => del();
+  I.querySelectorAll('[data-as]').forEach(b => b.onclick = () => { animSub = b.dataset.as; renderInsp(); });
+  I.querySelectorAll('[data-an]').forEach(b => b.onclick = () => { if (locked) return lockToast(); const slot = animSub, id = b.dataset.an; snap(); e.anim = {...(e.anim || {})};
+    if (!id) delete e.anim[slot]; else { e.anim[slot] = {id, d: e.anim[slot]?.d || (slot === 'loop' ? 1.2 : id === 'typewriter' ? 1.2 : .5)}; if (slot === 'loop') { delete e.anim.in; delete e.anim.out; } else delete e.anim.loop; }
+    commit(); seek(slot === 'out' ? Math.max(e.start, end(e) - (e.anim[slot]?.d || .5) - .05) : e.start); });
+  const anD = $('#anD'); if (anD) { anD.oninput = () => { snap(); e.anim[animSub].d = +anD.value; anD.nextElementSibling.textContent = (+anD.value).toFixed(1) + 's'; renderStage(); renderTimeline(); }; anD.onchange = commit; }
+  I.querySelectorAll('[data-look]').forEach(b => b.onclick = () => { if (locked) return lockToast(); snap(); if (b.dataset.look) e.look = b.dataset.look; else delete e.look; commit(); });
+  I.querySelectorAll('[data-adj]').forEach(r => { r.oninput = () => { snap(); e.adj = {...(e.adj || {}), [r.dataset.adj]: +r.value}; r.nextElementSibling.textContent = Math.round(r.value * 100); renderStage(); }; r.onchange = commit; });
+  const pip = $('#pPip'); if (pip) pip.onclick = () => { if (locked) return lockToast(); snap(); for (const k of ['x', 'y', 'scale']) delete e.keyframes[k]; Object.assign(e, {scale: .35, x: .55, y: -.55}); if (!S.bg) S.bg = {mode: 'blur', color: '#000000'}; commit(); Studio.toast('Gambar dalam gambar: klip di pojok kanan bawah (skala 0,35).'); };
+  const pb = $('#pBeat'); if (pb) pb.onclick = () => detectBeats(e);
+  const pbc = $('#pBeatClr'); if (pbc) pbc.onclick = () => { snap(); delete e.beats; commit(); };
+  const pbs = $('#pBeatSnap'); if (pbs) pbs.onchange = () => { beatSnap = pbs.checked; renderTlbar(); };
 }
 
 // ---------- media panel ----------
 const TABS = [['media', 'film', 'Media'], ['audio', 'music', 'Audio'], ['text', 'text', 'Teks'], ['sticker', 'star', 'Stiker'], ['effect', 'wand', 'Efek'], ['transition', 'transition', 'Transisi'], ['filter', 'filter', 'Filter'], ['adjust', 'adjust', 'Penyesuaian']];
 const LIBSUB = [['all', 'Semua'], ['free', 'Gratis'], ['pro', 'PRO']];
-const SUBS = {media: [['local', 'Lokal'], ['library', 'Library']], audio: [['music', 'Musik'], ['sfx', 'Efek suara']], text: [['default', 'Teks default'], ['template', 'Template']],
+const SUBS = {media: [['local', 'Lokal'], ['library', 'Library']], audio: [['music', 'Musik'], ['sfx', 'Efek suara']], text: [['template', 'Template'], ['default', 'Teks default'], ['script', 'Teks dari naskah']],
   sticker: LIBSUB, effect: LIBSUB, transition: LIBSUB, filter: LIBSUB, adjust: [['all', 'Penyesuaian'], ['free', 'Gratis']]};
 function renderTabs() {
   $('#mtabs').innerHTML = TABS.map(([k, i, l]) => `<button data-t="${k}" class="${k === tab ? 'on' : ''}" aria-pressed="${k === tab}">${icon(i)}${l}</button>`).join('');
@@ -834,13 +1075,28 @@ function renderTabs() {
   renderMedia();
 }
 const fmtDur = d => d ? (d >= 60 ? `${Math.floor(d / 60)}:${String(Math.round(d % 60)).padStart(2, '0')}` : `00:${String(Math.round(d)).padStart(2, '0')}`) : '';
-function mitem(thumb, name, data, {vip, dur, temp} = {}) {
-  const b = document.createElement('div'); b.className = 'mitem'; b.draggable = true; b.tabIndex = 0; b.setAttribute('role', 'button'); b.title = name + ' · klik atau ＋ untuk menambah di playhead';
-  b.innerHTML = `<div class="th">${thumb}${vip ? '<span class="tier pro">PRO</span>' : ''}${temp ? '<span class="tmp">sementara</span>' : ''}${dur ? `<span class="dur">${fmtDur(dur)}</span>` : ''}
+function mitem(thumb, name, data, {vip, dur, temp, orig} = {}) {
+  const b = document.createElement('div'); b.className = 'mitem'; b.draggable = true; b.tabIndex = 0; b.setAttribute('role', 'button'); b.title = name + (orig ? ' · Gratis · pratinjau saja (tidak ikut di-deploy)' : '') + ' · klik atau ＋ untuk menambah di playhead';
+  b.innerHTML = `<div class="th">${thumb}${vip ? '<span class="tier pro">PRO</span>' : orig ? '<span class="tier free">Gratis</span>' : ''}${temp ? '<span class="tmp">sementara</span>' : ''}${dur ? `<span class="dur">${fmtDur(dur)}</span>` : ''}${orig && !dur ? '<span class="tier prev pv">Pratinjau</span>' : ''}
     <button class="add" type="button" title="Tambah di playhead" aria-label="Tambah ${esc(name)} di playhead">${icon('plus')}</button></div><div class="nm">${esc(name)}</div>`;
   b.ondragstart = ev => ev.dataTransfer.setData('text/plain', JSON.stringify(data));
   b.onclick = () => addAtPlayhead(data); b.onkeydown = ev => { if (ev.key === 'Enter' && ev.target === b) addAtPlayhead(data); };
   b.querySelector('.add').onclick = ev => { ev.stopPropagation(); addAtPlayhead(data); }; return b;
+}
+function arow(it, sfx) { // a synthesised music bed / sound effect row: ▶ audition, click or ＋ adds at playhead
+  const r = document.createElement('div'), data = {gen: it.id, name: it.name, dur: it.dur}; r.className = 'arow'; r.draggable = true; r.tabIndex = 0; r.setAttribute('role', 'button'); r.title = `${it.name} · klik atau ＋ untuk menambah di playhead`;
+  const col = it.color || '#3dd6e0';
+  r.innerHTML = `<div class="cv" style="background:linear-gradient(135deg, ${col}, ${col}55)"><button type="button" class="aud" title="Dengarkan" aria-label="Dengarkan ${esc(it.name)}">${icon('play')}</button></div>
+    <div class="t"><b>${esc(it.name)}</b><span>${sfx ? 'Efek suara' : `${esc(it.mood)} · ${it.bpm} BPM`} · ${fmtDur(Math.round(it.dur)) || it.dur.toFixed(1) + 's'} · Gratis</span></div><button type="button" class="add" title="Tambah di playhead" aria-label="Tambah ${esc(it.name)}">${icon('plus')}</button>`;
+  r.ondragstart = ev => ev.dataTransfer.setData('text/plain', JSON.stringify(data));
+  r.onclick = () => addAtPlayhead(data); r.onkeydown = ev => { if (ev.key === 'Enter' && ev.target === r) addAtPlayhead(data); };
+  r.querySelector('.add').onclick = ev => { ev.stopPropagation(); addAtPlayhead(data); };
+  const ab = r.querySelector('.aud'); ab.onclick = async ev => { ev.stopPropagation();
+    if (previewAudio?.dataset.id === it.id && !previewAudio.paused) { previewAudio.pause(); ab.innerHTML = icon('play'); return; }
+    previewAudio?.pause(); $$('.arow .aud').forEach(x => x.innerHTML = icon('play')); r.classList.add('busy');
+    try { const u = await RAKIT.audio.ensure(it.id); previewAudio = new Audio(u); previewAudio.dataset.id = it.id; previewAudio.onended = () => { ab.innerHTML = icon('play'); }; await previewAudio.play(); ab.innerHTML = icon('pause'); }
+    catch { Studio.toast('Audio tidak bisa diputar di browser ini.'); } finally { r.classList.remove('busy'); } };
+  return r;
 }
 function importFiles(list) {
   let n = 0;
@@ -871,23 +1127,50 @@ function renderMedia() {
     for (const f of items.slice(0, 200)) grid.appendChild(fileItem(f));
   } else if (tab === 'media') note('Library stok tidak disertakan. Pakai file Anda sendiri (Lokal) atau elemen dari library CapCut di tab Stiker, Efek, Transisi, dan Filter.');
   else if (tab === 'audio') {
+    const list = document.createElement('div'); list.className = 'alist';
+    B.insertAdjacentHTML('beforeend', `<div class="shead">${icon(cur === 'sfx' ? 'bolt' : 'music')} ${cur === 'sfx' ? 'Efek suara Rakit (orisinal)' : 'Musik Rakit (orisinal)'} <span class="tier free">Gratis</span></div>`);
+    note('Disintesis di browser saat pertama dipakai. Bebas royalti. Pratinjau saja — tidak ikut di-deploy ke CapCut.');
+    for (const it of RAKIT.audio[cur === 'sfx' ? 'sfx' : 'music']) list.appendChild(arow(it, cur === 'sfx'));
+    B.appendChild(list); B.insertAdjacentHTML('beforeend', `<div class="shead">${icon('folder')} File Anda</div>`);
     const items = FILES.filter(f => f.type === 'audio' && (cur === 'sfx' ? (f.dur || 99) < 6 : (f.dur || 99) >= 6));
     note(cur === 'sfx' ? 'Audio pendek (< 6 detik) dari file Anda.' : DEMO ? 'Musik contoh buatan Studio, plus audio yang Anda impor.' : 'Musik dari folder Musik, Unduhan & Desktop di komputer Anda.');
     if (!items.length) note('Tidak ada file. Impor audio dari Media → Lokal.');
     for (const f of items.slice(0, 200)) grid.appendChild(fileItem(f));
+  } else if (tab === 'text' && cur === 'script') {
+    B.insertAdjacentHTML('beforeend', `<div class="shead">${icon('text')} Teks dari naskah</div>`);
+    note('Tempel naskah, satu kalimat per baris. Studio membuat teks bergaya subtitle yang dibagi rata sepanjang klip terpilih (atau seluruh video jika tidak ada klip dipilih).');
+    B.insertAdjacentHTML('beforeend', `<textarea id="script" rows="7" placeholder="Halo semuanya!\nHari ini kita ke pasar pagi.\nIkuti sampai akhir ya."></textarea><button type="button" class="btn primary" id="scriptGo">${icon('plus')} Buat teks</button>`);
+    try { $('#script').value = sessionStorage.getItem('rakitScript') || ''; } catch {}
+    $('#script').oninput = ev => { try { sessionStorage.setItem('rakitScript', ev.target.value); } catch {} };
+    $('#scriptGo').onclick = () => captionsFromScript($('#script').value);
   } else if (tab === 'text') {
-    const P = cur === 'template' ? [['Judul tebal', {new: 'text', text: 'BIG SALE', font_size: 16, color: '#F4C95D', y: .4}], ['Lower third', {new: 'text', text: 'Nama · Jabatan', font_size: 7, y: -.7}], ['Kutipan', {new: 'text', text: '"Tulis kutipan"', font_size: 9, color: '#36C5B1'}], ['Ajakan', {new: 'text', text: 'Ikuti untuk lanjut →', font_size: 8, color: '#FF8C5A', y: -.55}]]
+    const P = cur === 'template' ? RAKIT.TEXTS.map(x => [x.name, {new: 'text', ...JSON.parse(JSON.stringify(x)), color: x.tstyle.color && x.tstyle.color !== 'transparent' ? x.tstyle.color : '#FFFFFF'}])
       : [['Judul', {new: 'text', text: 'JUDUL', font_size: 14, y: .5}], ['Subjudul', {new: 'text', text: 'Subjudul', font_size: 9}], ['Caption', {new: 'text', text: 'Tulis caption di sini', font_size: 7, y: -.6}], ['Sorotan', {new: 'text', text: 'PROMO!', font_size: 12, color: '#F4C95D'}]];
-    for (const [l, d] of P) grid.appendChild(mitem(`<b style="font-size:${10 + Math.min(14, d.font_size)}px;color:${d.color || '#fff'}">${l}</b>`, l, d, {dur: 3}));
+    if (cur === 'template') note('Template teks Rakit (orisinal) dengan animasi masuk/keluar. Gaya kotak/neon/garis tepi tampil di pratinjau; CapCut menerima teks dan warnanya.');
+    for (const [l, d] of P) { const fs = Math.max(10, Math.min(15, 7 + (d.font_size || 8) * .4)), txt = d.text.split('\n')[0];
+      grid.appendChild(mitem(`<div class="tprev"><span style="font-size:${fs}px;color:${d.color || '#fff'};${RAKIT.textCss(d.tstyle, fs)}">${esc(txt)}</span></div>`, l, d, {dur: d.duration || 3})); }
     note('Klik ＋ untuk menambah di posisi playhead, atau seret ke timeline.');
   } else {
-    const items = LIB.filter(i => i.kind === tab && (cur === 'free' ? !i.vip : cur === 'pro' ? i.vip : true));
-    note(DEMO ? 'Item contoh. Di project asli, isinya adalah elemen yang pernah Anda pakai di CapCut (scan dari Beranda → Library CapCut).' : 'Elemen dari project CapCut Anda. PRO = butuh langganan CapCut saat dirender.');
-    if (!items.length) note('Belum ada. Scan project CapCut Anda dari Beranda → Library CapCut.');
+    const items = LIB.filter(i => i.kind === tab && (cur === 'free' ? !i.vip : cur === 'pro' ? i.vip : true)), mine = items.filter(i => !i.orig), orig = items.filter(i => i.orig);
+    const ic = {sticker: 'star', effect: 'wand', transition: 'transition', filter: 'filter', adjust: 'adjust'}, smp = RAKIT.sampleImg();
+    const thumb = i => {
+      if (i.kind === 'sticker' && i.preview) return `<img src="${esc(mediaUrl(i.preview))}" alt="" style="object-fit:contain;padding:12%">`;
+      const o = ORIG_BY[i.key];
+      if (i.kind === 'filter' && o) return `<img src="${smp}" alt="" style="filter:${o.css}">`;
+      if (i.kind === 'adjust' && o) { const ti = RAKIT.tintCss(o.adj); return `<img src="${smp}" alt="" style="filter:${RAKIT.adjCss(o.adj) || 'none'}">${ti ? `<div class="fxo" style="background:${ti};mix-blend-mode:soft-light"></div>` : ''}${i.key.endsWith('kustom') ? `<div class="fxo" style="display:flex;align-items:center;justify-content:center;background:#0006">${icon('adjust')}</div>` : ''}`; }
+      if (i.kind === 'effect' && o) { const v = o.fn(.35, 3); return `<img src="${smp}" alt="" style="filter:${v.filter || 'none'};transform:${v.transform || 'none'}">${(v.overlay || '').replace(/vhs-tc/g, 'vhs-tc" style="font-size:8px')}`; }
+      if (i.kind === 'transition' && o) return `<div style="display:flex;width:100%;height:100%"><img src="${smp}" alt="" style="width:50%;object-fit:cover"><div style="width:50%;background:linear-gradient(135deg,#3dd6e0,#1f4a73)"></div></div><div class="fxo" style="display:flex;align-items:center;justify-content:center;color:#fff">${icon('transition')}</div>`;
+      return icon(ic[i.kind] || 'sparkles');
+    };
+    const add = (g, i) => g.appendChild(mitem(thumb(i), i.name, {lib: i.key, kind: i.kind, name: i.name, vip: i.vip, preview: i.preview}, {vip: i.vip, orig: i.orig}));
     if (tab === 'transition') note('Seret ke klip di timeline, atau pilih klip lalu klik transisi.');
-    const ic = {sticker: 'star', effect: 'wand', transition: 'transition', filter: 'filter', adjust: 'adjust'};
-    for (const i of items) grid.appendChild(mitem(i.preview ? `<img src="${esc(mediaUrl(i.preview))}" alt="" style="object-fit:contain;padding:10px">` : icon(ic[i.kind] || 'sparkles'), i.name,
-      {lib: i.key, kind: i.kind, name: i.name, vip: i.vip, preview: i.preview}, {vip: i.vip}));
+    if (mine.length || !DEMO) { B.insertAdjacentHTML('beforeend', `<div class="shead">${icon('folder')} Dari project CapCut Anda</div>`);
+      note(mine.length ? 'PRO = butuh langganan CapCut saat dirender.' : 'Belum ada. Scan project CapCut Anda dari Beranda → Library CapCut.');
+      const g = document.createElement('div'); g.className = 'mgrid' + (tab === 'sticker' ? ' g3' : ''); mine.forEach(i => add(g, i)); B.appendChild(g); }
+    B.insertAdjacentHTML('beforeend', `<div class="shead">${icon('sparkles')} Rakit (orisinal) <span>${orig.length} item</span></div>`);
+    note('Gratis. Pratinjau saja: tampil di pemutar Studio, tidak ikut di-deploy ke CapCut.');
+    if (tab === 'sticker') grid.classList.add('g3');
+    for (const i of orig) add(grid, i);
   }
   B.appendChild(grid);
 }
@@ -901,8 +1184,9 @@ addEventListener('keydown', ev => {
   else if (c && k === 's') { ev.preventDefault(); saveNow(); }
   else if ((c && k === 'b') || (!c && k === 's')) { ev.preventDefault(); split(); }
   else if (c && k === 'd') { ev.preventDefault(); dup(); }
-  else if (!c && k === 'k') { ev.preventDefault(); toggleKf(); }
-  else if (ev.key === 'Delete' || ev.key === 'Backspace') { ev.preventDefault(); del(); }
+  else if (ev.altKey && ev.code === 'KeyK') { ev.preventDefault(); toggleKf(); }
+  else if (!c && ['j', 'k', 'l'].includes(k)) { ev.preventDefault(); shuttle({j: -1, k: 0, l: 1}[k]); }
+  else if (ev.key === 'Delete' || ev.key === 'Backspace') { ev.preventDefault(); del(ev.shiftKey); }
   else if (ev.key === 'ArrowLeft') { ev.preventDefault(); seek(t - (ev.shiftKey ? 1 : 1 / FPS)); }
   else if (ev.key === 'ArrowRight') { ev.preventDefault(); seek(t + (ev.shiftKey ? 1 : 1 / FPS)); }
   else if (ev.key === 'Home') seek(0); else if (ev.key === 'End') seek(total());
