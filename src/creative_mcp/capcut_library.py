@@ -125,7 +125,11 @@ def list_items(kind: str | None = None, query: str | None = None, free_only: boo
             continue
         if free_only and it["vip"]:
             continue
-        out.append({k: it[k] for k in ("key", "kind", "name", "vip", "file_available", "used_in")})
+        row = {k: it[k] for k in ("key", "kind", "name", "vip", "file_available", "used_in")}
+        path = str(it["material"].get("path") or "")
+        if Path(path).suffix.lower() in {".png", ".gif", ".webp", ".jpg", ".jpeg"} and Path(path).exists():
+            row["preview"] = path
+        out.append(row)
     return sorted(out, key=lambda i: (i["kind"], i["name"]))
 
 

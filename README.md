@@ -59,19 +59,24 @@ pip install -e ".[desktop]"
 ```
 Claude Code: `claude mcp add creative -e ENABLE_DESKTOP_CONTROL=1 -- creative-mcp`
 
-## Creative Studio (dashboard)
+## Rakit Studio (dashboard + editor)
 ```
-creative-mcp studio        # jalankan bridge + buka dashboard di browser
+creative-mcp studio        # jalankan bridge + buka Studio di browser
 ```
+Tata letak dibuat akrab bagi pengguna Canva/CapCut (rail kiri, panel, toolbar kontekstual, timeline),
+tapi dengan nama & desain sendiri. Bukan tiruan merek.
+
 | Halaman | Isi |
 |---|---|
-| `index.html` — Beranda | Buat baru per ukuran (Post IG, Story, Thumbnail YT, Presentasi, A4, Persegi, Video), desain terakhir, pencarian |
-| `design.html` — Editor desain | Template + 5 palet, elemen bentuk/garis/frame, teks + kombinasi font, upload foto, foto dari komputer, latar; drag & drop, resize, rotasi, snap ke tengah/tepi, edit teks (double-click), layer, multi-halaman, undo/redo, copy-paste, ganti palet satu klik, export PNG, **Kirim ke Canva** (jadi desain Canva yang bisa diedit) |
-| `video.html` — Editor video | Timeline project CapCut + live preview (lihat di bawah) |
-| Template / Library / Canva | Buat video dari template, library elemen CapCut (gratis/VIP), status & desain Canva |
+| `index.html`: Beranda | Buat desain per ukuran (8 preset), buat video, desain terakhir, Proyek, Template, Merek, Library CapCut, Akun Canva |
+| `design.html`: Editor desain | Template orisinal, bentuk (kotak, bulat, pil, lingkaran, segitiga, bintang, garis, bingkai), bingkai foto, gradien, teks + gaya + kombinasi font, upload gambar (klik/seret/tempel), foto komputer, latar, palet merek, **upload font**, layer (sembunyikan/kunci). Multi-select (Shift/kotak seleksi), group, rata & sebar, snap ke tengah/tepi/elemen lain, resize 8 arah, rotasi, kunci, crop/zoom/flip, edit foto (8 filter + 7 penyesuaian), bayangan, efek teks (bayangan, terangkat, hollow, outline, neon, latar), spasi huruf/baris, multi-halaman, **Ubah ukuran**, ekspor **PNG (transparan) / JPG / PDF** dengan skala, Kirim ke Canva |
+| `video.html`: Editor video | Panel Media/Audio/Teks/Stiker/Efek/Transisi/Filter, player dengan timecode, inspector (posisi, skala, rotasi, opacity, **keyframe** per properti, **kecepatan**, volume, **fade in/out**, transisi), timeline multi-track dengan **potong**, trim kiri/kanan, snap, pindah track, auto-track saat tumpang tindih, zoom, duplikat. Mode demo tanpa komputer |
+| `features.html`: Fitur Free & Pro | Daftar fitur Canva & CapCut: paket Free/Pro di aplikasi asli dan status di Rakit (lihat [FEATURES.md](FEATURES.md)) |
 
-Tanpa bridge (misalnya dibuka di Vercel saja), editor desain tetap jalan dan menyimpan desain di browser.
-Dengan bridge, desain disimpan di `~/.creative-mcp/designs` dan semua fitur komputer (CapCut, media, Canva) aktif.
+Tanpa bridge (misalnya dibuka di Vercel saja) editor desain tetap jalan dan menyimpan di browser; editor video
+membuka contoh project. Dengan bridge, desain disimpan di `~/.creative-mcp/designs` dan semua fitur komputer aktif.
+
+Daftar fitur diperbarui lewat `src/creative_mcp/editor/features.json`, lalu `python scripts/gen_features.py`.
 
 ## Live Editor video (preview sampai puas, lalu deploy)
 ```

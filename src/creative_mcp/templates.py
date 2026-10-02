@@ -296,7 +296,7 @@ def build_pptx(template: str, out_path: str, title: str, subtitle: str = "",
 
 
 def design_to_pptx(design: dict, out_dir: str | Path) -> str:
-    """Convert a Studio design (pages of text/rect/ellipse/line/image) into an editable PPTX."""
+    """Convert a Studio design into an editable PPTX (text boxes, shapes, gradients, cropped photos)."""
     import base64
     import io
 
@@ -306,53 +306,78 @@ def design_to_pptx(design: dict, out_dir: str | Path) -> str:
     from pptx.enum.text import PP_ALIGN
     from pptx.util import Emu
 
-    px = lambda v: Emu(int(float(v) * 9525))  # noqa: E731
+    px = lambda v: Emu(int(float(v) * 9525))  # noqa: E731  (1 CSS px at 96 dpi)
     prs = Presentation()
     prs.slide_width, prs.slide_height = px(design["width"]), px(design["height"])
     align = {"left": PP_ALIGN.LEFT, "center": PP_ALIGN.CENTER, "right": PP_ALIGN.RIGHT}
+    shapes = {"ellipse": MSO_SHAPE.OVAL, "triangle": MSO_SHAPE.ISOSCELES_TRIANGLE, "star": MSO_SHAPE.STAR_5_POINT,
+              "line": MSO_SHAPE.RECTANGLE}
 
     def color(v):
         return v if isinstance(v, str) and v.startswith("#") and len(v) == 7 else None
 
+    def paint(fill, value):
+        """Solid colour or a two-stop linear gradient ({"a": css angle, "c": [c1, c2]})."""
+        if isinstance(value, dict) and len(value.get("c", [])) == 2:
+            fill.gradient()
+            fill.gradient_angle = (90 - float(value.get("a", 135))) % 360  # CSS angle -> DrawingML
+            stops = fill.gradient_stops
+            stops[0].color.rgb, stops[1].color.rgb = _rgb(value["c"][0]), _rgb(value["c"][1])
+        elif color(value):
+            fill.solid()
+            fill.fore_color.rgb = _rgb(value)
+        else:
+            fill.background()
+
+    def flip(sh, e):
+        xfrm = sh._element.spPr.get_or_add_xfrm()
+        if e.get("flipX"):
+            xfrm.set("flipH", "1")
+        if e.get("flipY"):
+            xfrm.set("flipV", "1")
+
     for page in design["pages"]:
         s = prs.slides.add_slide(prs.slide_layouts[6])
-        if color(page.get("bg")):
-            s.background.fill.solid()
-            s.background.fill.fore_color.rgb = _rgb(page["bg"])
+        if page.get("bg"):
+            paint(s.background.fill, page["bg"])
         for e in page["elements"]:
+            if e.get("hidden"):
+                continue
             x, y, w, h = px(e["x"]), px(e["y"]), px(max(e["w"], 1)), px(max(e["h"], 1))
             t = e["type"]
-            if t in ("rect", "ellipse", "line"):
-                kind = (MSO_SHAPE.OVAL if t == "ellipse" else
-                        MSO_SHAPE.ROUNDED_RECTANGLE if e.get("radius") else MSO_SHAPE.RECTANGLE)
+            if t in ("rect", "ellipse", "line", "triangle", "star"):
+                kind = shapes.get(t) or (MSO_SHAPE.ROUNDED_RECTANGLE if e.get("radius") else MSO_SHAPE.RECTANGLE)
                 sh = s.shapes.add_shape(kind, x, y, w, h)
-                if color(e.get("fill")):
-                    sh.fill.solid()
-                    sh.fill.fore_color.rgb = _rgb(e["fill"])
-                else:
-                    sh.fill.background()
-                if color(e.get("stroke")):
+                paint(sh.fill, e.get("fill"))
+                if color(e.get("stroke")) and t in ("rect", "ellipse"):
                     sh.line.color.rgb = _rgb(e["stroke"])
                     sh.line.width = px(e.get("strokeW", 4))
                 else:
                     sh.line.fill.background()
                 if kind == MSO_SHAPE.ROUNDED_RECTANGLE:
                     sh.adjustments[0] = min(0.5, e["radius"] / max(1, min(e["w"], e["h"])))
+                flip(sh, e)
             elif t == "text":
                 sh = s.shapes.add_textbox(x, y, w, h)
                 tf = sh.text_frame
                 tf.word_wrap = True
-                for i, line in enumerate(str(e.get("text", "")).split("\n")):
+                text = str(e.get("text", ""))
+                for i, line in enumerate((text.upper() if e.get("upper") else text).split("\n")):
                     p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
                     p.alignment = align.get(e.get("align"), PP_ALIGN.LEFT)
+                    p.line_spacing = float(e.get("lh") or 1.2)
                     r = p.add_run()
                     r.text = line
                     r.font.size = px(e.get("fontSize", 32))
                     r.font.bold = bool(e.get("bold"))
                     r.font.italic = bool(e.get("italic"))
-                    r.font.name = e.get("font", "Montserrat")
+                    r.font.underline = bool(e.get("underline"))
+                    r.font.name = e.get("font", "Plus Jakarta Sans")
                     if color(e.get("color")):
                         r.font.color.rgb = _rgb(e["color"])
+                if e.get("effect") == "background" and color((e.get("fx") or {}).get("color")):
+                    sh.fill.solid()
+                    sh.fill.fore_color.rgb = _rgb(e["fx"]["color"])
             elif t == "image":
                 src = e.get("src", "")
                 if src.startswith("data:"):
@@ -364,15 +389,22 @@ def design_to_pptx(design: dict, out_dir: str | Path) -> str:
                 iw, ih = PILImage.open(stream).size
                 stream.seek(0)
                 sh = s.shapes.add_picture(stream, x, y, w, h)
-                box, img = e["w"] / e["h"], iw / ih  # cover-crop like the editor
-                if img > box:
-                    sh.crop_left = sh.crop_right = (1 - box / img) / 2
-                else:
-                    sh.crop_top = sh.crop_bottom = (1 - img / box) / 2
+                # same placement as the editor: cover the frame, then zoom and pan (crop)
+                c = {"zoom": 1, "ox": 0, "oy": 0, **(e.get("crop") or {})}
+                ar = iw / ih
+                cw, ch = e["w"], e["w"] / ar
+                if ch < e["h"]:
+                    ch, cw = e["h"], e["h"] * ar
+                sw, shh = cw * c["zoom"], ch * c["zoom"]
+                ix = (e["w"] - sw) / 2 + c["ox"] * (sw - e["w"]) / 2
+                iy = (e["h"] - shh) / 2 + c["oy"] * (shh - e["h"]) / 2
+                sh.crop_left, sh.crop_right = -ix / sw, (ix + sw - e["w"]) / sw
+                sh.crop_top, sh.crop_bottom = -iy / shh, (iy + shh - e["h"]) / shh
+                flip(sh, e)
             else:
                 continue
             if e.get("rot"):
-                sh.rotation = float(e["rot"])
+                sh.rotation = float(e["rot"]) % 360
     out = Path(out_dir).expanduser()
     out.mkdir(parents=True, exist_ok=True)
     safe = "".join(c if c.isalnum() or c in "-_ " else "_" for c in design.get("title", "design"))
