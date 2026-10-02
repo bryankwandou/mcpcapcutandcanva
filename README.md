@@ -133,6 +133,14 @@ template ini memakai font umum (default Montserrat — tersedia gratis di Canva)
 - Elemen Canva: `canva_open_editor` membuka desain di browser, lalu AI memakai `desktop_*` untuk mencari &
   drag elemen apa pun yang tersedia di akun Anda.
 
+## Bukti koneksi (jalankan di komputer Anda)
+```
+python scripts/verify_connection.py           # cek: handshake MCP, akun Canva, project CapCut
+python scripts/verify_connection.py --write   # + buat desain tes di Canva & project tes di CapCut
+```
+Skrip menjalankan `creative-mcp` sebagai server MCP sungguhan (stdio) dan memanggil tool persis seperti Claude.
+Hasil `[OK ] Canva: akun terhubung  nama=<nama Anda>` dan project `tes-mcp-…` yang muncul di CapCut adalah buktinya.
+
 ## Contoh perintah ke AI
 - "Buat project CapCut `promo` 9:16, masukkan `C:\video\a.mp4` 0–5 detik, tambah teks 'DISKON 50%' di atas."
 - "Screenshot layar, lalu drag stiker pertama di panel kiri CapCut ke tengah canvas."
