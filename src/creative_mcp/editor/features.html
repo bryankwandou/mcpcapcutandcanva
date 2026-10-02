@@ -55,7 +55,7 @@ td.note { color: var(--muted); max-width: 46ch; }
 <script src="studio.js"></script>
 <script>
 const $ = s => document.querySelector(s);
-$('#back').innerHTML = `${icon('back')} Beranda`; $('#back').onclick = () => Studio.go('./');
+$('#back').innerHTML = `${icon('back')} Beranda`; $('#back').onclick = () => Studio.go('index.html');
 const TIER = {free: ['free', 'Gratis'], terbatas: ['terbatas', 'Gratis terbatas'], pro: ['pro', 'Pro']}, ST = {ada: 'Ada', sebagian: 'Sebagian', akun: 'Lewat akun Anda', tidak: 'Tidak ada'};
 const COL = {ada: 'var(--ok)', sebagian: 'var(--accent)', akun: 'var(--select)', tidak: '#f08b8b'};
 let F = null; const f = {app: '', tier: '', st: '', q: ''};

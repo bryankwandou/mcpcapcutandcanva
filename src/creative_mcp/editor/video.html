@@ -123,7 +123,7 @@ let LIB = [], FILES = [];
 // ---------- boot ----------
 $('#home').innerHTML = icon('home'); $('#undo').innerHTML = icon('undo'); $('#redo').innerHTML = icon('redo'); $('#play').innerHTML = icon('play');
 $('#deploy').innerHTML = `${icon('send')}<span class="lbl"> Deploy ke CapCut</span>`;
-$('#home').onclick = () => Studio.go('./');
+$('#home').onclick = () => Studio.go('index.html');
 async function boot() {
   await Studio.connect();
   if (Studio.connected) {

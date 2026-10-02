@@ -174,7 +174,7 @@ const restore = json => { D = JSON.parse(json); sel = sel.filter(id => findEl(id
 $('#undo').onclick = () => { if (undoS.length) { redoS.push(JSON.stringify(D)); restore(undoS.pop()); } };
 $('#redo').onclick = () => { if (redoS.length) { undoS.push(JSON.stringify(D)); restore(redoS.pop()); } };
 $('#title').onchange = () => { snap(); D.title = $('#title').value || 'Tanpa judul'; commit(); };
-$('#home').onclick = () => Studio.go('./');
+$('#home').onclick = () => Studio.go('index.html');
 
 // ---------- helpers ----------
 const page = () => D.pages[cur];
