@@ -7,6 +7,22 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;700;800&family=Plus+Jakarta+Sans:ital,wght@0,400;0,700;1,400;1,700&family=JetBrains+Mono:wght@400;600&family=Montserrat:ital,wght@0,400;0,700;1,400&family=Poppins:wght@400;700&family=Roboto:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lora:wght@400;700&family=Oswald:wght@400;700&family=Bebas+Neue&family=Pacifico&family=Dancing+Script:wght@400;700&family=Archivo+Black&family=DM+Serif+Display&display=swap">
 <link rel="stylesheet" href="studio.css">
 <style>
+/* Light theme for the design editor (page-local token overrides). */
+:root {
+  --bg: #f3f4f6; --surface: #ffffff; --surface-2: #f1f2f5; --well: #e6e8ec; --line: #dadde3;
+  --fg: #1c1e24; --muted: #5a5f6d; --accent: #e8b02a; --accent-ink: #1d1604; --accent-strong: #8a6200;
+  --ok: #1d7a4c; --danger: #c93c3c; --pro: #6b3fc4; --select: #1677c9; --hover: #e9ebef;
+  color-scheme: light;
+}
+[hidden] { display: none !important; }
+.btn:hover { border-color: #c4c8d0; background: var(--hover); }
+.btn.ghost:hover { background: var(--hover); }
+.tier.free { background: #dcf2e5; color: var(--ok); }
+.tier.pro { background: #ece4ff; color: var(--pro); }
+.tier.note { background: #e8eaee; color: var(--muted); }
+.toast { background: #1f2128; color: #fff; border-color: #1f2128; box-shadow: 0 6px 20px #0003; }
+.modal-back { background: rgba(20, 22, 28, .45); }
+.modal { box-shadow: 0 20px 50px #0003; }
 body { display: grid; height: 100%; overflow: hidden;
   grid-template-columns: 72px 300px minmax(0, 1fr); grid-template-rows: 52px 46px minmax(0, 1fr) 40px;
   grid-template-areas: "top top top" "rail side tool" "rail side work" "rail side foot"; }
@@ -26,19 +42,20 @@ header .title input:hover, header .title input:focus { border-color: var(--line)
 .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .tiles.two { grid-template-columns: repeat(2, 1fr); }
 .tile { aspect-ratio: 1; border-radius: 8px; background: var(--surface-2); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; cursor: grab; overflow: hidden; position: relative; padding: 0; color: var(--fg); font-size: 11px; text-align: center; }
-.tile:hover { border-color: #505767; }
+.tile:hover { border-color: #aeb3bd; }
+#ts .tile { background: #2a2c33; border-color: #2a2c33; color: #fff; }
 .tile img { width: 100%; height: 100%; object-fit: cover; }
-.tile .cap { position: absolute; left: 0; right: 0; bottom: 0; padding: 3px 5px; background: #000a; font-size: 10px; }
+.tile .cap { position: absolute; left: 0; right: 0; bottom: 0; padding: 3px 5px; background: #000a; color: #fff; font-size: 10px; }
 .addtext { display: block; width: 100%; text-align: left; background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; cursor: grab; }
 .swatches { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-.swatches button { aspect-ratio: 1; border-radius: 50%; border: 1px solid #ffffff2a; padding: 0; }
+.swatches button { aspect-ratio: 1; border-radius: 50%; border: 1px solid #0000002a; padding: 0; }
 .swatches button:hover { transform: scale(1.08); }
 .field { display: grid; gap: 4px; }
 .field > span { font-size: 11.5px; color: var(--muted); display: flex; justify-content: space-between; }
 .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-.fxtile { aspect-ratio: 1.3; border-radius: 8px; background: var(--surface-2); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 4px; font: 700 22px var(--f-display); color: #fff; }
-.fxtile small { font: 400 10.5px var(--f-body); color: var(--muted); }
+.fxtile { aspect-ratio: 1.3; border-radius: 8px; background: #2a2c33; border: 1px solid #2a2c33; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 4px; font: 700 22px var(--f-display); color: #fff; }
+.fxtile small { font: 400 10.5px var(--f-body); color: #c9cbd3; }
 .fxtile.on { border-color: var(--select); }
 .layer { display: flex; align-items: center; gap: 6px; padding: 6px 8px; border-radius: 6px; background: var(--surface-2); border: 1px solid transparent; cursor: pointer; }
 .layer.sel { border-color: var(--select); }
@@ -54,9 +71,10 @@ header .title input:hover, header .title input:focus { border-color: var(--line)
 .pagehead { display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: 12px; margin-bottom: 6px; gap: 8px; }
 .pagehead .row { gap: 2px; }
 .pagehead .btn { padding: 3px; }
-.page { position: relative; overflow: hidden; transform-origin: 0 0; box-shadow: 0 6px 30px #0009; }
-.pagebox.cur .page { outline: 2px solid #ffffff22; }
+.page { position: relative; overflow: hidden; transform-origin: 0 0; box-shadow: 0 1px 3px #0000001f, 0 6px 22px #00000014; }
+.pagebox.cur .pagehead > span:first-child { color: var(--fg); font-weight: 600; }
 .el { position: absolute; transform-origin: center; user-select: none; touch-action: none; }
+.el:not(.sel):hover::after { content: ""; position: absolute; inset: 0; outline: calc(1px / var(--z)) solid var(--select); opacity: .75; pointer-events: none; }
 .el.sel::after { content: ""; position: absolute; inset: 0; outline: calc(2px / var(--z)) solid var(--select); pointer-events: none; }
 .el .in { width: 100%; height: 100%; }
 .el.text { white-space: pre-wrap; overflow-wrap: break-word; cursor: move; }
@@ -73,11 +91,34 @@ header .title input:hover, header .title input:focus { border-color: var(--line)
 .hd[data-h=s] { bottom: calc(-7px / var(--z)); left: calc(50% - 7px / var(--z)); border-radius: 4px; cursor: ns-resize; }
 .hd[data-h=n] { top: calc(-7px / var(--z)); left: calc(50% - 7px / var(--z)); border-radius: 4px; cursor: ns-resize; }
 .hd[data-h=rot] { bottom: calc(-36px / var(--z)); left: calc(50% - 7px / var(--z)); cursor: grab; }
-.lockbadge { position: absolute; right: 0; top: 0; transform: translate(50%, -50%) scale(calc(1 / var(--z))); background: var(--surface); border-radius: 50%; padding: 3px; color: var(--accent); display: flex; z-index: 3; }
+.lockbadge { position: absolute; right: 0; top: 0; transform: translate(50%, -50%) scale(calc(1 / var(--z))); background: var(--surface); box-shadow: 0 1px 4px #0003; border-radius: 50%; padding: 3px; color: var(--accent-strong); display: flex; z-index: 3; }
 .guide { position: absolute; background: #ff4fa0; z-index: 4; pointer-events: none; }
 .marquee { position: absolute; border: calc(1px / var(--z)) solid var(--select); background: #46c2ff22; z-index: 5; pointer-events: none; }
 #foot { grid-area: foot; display: flex; align-items: center; gap: 10px; padding: 0 12px; background: var(--surface); border-top: 1px solid var(--line); }
 #foot input[type=range] { width: 160px; }
+body.noside { grid-template-columns: 72px 0 minmax(0, 1fr); }
+body.noside #side { display: none; }
+.psearch { width: 100%; padding: 7px 10px !important; }
+.nores { margin: 0; color: var(--muted); }
+#thumbs { display: flex; gap: 6px; align-items: center; overflow-x: auto; overflow-y: hidden; min-width: 0; flex: 1; padding: 2px; scrollbar-width: thin; }
+#thumbs button { flex: none; padding: 0; border: 2px solid transparent; border-radius: 5px; background: none; line-height: 0; }
+#thumbs button canvas { height: 26px; width: auto; border-radius: 3px; box-shadow: 0 0 0 1px var(--line); }
+#thumbs button.cur { border-color: var(--select); }
+#thumbs button:hover:not(.cur) { border-color: #b8bdc7; }
+#thumbs .addpg { width: 28px; height: 28px; border: 1px dashed #b8bdc7; display: flex; align-items: center; justify-content: center; color: var(--muted); line-height: 1; }
+#mini { position: absolute; z-index: 6; display: none; gap: 2px; padding: 3px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 4px 16px #00000024; }
+#mini.show { display: flex; }
+#mini button { background: none; border: 0; border-radius: 7px; padding: 6px; color: var(--fg); display: flex; }
+#mini button:hover { background: var(--hover); }
+#cmenu { position: fixed; z-index: 45; min-width: 220px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 10px 30px #00000030; padding: 5px; }
+#cmenu button { display: flex; width: 100%; align-items: center; gap: 10px; background: none; border: 0; padding: 6px 10px; border-radius: 6px; text-align: left; }
+#cmenu button:hover:not(:disabled), #cmenu button:focus-visible { background: var(--hover); }
+#cmenu button:disabled { opacity: .4; cursor: default; }
+#cmenu kbd { margin-left: auto; color: var(--muted); font: 11px var(--f-mono); }
+#cmenu hr { border: 0; border-top: 1px solid var(--line); margin: 4px 2px; }
+@media (prefers-reduced-motion: no-preference) {
+  .btn, #rail button, .tile, .addtext, .layer, #thumbs button, #mini button, #cmenu button, .swatches button { transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease, box-shadow 120ms ease, transform 120ms ease; }
+}
 .drop-hint { position: fixed; inset: 0; border: 3px dashed var(--accent); pointer-events: none; z-index: 40; display: none; }
 @media (max-width: 820px) {
   body { grid-template-columns: minmax(0, 1fr); grid-template-rows: 52px 46px minmax(0, 1fr) 40px 62px;
@@ -87,7 +128,8 @@ header .title input:hover, header .title input:focus { border-color: var(--line)
   #side { position: fixed; left: 0; right: 0; bottom: 62px; height: 46vh; z-index: 20; border-top: 1px solid var(--line); }
   #side.closed { display: none; }
   header .hide-sm { display: none; }
-  #foot input[type=range] { width: 100px; }
+  #foot input[type=range] { width: 70px; }
+  #foot { gap: 4px; padding: 0 6px; } #zv { display: none; }
   #pageInfo, #saved { display: none; }
 }
 @media (max-width: 560px) { header .lbl { display: none; } }
@@ -107,9 +149,10 @@ header .title input:hover, header .title input:focus { border-color: var(--line)
 <nav id="rail" aria-label="Panel"></nav>
 <aside id="side"><div class="ph"><h3 id="sideTitle"></h3><button class="btn ghost icon" id="sideClose" title="Tutup panel"></button></div><div id="sideBody"></div></aside>
 <div id="tool" role="toolbar" aria-label="Alat elemen"></div>
-<main id="work"><div id="pages"></div></main>
+<main id="work"><div id="pages"></div><div id="mini" role="toolbar" aria-label="Aksi cepat"></div></main>
+<div id="cmenu" role="menu" hidden></div>
 <footer id="foot">
-  <span class="mono" id="pageInfo"></span><span class="grow"></span>
+  <span class="mono" id="pageInfo"></span><div id="thumbs" aria-label="Halaman"></div>
   <button class="btn ghost icon" id="zout" title="Perkecil"></button>
   <input type="range" id="zoom" min="5" max="300" value="50" aria-label="Zoom">
   <button class="btn ghost icon" id="zin" title="Perbesar"></button>
@@ -123,6 +166,9 @@ header .title input:hover, header .title input:focus { border-color: var(--line)
 <script src="studio.js"></script>
 <script>
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+Object.assign(ICONS, {fwd: 'M12 19V6M6 12l6-6 6 6', bwd: 'M12 5v13M6 12l6 6 6-6', front: 'M5 4h14M12 21V9M7 14l5-5 5 5', backmost: 'M5 20h14M12 3v12M7 10l5 5 5-5',
+  center: 'M12 2v5M12 17v5M2 12h5M17 12h5M8 8h8v8H8z', paste: 'M9 3h6v4H9zM8 5H5v16h14V5h-3'});
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const FONTS = ['Plus Jakarta Sans', 'Bricolage Grotesque', 'Montserrat', 'Poppins', 'Roboto', 'Oswald', 'Archivo Black', 'Bebas Neue', 'Playfair Display', 'DM Serif Display', 'Lora', 'Pacifico', 'Dancing Script', 'JetBrains Mono'];
 const BASIC = ['#000000', '#FFFFFF', '#545454', '#D95D39', '#E8B02A', '#F2A541', '#2F8F5B', '#36C5B1', '#1F6FB2', '#2F5D8A', '#7A4A2A', '#B48CFF', '#F27BA6', '#2A1B3D'];
 const GRADS = [['#FF8C5A', '#F4C95D'], ['#1F6FB2', '#36C5B1'], ['#2A1B3D', '#D95D39'], ['#E8B02A', '#D95D39'], ['#B48CFF', '#46C2FF'], ['#13301F', '#2F8F5B'], ['#F4EDE1', '#E8B02A'], ['#000000', '#545454']];
@@ -140,8 +186,14 @@ $('#exportBtn').innerHTML = `${icon('download')}<span class="lbl"> Ekspor</span>
 $('#zout').innerHTML = icon('zoomOut'); $('#zin').innerHTML = icon('zoomIn');
 const RAIL = [['tpl', 'layout', 'Template'], ['el', 'shapes', 'Elemen'], ['txt', 'text', 'Teks'], ['up', 'upload', 'Upload'], ['pc', 'image', 'Foto'], ['bg', 'fill', 'Latar'], ['brand', 'palette', 'Merek'], ['layers', 'layers', 'Layer']];
 $('#rail').innerHTML = RAIL.map(([k, i, l]) => `<button data-r="${k}">${icon(i)}${l}</button>`).join('');
-$$('#rail button').forEach(b => b.onclick = () => { ctx = null; openRail(b.dataset.r); });
-$('#sideClose').onclick = () => { if (ctx) { ctx = null; openRail(rail); } else $('#side').classList.add('closed'); };
+$$('#rail button').forEach(b => b.onclick = () => { if (b.dataset.r === rail && !ctx && !sideHidden()) return collapseSide(); ctx = null; openRail(b.dataset.r); });
+$('#sideClose').onclick = () => { if (ctx) { ctx = null; openRail(rail); } else collapseSide(); };
+const sideHidden = () => document.body.classList.contains('noside') || $('#side').classList.contains('closed');
+function collapseSide() {
+  if (innerWidth <= 820) $('#side').classList.add('closed'); else document.body.classList.add('noside');
+  $$('#rail button').forEach(b => b.classList.remove('on')); render();
+}
+function showSide() { $('#side').classList.remove('closed'); document.body.classList.remove('noside'); }
 
 async function boot() {
   await Studio.connect();
@@ -217,12 +269,12 @@ function render() {
     const pg = document.createElement('div'); pg.className = 'page'; pg.dataset.pi = pi;
     pg.style.cssText = `width:${D.width}px;height:${D.height}px;background:${cssFill(p.bg)};transform:scale(${zoom});--z:${zoom}`;
     for (const e of p.elements) if (!e.hidden) pg.appendChild(elNode(e, pi));
-    pg.onpointerdown = ev => { if (ev.target === pg) marquee(ev, pi, pg); };
+    pg.onpointerdown = ev => { if (ev.target === pg && ev.button === 0) marquee(ev, pi, pg); };
     pg.ondragover = ev => ev.preventDefault(); pg.ondrop = ev => dropOnPage(ev, pi, pg);
     holder.appendChild(pg); box.appendChild(holder); wrap.appendChild(box);
   });
   for (const n of $$('.el.text')) { const [e] = findEl(n.dataset.id); if (e) e.h = n.offsetHeight; }
-  renderTool(); if (ctx) renderCtx(); else if (rail === 'layers') openRail('layers', true);
+  renderTool(); renderThumbs(); if (ctx) renderCtx(); else if (rail === 'layers' && !sideHidden()) openRail('layers', true);
 }
 function elNode(e, pi) {
   const n = document.createElement('div'), isSel = sel.includes(e.id);
@@ -254,7 +306,7 @@ function elNode(e, pi) {
     for (const h of hs) { const d = document.createElement('div'); d.className = 'hd'; d.dataset.h = h; n.appendChild(d); }
   }
   if (isSel && e.locked) n.insertAdjacentHTML('beforeend', `<span class="lockbadge">${icon('lock')}</span>`);
-  n.onpointerdown = ev => { if (editing === e.id) return; pointerOnEl(ev, e, pi); };
+  n.onpointerdown = ev => { if (editing === e.id) return; if (ev.button === 2) { ev.stopPropagation(); return; } pointerOnEl(ev, e, pi); };
   return n;
 }
 function textFx(e) {
@@ -365,7 +417,7 @@ function startEdit(e) {
   sel = [e.id]; editing = e.id; render(); snap();
   const n = $(`.el[data-id="${e.id}"]`); n.contentEditable = 'true'; n.focus(); getSelection().selectAllChildren(n);
   n.oninput = () => { e.text = n.innerText; }; n.onblur = stopEdit;
-  n.onkeydown = k => { if (k.key === 'Escape') { k.preventDefault(); n.blur(); } };
+  n.onkeydown = k => { if (k.key === 'Escape') { k.preventDefault(); k.stopPropagation(); n.blur(); } };
 }
 function stopEdit() { if (!editing) return; editing = null; commit(); }
 
@@ -439,7 +491,7 @@ function bindInput(el, fn) { // live preview while dragging a slider / colour, o
 // ---------- contextual toolbar ----------
 function tb(html) { return html; }
 function renderTool() {
-  const t = $('#tool'), els = selected(), e = one();
+  const t = $('#tool'), els = selected(), e = one(); placeMini();
   if (document.activeElement && t.contains(document.activeElement) && document.activeElement.matches('input,select')) {
     t.querySelectorAll('[data-live]').forEach(i => { if (i !== document.activeElement && e) i.value = Math.round(e[i.dataset.live] ?? 0); }); return;
   }
@@ -539,8 +591,20 @@ function distribute(axis) {
 // ---------- side panels ----------
 const tile = (inner, data, onclick, title = '') => { const t = document.createElement('button'); t.className = 'tile'; t.innerHTML = inner; t.title = title; t.draggable = !!data;
   if (data) t.ondragstart = ev => ev.dataTransfer.setData('text/plain', JSON.stringify(data)); t.onclick = onclick; return t; };
+const named = (el, name) => { el.dataset.name = name; return el; };
+function searchBox(B, ph) {
+  B.insertAdjacentHTML('afterbegin', `<input type="search" class="psearch" placeholder="${ph}" aria-label="${ph}">`);
+  B.insertAdjacentHTML('beforeend', '<p class="nores" hidden>Tidak ada yang cocok.</p>');
+  const i = B.querySelector('.psearch');
+  i.oninput = () => {
+    const q = i.value.trim().toLowerCase(); let n = 0;
+    B.querySelectorAll('[data-name]').forEach(t => { t.hidden = !!q && !t.dataset.name.toLowerCase().includes(q); if (!t.hidden) n++; });
+    B.querySelectorAll('[data-sec]').forEach(sec => { const any = [...sec.querySelectorAll('[data-name]')].some(t => !t.hidden), lab = sec.previousElementSibling; sec.hidden = !any; if (lab?.classList.contains('label')) lab.hidden = !any; });
+    B.querySelector('.nores').hidden = n > 0;
+  };
+}
 function openRail(r, keepScroll) {
-  rail = r; ctx = null; $('#side').classList.remove('closed');
+  rail = r; ctx = null; showSide();
   $$('#rail button').forEach(b => b.classList.toggle('on', b.dataset.r === r));
   const B = $('#sideBody'), sc = B.scrollTop; B.innerHTML = ''; const T = (s) => $('#sideTitle').textContent = s;
   if (r === 'tpl') {
@@ -554,34 +618,37 @@ function openRail(r, keepScroll) {
     }
   } else if (r === 'el') {
     T('Elemen');
-    B.insertAdjacentHTML('beforeend', `<div class="label">Bentuk & garis</div><div class="tiles" id="sh"></div><div class="label">Bingkai foto</div><div class="tiles" id="fr"></div><div class="label">Gradien</div><div class="tiles" id="gr"></div>`);
+    B.insertAdjacentHTML('beforeend', `<div class="label">Bentuk & garis</div><div class="tiles" id="sh" data-sec></div><div class="label">Bingkai foto</div><div class="tiles" id="fr" data-sec></div><div class="label">Gradien</div><div class="tiles" id="gr" data-sec></div>`);
     const prev = {rect: 'background:#2F5D8A;width:60%;height:60%', round: 'background:#36C5B1;width:70%;height:42%;border-radius:10px', pill: 'background:#E8B02A;width:76%;height:30%;border-radius:99px',
       ellipse: 'background:#D95D39;width:60%;height:60%;border-radius:50%', triangle: 'background:#2F8F5B;width:60%;height:52%;clip-path:polygon(50% 0,100% 100%,0 100%)',
-      star: `background:#F4C95D;width:62%;height:62%;clip-path:polygon(${POLY.star.map(([a, b]) => `${a * 100}% ${b * 100}%`).join(',')})`, line: 'background:#ddd;width:72%;height:4px', frame: 'border:3px solid #ddd;width:60%;height:60%'};
-    for (const k of Object.keys(prev)) $('#sh').appendChild(tile(`<i style="display:block;${prev[k]}"></i>`, {preset: k}, () => add(PRESETS[k]()), k));
-    $('#fr').appendChild(tile(`<i style="display:block;background:#C9CCD6;width:64%;height:64%;border-radius:6px"></i><span class="cap">Foto</span>`, {preset: 'photo'}, () => add(PRESETS.photo())));
-    $('#fr').appendChild(tile(`<i style="display:block;background:#C9CCD6;width:64%;height:64%;border-radius:50%"></i><span class="cap">Lingkaran</span>`, null, () => add({...PRESETS.photo(), radius: 9999})));
-    for (const g of GRADS) $('#gr').appendChild(tile(`<i style="display:block;width:70%;height:70%;border-radius:8px;background:linear-gradient(135deg,${g[0]},${g[1]})"></i>`, null, () => add({...PRESETS.rect(), fill: {g: 'linear', a: 135, c: [...g]}})));
+      star: `background:#F4C95D;width:62%;height:62%;clip-path:polygon(${POLY.star.map(([a, b]) => `${a * 100}% ${b * 100}%`).join(',')})`, line: 'background:#3a3d46;width:72%;height:4px', frame: 'border:3px solid #3a3d46;width:60%;height:60%'};
+    const NM = {rect: 'Kotak persegi', round: 'Kotak sudut bulat', pill: 'Pil tombol', ellipse: 'Lingkaran elips', triangle: 'Segitiga', star: 'Bintang', line: 'Garis', frame: 'Bingkai garis tepi'};
+    for (const k of Object.keys(prev)) $('#sh').appendChild(named(tile(`<i style="display:block;${prev[k]}"></i>`, {preset: k}, () => add(PRESETS[k]()), NM[k]), NM[k] + ' bentuk'));
+    $('#fr').appendChild(named(tile(`<i style="display:block;background:#C9CCD6;width:64%;height:64%;border-radius:6px"></i><span class="cap">Foto</span>`, {preset: 'photo'}, () => add(PRESETS.photo()), 'Bingkai foto'), 'Bingkai foto kotak'));
+    $('#fr').appendChild(named(tile(`<i style="display:block;background:#C9CCD6;width:64%;height:64%;border-radius:50%"></i><span class="cap">Lingkaran</span>`, null, () => add({...PRESETS.photo(), radius: 9999}), 'Bingkai foto lingkaran'), 'Bingkai foto lingkaran'));
+    for (const g of GRADS) $('#gr').appendChild(named(tile(`<i style="display:block;width:70%;height:70%;border-radius:8px;background:linear-gradient(135deg,${g[0]},${g[1]})"></i>`, null, () => add({...PRESETS.rect(), fill: {g: 'linear', a: 135, c: [...g]}}), 'Gradien'), 'Gradien warna'));
+    searchBox(B, 'Cari elemen');
   } else if (r === 'txt') {
     T('Teks');
     for (const [k, l, st] of [['heading', 'Tambahkan judul', 'font:800 22px var(--f-display)'], ['sub', 'Tambahkan subjudul', 'font:700 16px var(--f-body)'], ['body', 'Tambahkan teks isi', 'font:400 13px var(--f-body)']]) {
       const b = document.createElement('button'); b.className = 'addtext'; b.innerHTML = `<span style="${st}">${l}</span>`; b.draggable = true;
-      b.ondragstart = ev => ev.dataTransfer.setData('text/plain', JSON.stringify({preset: k})); b.onclick = () => add(PRESETS[k]()); B.appendChild(b);
+      b.ondragstart = ev => ev.dataTransfer.setData('text/plain', JSON.stringify({preset: k})); b.onclick = () => startEdit(add(PRESETS[k]())); b.dataset.name = l + ' teks'; B.appendChild(b);
     }
-    B.insertAdjacentHTML('beforeend', '<div class="label">Gaya teks</div><div class="tiles two" id="ts"></div><div class="label">Kombinasi font</div><div id="fc" style="display:grid;gap:8px"></div>');
+    B.insertAdjacentHTML('beforeend', '<div class="label">Gaya teks</div><div class="tiles two" id="ts" data-sec></div><div class="label">Kombinasi font</div><div id="fc" style="display:grid;gap:8px" data-sec></div>');
     const styles = [['Neon', {color: '#FFFFFF', effect: 'neon', fx: {color: '#FF4FD8', size: 10}, font: 'Bebas Neue'}, 'text-shadow:0 0 6px #FF4FD8,0 0 14px #FF4FD8;font-family:Bebas Neue'],
       ['Outline', {color: '#FFFFFF', effect: 'outline', fx: {color: '#111111', size: 10}, font: 'Archivo Black'}, '-webkit-text-stroke:3px #111;paint-order:stroke fill;font-family:Archivo Black'],
       ['Label', {color: '#1D1604', effect: 'background', fx: {color: '#E8B02A', size: 14}, font: 'Plus Jakarta Sans', bold: true}, 'background:#E8B02A;color:#1D1604;padding:2px 6px;border-radius:4px'],
       ['Hollow', {color: '#FFFFFF', effect: 'hollow', fx: {size: 6}, font: 'Bricolage Grotesque', bold: true}, 'color:transparent;-webkit-text-stroke:1.5px #fff;font-family:Bricolage Grotesque;font-weight:800']];
-    for (const [n, o, css] of styles) $('#ts').appendChild(tile(`<span style="font-size:22px;${css}">${n}</span>`, null, () => add({...PRESETS.heading(), ...o, text: n.toUpperCase()})));
+    for (const [n, o, css] of styles) $('#ts').appendChild(named(tile(`<span style="font-size:22px;${css}">${n}</span>`, null, () => add({...PRESETS.heading(), ...o, text: n.toUpperCase()}), n), n + ' gaya teks efek'));
     for (const [a, b] of [['Bebas Neue', 'Roboto'], ['Playfair Display', 'Montserrat'], ['Bricolage Grotesque', 'Plus Jakarta Sans'], ['Pacifico', 'Poppins'], ['DM Serif Display', 'Lora']]) {
       const x = document.createElement('button'); x.className = 'addtext';
-      x.innerHTML = `<div style="font-family:'${a}';font-size:20px">${a}</div><div style="font-family:'${b}';color:var(--muted)">dipasangkan dengan ${b}</div>`;
+      x.dataset.name = `${a} ${b} kombinasi font`; x.innerHTML = `<div style="font-family:'${a}';font-size:20px">${a}</div><div style="font-family:'${b}';color:var(--muted)">dipasangkan dengan ${b}</div>`;
       x.onclick = () => { const g = uid(); snap(); const h = {...PRESETS.heading(), font: a, group: g}; h.x = Math.round((D.width - h.w) / 2); h.y = Math.round(D.height * .38);
         const s2 = {...PRESETS.body(), font: b, group: g}; s2.x = Math.round((D.width - s2.w) / 2); s2.y = h.y + h.fontSize * 1.5;
         for (const e of [h, s2]) { e.id = uid(); e.rot = 0; e.opacity = 1; page().elements.push(e); } sel = [h.id, s2.id]; commit(); };
       $('#fc').appendChild(x);
     }
+    searchBox(B, 'Cari teks atau font');
   } else if (r === 'up') {
     T('Upload');
     B.insertAdjacentHTML('beforeend', `<button class="btn primary" id="upBtn" style="justify-content:center">${icon('upload')} Upload gambar</button>
@@ -628,7 +695,7 @@ function openRail(r, keepScroll) {
   }
   if (keepScroll) B.scrollTop = sc;
 }
-function openCtx(c) { ctx = c; $('#side').classList.remove('closed'); renderCtx(); }
+function openCtx(c) { ctx = c; showSide(); renderCtx(); }
 function renderCtx() {
   const B = $('#sideBody'), e = one(), els = selected(), T = s => $('#sideTitle').textContent = s; B.innerHTML = '';
   $$('#rail button').forEach(b => b.classList.remove('on'));
@@ -733,6 +800,75 @@ $('#fontFile').onchange = async ev => {
   catch { Studio.toast('File font tidak bisa dibaca. Gunakan .ttf, .otf atau .woff.'); }
 };
 
+// ---------- clipboard, centering, mini toolbar, context menu ----------
+function copySel() { if (sel.length) clip = JSON.stringify(selected()); }
+function paste() { if (!clip) return; snap(); const gmap = {}; sel = JSON.parse(clip).map(x => { x.id = uid(); x.x += 24; x.y += 24; x.locked = false; if (x.group) x.group = gmap[x.group] ??= uid(); page().elements.push(x); return x.id; }); commit(); }
+function centerOnPage() {
+  const els = selected().filter(e => !e.locked); if (!els.length) return; snap();
+  const b = bbox(els), dx = Math.round((D.width - b.w) / 2 - b.x), dy = Math.round((D.height - b.h) / 2 - b.y);
+  for (const e of els) { e.x += dx; e.y += dy; } commit();
+}
+function placeMini() {
+  const m = $('#mini'), nodes = $$('.el.sel');
+  if (!nodes.length || editing) { m.classList.remove('show'); return; }
+  const W = $('#work'), wr = W.getBoundingClientRect(); let l = 1e9, t = 1e9, r = -1e9, b = -1e9;
+  for (const n of nodes) { const q = n.getBoundingClientRect(); l = Math.min(l, q.left); t = Math.min(t, q.top); r = Math.max(r, q.right); b = Math.max(b, q.bottom); }
+  const locked = selected().every(e => e.locked), key = sel.join() + locked;
+  if (m.dataset.key !== key) {
+    m.dataset.key = key;
+    m.innerHTML = `<button data-m="dup" title="Duplikat (Ctrl+D)" aria-label="Duplikat">${icon('copy')}</button><button data-m="lock" title="${locked ? 'Buka kunci' : 'Kunci'}" aria-label="${locked ? 'Buka kunci' : 'Kunci'}">${icon(locked ? 'lock' : 'unlock')}</button><button data-m="del" title="Hapus (Del)" aria-label="Hapus">${icon('trash')}</button><button data-m="more" title="Lainnya" aria-label="Lainnya" aria-haspopup="menu">${icon('more')}</button>`;
+    m.querySelector('[data-m=dup]').onclick = duplicate; m.querySelector('[data-m=lock]').onclick = lockToggle; m.querySelector('[data-m=del]').onclick = remove;
+    m.querySelector('[data-m=more]').onclick = ev => { const q = ev.currentTarget.getBoundingClientRect(); openMenu(q.left, q.bottom + 4); };
+  }
+  m.classList.add('show');
+  const mw = m.offsetWidth, mh = m.offsetHeight;
+  let x = (l + r) / 2 - wr.left + W.scrollLeft - mw / 2, y = t - wr.top + W.scrollTop - mh - 14;
+  if (y < W.scrollTop + 4) y = b - wr.top + W.scrollTop + 48;  // below (past the rotate handle) when there is no room above
+  x = Math.max(W.scrollLeft + 4, Math.min(x, W.scrollLeft + W.clientWidth - mw - 4));
+  m.style.left = x + 'px'; m.style.top = y + 'px';
+}
+$('#mini').addEventListener('pointerdown', ev => ev.stopPropagation());
+function openMenu(x, y) {
+  const els = selected(), has = els.length > 0, grouped = els.length > 1 && els.every(e => e.group && e.group === els[0].group), m = $('#cmenu');
+  const items = [['copy', 'Salin', 'Ctrl+C', has, copySel], ['paste', 'Tempel', 'Ctrl+V', !!clip, paste], ['copy', 'Duplikat', 'Ctrl+D', has, duplicate], ['trash', 'Hapus', 'Del', has, remove], '-',
+    ['fwd', 'Maju', '', has, () => reorder('up')], ['bwd', 'Mundur', '', has, () => reorder('down')], ['front', 'Paling depan', '', has, () => reorder('front')], ['backmost', 'Paling belakang', '', has, () => reorder('back')], '-',
+    ['group', grouped ? 'Pisahkan' : 'Grupkan', 'Ctrl+G', els.length > 1, groupToggle], ['lock', has && els.every(e => e.locked) ? 'Buka kunci' : 'Kunci', '', has, lockToggle], ['center', 'Ratakan ke halaman', '', has, centerOnPage]];
+  m.innerHTML = items.map((it, i) => it === '-' ? '<hr>' : `<button role="menuitem" data-i="${i}" ${it[3] ? '' : 'disabled'}>${icon(it[0])}${it[1]}${it[2] ? `<kbd>${it[2]}</kbd>` : ''}</button>`).join('');
+  m.querySelectorAll('[data-i]').forEach(b => b.onclick = () => { closeMenu(); items[b.dataset.i][4](); });
+  m.hidden = false; const w = m.offsetWidth, h = m.offsetHeight;
+  m.style.left = Math.max(4, Math.min(x, innerWidth - w - 4)) + 'px'; m.style.top = Math.max(4, Math.min(y, innerHeight - h - 4)) + 'px';
+  m.querySelector('button:not(:disabled)')?.focus();
+}
+function closeMenu() { $('#cmenu').hidden = true; }
+$('#work').addEventListener('contextmenu', ev => {
+  if (editing) return; ev.preventDefault();
+  const n = ev.target.closest('.el'), pg = ev.target.closest('.page');
+  if (n) { const [e, p, pi] = findEl(n.dataset.id); if (e && !sel.includes(e.id)) sel = groupIds(e, p); if (e) cur = pi; }
+  else { sel = []; if (pg) cur = +pg.dataset.pi; }
+  render(); openMenu(ev.clientX, ev.clientY);
+});
+addEventListener('pointerdown', ev => { if (!$('#cmenu').hidden && !ev.target.closest('#cmenu')) closeMenu(); }, true);
+addEventListener('keydown', ev => { if (ev.key === 'Escape' && !$('#cmenu').hidden) { ev.stopImmediatePropagation(); ev.preventDefault(); closeMenu(); } }, true);
+addEventListener('blur', closeMenu); $('#work').addEventListener('scroll', closeMenu);
+
+// ---------- page thumbnails ----------
+let thumbRaf;
+function renderThumbs() {
+  cancelAnimationFrame(thumbRaf);
+  thumbRaf = requestAnimationFrame(() => {
+    const s = $('#thumbs'), k = 52 / D.height; s.innerHTML = '';
+    D.pages.forEach((p, pi) => {
+      const b = document.createElement('button'); b.className = pi === cur ? 'cur' : ''; b.title = `Halaman ${pi + 1}`; b.setAttribute('aria-label', `Halaman ${pi + 1}`);
+      const c = document.createElement('canvas'); renderPageTo(c, p, k); b.appendChild(c);
+      b.onclick = () => { stopEdit(); cur = pi; sel = []; render(); $$('.pagebox')[pi]?.scrollIntoView({block: 'start', inline: 'nearest', behavior: REDUCED ? 'auto' : 'smooth'}); };
+      s.appendChild(b);
+    });
+    const a = document.createElement('button'); a.className = 'addpg'; a.title = 'Tambah halaman'; a.setAttribute('aria-label', 'Tambah halaman'); a.innerHTML = icon('plus');
+    a.onclick = () => { pageAction('add', D.pages.length - 1); requestAnimationFrame(() => $$('.pagebox')[cur]?.scrollIntoView({block: 'start', behavior: REDUCED ? 'auto' : 'smooth'})); };
+    s.appendChild(a);
+  });
+}
+
 // ---------- keyboard ----------
 addEventListener('keydown', ev => {
   if (editing || ev.target.matches('input,select,textarea')) return;
@@ -742,8 +878,8 @@ addEventListener('keydown', ev => {
   else if (c && k === 'd') { ev.preventDefault(); duplicate(); }
   else if (c && k === 'a') { ev.preventDefault(); sel = page().elements.filter(e => !e.hidden).map(e => e.id); render(); }
   else if (c && k === 'g') { ev.preventDefault(); const els = selected(); if (ev.shiftKey || (els.length > 1 && els.every(x => x.group && x.group === els[0].group))) { if (els.some(x => x.group)) setAll(x => delete x.group); } else groupToggle(); }
-  else if (c && k === 'c' && sel.length) clip = JSON.stringify(selected());
-  else if (c && k === 'v' && clip) { snap(); const gmap = {}; sel = JSON.parse(clip).map(x => { x.id = uid(); x.x += 24; x.y += 24; if (x.group) x.group = gmap[x.group] ??= uid(); page().elements.push(x); return x.id; }); commit(); }
+  else if (c && k === 'c' && sel.length) copySel();
+  else if (c && k === 'v' && clip) paste();
   else if (c && k === 'b') { ev.preventDefault(); setAll(x => { if (x.type === 'text') x.bold = !x.bold; }); }
   else if (c && k === 'i') { ev.preventDefault(); setAll(x => { if (x.type === 'text') x.italic = !x.italic; }); }
   else if ((ev.key === 'Delete' || ev.key === 'Backspace') && sel.length) { ev.preventDefault(); remove(); }
