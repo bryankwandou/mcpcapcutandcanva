@@ -81,30 +81,70 @@ header select { max-width: 220px; }
 #playhead::before { content: ""; position: absolute; top: 0; left: -6px; border: 7px solid transparent; border-top: 9px solid var(--fg); }
 .snapline { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--accent); z-index: 6; pointer-events: none; }
 .empty-tl { padding: 26px; color: var(--muted); }
+/* ---- compact panelled workspace (page-specific) ---- */
+body { --gap: 4px; background: #08090c; padding: 0 var(--gap) var(--gap); column-gap: var(--gap); grid-template-rows: 44px minmax(240px, 1fr) var(--gap) var(--tlh, 290px); grid-template-columns: 280px minmax(0, 1fr) 290px; }
+header { margin: 0 calc(-1 * var(--gap)) var(--gap); border-bottom-color: #000; }
+#media, #player, #insp, #tl { border: 1px solid #23262e; border-radius: 8px; overflow: hidden; }
+#media { grid-template-rows: auto auto minmax(0, 1fr); }
+#player { grid-template-rows: 30px minmax(0, 1fr) 40px; }
+#insp { display: grid; grid-template-rows: auto minmax(0, 1fr); padding: 0; gap: 0; overflow: hidden; }
+#inspBody { overflow: auto; padding: 12px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; align-content: start; min-height: 0; min-width: 0; }
+#inspBody h3 { font-size: 14px; }
+.phd { height: 30px; display: flex; align-items: center; gap: 6px; padding: 0 10px; font-size: 11.5px; font-weight: 700; color: var(--muted); border-bottom: 1px solid #ffffff0d; background: #ffffff04; white-space: nowrap; }
+.phd b { color: var(--fg); font-weight: 700; }
+#split { background: transparent; border: 0; border-radius: 2px; }
+#split:hover { background: #ffffff14; }
+#pctl { justify-content: space-between; gap: 8px; }
+#pctl .mid { display: flex; align-items: center; gap: 6px; }
+#pctl .side { display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0; }
+#pctl .side.r { justify-content: flex-end; }
+#ratioSel { padding: 3px 6px; font-size: 12px; max-width: 120px; }
+#player:fullscreen { border-radius: 0; border: 0; }
+#tl { grid-template-rows: 36px minmax(0, 1fr); }
+#tlbar { gap: 2px; padding: 0 6px; }
+#tlbar .btn.icon { padding: 5px; border-radius: 6px; }
+#tlbar .btn.icon svg.i { width: 17px; height: 17px; }
+#tlbar .zoom { display: flex; align-items: center; gap: 2px; flex: none; }
+#tlbar .btn.on { border-color: transparent; background: #46c2ff1f; }
+.seg { background-size: auto 100%; }
+.seg:hover { border-color: #ffffff6b; }
+.seg.sel:hover { border-color: #fff; }
+.seg canvas.wf { position: absolute; left: 0; bottom: 0; width: 100%; pointer-events: none; }
+.seg.audio canvas.wf { height: 70%; }
+.seg.video canvas.wf { height: 30%; background: #0007; }
+#playhead .ph-head { position: absolute; top: 0; left: -8px; width: 18px; height: 22px; pointer-events: auto; cursor: ew-resize; touch-action: none; }
+#playhead::before { left: -6px; }
+#playhead.drag, #playhead:has(.ph-head:hover) { background: var(--accent); }
+@media (prefers-reduced-motion: no-preference) {
+  .seg { transition: border-color 120ms ease, box-shadow 120ms ease, filter 120ms ease; }
+  .btn, .mitem, #mtabs button, #split { transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 @media (max-width: 900px) {
-  body { grid-template-columns: minmax(0, 1fr); grid-template-rows: 50px minmax(220px, 1fr) 0 230px auto auto; grid-template-areas: "top" "player" "split" "tl" "insp" "media"; overflow: auto; height: auto; }
-  #insp, #media { max-height: 360px; border: 0; border-top: 1px solid var(--line); }
+  body { padding: 0 var(--gap) var(--gap); row-gap: var(--gap); grid-template-columns: minmax(0, 1fr); grid-template-rows: 44px minmax(220px, 1fr) 0 260px auto auto; grid-template-areas: "top" "player" "split" "tl" "insp" "media"; overflow: auto; height: auto; }
+  #insp, #media { max-height: 360px; } header { margin-bottom: 0; }
   header .hide-sm { display: none; }
 }
-@media (max-width: 560px) { #deploy .lbl, #status { display: none; } #tlbar .btn:not(.icon) { font-size: 0; gap: 0; } #tlbar .btn svg { font-size: 13px; } #tlZoom { width: 80px !important; } }
+@media (max-width: 560px) { #deploy .lbl, #status { display: none; } #tlZoom { width: 70px !important; } #pctl .tc span { display: none; } #ratioSel { max-width: 74px; } }
 </style>
 </head>
 <body>
 <header>
   <button class="btn ghost icon" id="home" title="Beranda"></button>
   <select id="draftSel" aria-label="Project" hidden></select><span id="demoTag" class="tier note" hidden>Mode demo</span>
-  <button class="btn ghost icon" id="undo" title="Urungkan (Ctrl+Z)"></button><button class="btn ghost icon" id="redo" title="Ulangi (Ctrl+Y)"></button>
   <span id="status" class="grow"></span>
   <button class="btn hide-sm" id="discard">Buang perubahan</button>
   <button class="btn primary" id="deploy"></button>
 </header>
-<aside id="media"><nav id="mtabs" aria-label="Aset"></nav><div id="mbody"></div></aside>
+<aside id="media"><div class="phd"><b>Media</b></div><nav id="mtabs" aria-label="Aset"></nav><div id="mbody"></div></aside>
 <section id="player">
+  <div class="phd"><b>Pemutar</b><span class="grow"></span><span id="ratio" class="mono"></span></div>
   <div id="stageWrap"><div id="stage"></div></div>
-  <div id="pctl"><span class="tc"><b id="tcNow">00:00:00</b> <span>/ <span id="tcEnd">00:00:00</span></span></span>
-    <button class="btn icon" id="play" title="Putar (Spasi)"></button><span class="tier note" id="ratio"></span></div>
+  <div id="pctl"><div class="side"><span class="tc"><b id="tcNow">00:00:00</b> <span>/ <span id="tcEnd">00:00:00</span></span></span></div>
+    <div class="mid"><button class="btn icon ghost" id="play" title="Putar (Spasi)"></button></div>
+    <div class="side r"><select id="ratioSel" aria-label="Rasio kanvas" title="Rasio kanvas (pratinjau)"></select><button class="btn icon ghost" id="fs" title="Layar penuh"></button></div></div>
 </section>
-<aside id="insp"></aside>
+<aside id="insp"><div class="phd"><b>Properti</b></div><div id="inspBody"></div></aside>
 <div id="split" title="Seret untuk mengubah tinggi timeline"></div>
 <section id="tl">
   <div id="tlbar"></div>
@@ -113,6 +153,7 @@ header select { max-width: 220px; }
 <script src="studio.js"></script>
 <script>
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+ICONS.fullscreen = 'M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5'; ICONS.fsExit = 'M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5';
 ICONS.magnet = 'M6 4v7a6 6 0 0 0 12 0V4h-4v7a2 2 0 0 1-4 0V4zM6 8h4M14 8h4';
 const FPS = 30, HW = 92, KF_PROPS = ['x', 'y', 'scale', 'rotation', 'alpha'];
 document.body.style.setProperty('--hw', HW + 'px');
@@ -121,7 +162,7 @@ const undoS = [], redoS = [], media = {};
 let LIB = [], FILES = [];
 
 // ---------- boot ----------
-$('#home').innerHTML = icon('home'); $('#undo').innerHTML = icon('undo'); $('#redo').innerHTML = icon('redo'); $('#play').innerHTML = icon('play');
+$('#home').innerHTML = icon('home'); $('#play').innerHTML = icon('play'); $('#fs').innerHTML = icon('fullscreen');
 $('#deploy').innerHTML = `${icon('send')}<span class="lbl"> Deploy ke CapCut</span>`;
 $('#home').onclick = () => Studio.go('index.html');
 async function boot() {
@@ -203,8 +244,8 @@ function save() {
   }, 300);
 }
 const restore = j => { S = JSON.parse(j); if (sel && !S.elements.some(e => e.id === sel)) sel = null; render(); save(); };
-$('#undo').onclick = () => { if (undoS.length) { redoS.push(JSON.stringify(S)); restore(undoS.pop()); } };
-$('#redo').onclick = () => { if (redoS.length) { undoS.push(JSON.stringify(S)); restore(redoS.pop()); } };
+function undo() { if (undoS.length) { redoS.push(JSON.stringify(S)); restore(undoS.pop()); } }
+function redo() { if (redoS.length) { undoS.push(JSON.stringify(S)); restore(redoS.pop()); } }
 $('#deploy').onclick = async () => {
   if (DEMO) return Studio.modal(`<h3>Deploy ke CapCut</h3><p>Ini mode demo. Untuk menulis hasil edit ke project CapCut di komputer Anda, jalankan <span class="mono">creative-mcp studio</span> lalu buka project dari menu Project video.</p><div class="actions"><button class="btn primary" onclick="this.closest('.modal-back').remove()">Mengerti</button></div>`);
   if (!await Studio.confirm('Deploy ke CapCut?', `Semua perubahan ditulis ke project "${DRAFT}". Tutup project ini di CapCut dulu, lalu buka lagi setelah deploy. Cadangan .json.bak dibuat otomatis.`, 'Deploy')) return;
@@ -248,7 +289,19 @@ function visible(e) { // a transition lets the next clip fade in over the last h
 
 // ---------- player ----------
 let sw = 0, sh = 0;
-function fitStage() { const r = $('#stageWrap').getBoundingClientRect(), ar = S.width / S.height; sh = Math.max(50, Math.min(r.height - 20, (r.width - 20) / ar)); sw = sh * ar; Object.assign($('#stage').style, {width: sw + 'px', height: sh + 'px'}); $('#ratio').textContent = `${S.width}×${S.height}`; }
+function fitStage() { const r = $('#stageWrap').getBoundingClientRect(), ar = S.width / S.height; sh = Math.max(50, Math.min(r.height - 20, (r.width - 20) / ar)); sw = sh * ar; Object.assign($('#stage').style, {width: sw + 'px', height: sh + 'px'}); $('#ratio').textContent = `${S.width}×${S.height}`; renderRatio(); }
+const RATIOS = [['9:16', 1080, 1920], ['16:9', 1920, 1080], ['1:1', 1080, 1080], ['4:5', 1080, 1350]];
+function renderRatio() {
+  const cur = RATIOS.find(([, w, h]) => w * S.height === h * S.width), sel = $('#ratioSel');
+  sel.innerHTML = (cur ? '' : `<option value="">${S.width}×${S.height}</option>`) + RATIOS.map(([l]) => `<option value="${l}">${l}</option>`).join('');
+  sel.value = cur ? cur[0] : '';
+}
+$('#ratioSel').onchange = ev => { const r = RATIOS.find(([l]) => l === ev.target.value); if (!r) return; snap(); S.width = r[1]; S.height = r[2]; commit(); Studio.toast(`Rasio kanvas ${r[0]} (${r[1]}×${r[2]})`); };
+$('#fs').onclick = async () => {
+  try { if (document.fullscreenElement) await document.exitFullscreen(); else if ($('#player').requestFullscreen) await $('#player').requestFullscreen(); else throw new Error('unsupported'); }
+  catch { Studio.toast('Layar penuh tidak tersedia di browser ini.'); }
+};
+document.addEventListener('fullscreenchange', () => { const on = !!document.fullscreenElement; $('#fs').innerHTML = icon(on ? 'fsExit' : 'fullscreen'); $('#fs').title = on ? 'Keluar layar penuh' : 'Layar penuh'; render(); });
 const toPx = (x, y) => [(x + 1) / 2 * sw, (1 - y) / 2 * sh], fromPx = (px, py) => [px / sw * 2 - 1, 1 - py / sh * 2];
 const zOrder = e => { const order = ['audio', 'effect', 'filter', 'video', 'sticker', 'text'], k = trackOf(e); return order.indexOf(kindOf(e.type)) * 1000 + S.tracks.indexOf(k) * 10 + e.start / 1000; };
 function renderStage() {
@@ -323,19 +376,64 @@ function seek(v) { t = Math.max(0, Math.min(total(), v)); renderStage(); renderP
 // ---------- timeline ----------
 function fitTl() { const w = (document.body.clientWidth || 1200) - HW - 60; pxs = Math.max(8, Math.min(160, w / (total() + 2))); }
 function renderTlbar() {
-  $('#tlbar').innerHTML = `<button class="btn ghost" id="bSplit" title="Potong di playhead (S / Ctrl+B)">${icon('scissors')} Potong</button>
-    <button class="btn ghost icon" id="bDel" title="Hapus (Delete)">${icon('trash')}</button><button class="btn ghost icon" id="bDup" title="Duplikat">${icon('copy')}</button>
-    <button class="btn ghost" id="bKf" title="Tambah/hapus keyframe di playhead">${icon('diamond')} Keyframe</button>
-    <span class="sep"></span><button class="btn ghost icon${snapOn ? ' on' : ''}" id="bSnap" title="Snap ke playhead & tepi klip">${icon('magnet')}</button>
-    <span class="grow"></span><button class="btn ghost icon" id="bZo" title="Perkecil timeline">${icon('zoomOut')}</button>
-    <input type="range" id="tlZoom" min="8" max="240" value="${Math.round(pxs)}" style="width:130px" aria-label="Zoom timeline"><button class="btn ghost icon" id="bZi" title="Perbesar timeline">${icon('zoomIn')}</button>
-    <button class="btn ghost" id="bFit">Pas</button>`;
+  const ib = (id, ic, tip, on) => `<button class="btn ghost icon${on ? ' on' : ''}" id="${id}" title="${tip}" aria-label="${tip}">${icon(ic)}</button>`;
+  $('#tlbar').innerHTML = `${ib('bUndo', 'undo', 'Urungkan (Ctrl+Z)')}${ib('bRedo', 'redo', 'Ulangi (Ctrl+Y)')}<span class="sep"></span>
+    ${ib('bSplit', 'scissors', 'Potong di playhead (S / Ctrl+B)')}${ib('bDel', 'trash', 'Hapus (Delete)')}${ib('bDup', 'copy', 'Duplikat (Ctrl+D)')}${ib('bKf', 'diamond', 'Tambah/hapus keyframe di playhead')}
+    <span class="sep"></span>${ib('bSnap', 'magnet', 'Snap ke playhead & tepi klip', snapOn)}
+    <span class="grow"></span><span class="zoom">${ib('bFit', 'resize', 'Pas ke layar')}${ib('bZo', 'zoomOut', 'Perkecil timeline')}
+    <input type="range" id="tlZoom" min="8" max="240" value="${Math.round(pxs)}" style="width:110px" aria-label="Zoom timeline" title="Zoom timeline (Ctrl + gulir)">${ib('bZi', 'zoomIn', 'Perbesar timeline')}</span>`;
+  $('#bUndo').onclick = undo; $('#bRedo').onclick = redo; $('#bUndo').disabled = !undoS.length; $('#bRedo').disabled = !redoS.length;
   $('#bSplit').onclick = split; $('#bDel').onclick = del; $('#bDup').onclick = dup; $('#bKf').onclick = toggleKf;
   $('#bSnap').onclick = () => { snapOn = !snapOn; renderTlbar(); };
   $('#tlZoom').oninput = e => { pxs = +e.target.value; renderTimeline(); };
   $('#bZo').onclick = () => { pxs = Math.max(8, pxs / 1.3); renderTlbar(); renderTimeline(); }; $('#bZi').onclick = () => { pxs = Math.min(240, pxs * 1.3); renderTlbar(); renderTimeline(); };
   $('#bFit').onclick = () => { fitTl(); renderTlbar(); renderTimeline(); };
 }
+function updUndoBtns() { const u = $('#bUndo'), r = $('#bRedo'); if (u) { u.disabled = !undoS.length; r.disabled = !redoS.length; } }
+
+// ---------- timeline media previews: video frame strips & audio waveforms ----------
+const thumbs = {}, peaks = {}; // per src: undefined | 'pending' | 'fail' | value
+function loadThumbs(src) {
+  if (thumbs[src]) return; thumbs[src] = 'pending';
+  const v = Object.assign(document.createElement('video'), {muted: true, preload: 'auto', playsInline: true, crossOrigin: 'anonymous'});
+  const fail = () => { thumbs[src] = 'fail'; v.removeAttribute('src'); v.load(); };
+  const seekTo = s => new Promise((ok, no) => { const tm = setTimeout(() => no(new Error('timeout')), 5000);
+    v.onseeked = () => { clearTimeout(tm); ok(); }; v.onerror = () => { clearTimeout(tm); no(new Error('error')); }; v.currentTime = s; });
+  v.onloadedmetadata = async () => {
+    try {
+      const d = isFinite(v.duration) && v.duration > 0 ? v.duration : 1, n = Math.max(1, Math.min(10, Math.ceil(d / 2))), fh = 64, fw = Math.max(16, Math.round(fh * (v.videoWidth || 16) / (v.videoHeight || 9)));
+      const k = document.createElement('canvas'); k.width = fw * n; k.height = fh; const x = k.getContext('2d');
+      for (let i = 0; i < n; i++) { await seekTo(Math.min(d - .05, (i + .5) * d / n)); x.drawImage(v, i * fw, 0, fw, fh); }
+      thumbs[src] = k.toDataURL('image/jpeg', .7); // throws on tainted (cross-origin) canvas
+      $$('.seg.video').forEach(n => { if (n.dataset.src === src) n.style.backgroundImage = `url("${thumbs[src]}")`; });
+    } catch { fail(); }
+    finally { v.removeAttribute('src'); v.load(); }
+  };
+  v.onerror = fail; v.src = mediaUrl(src);
+}
+const PEAK_RATE = 100; // peak buckets per second of source audio
+async function loadPeaks(src) {
+  if (peaks[src]) return; peaks[src] = 'pending';
+  try {
+    const r = await fetch(mediaUrl(src)); if (!r.ok) throw new Error(r.status);
+    if (+r.headers.get('content-length') > 300e6) throw new Error('too large');
+    const C = window.OfflineAudioContext || window.webkitOfflineAudioContext, ctx = new C(1, 1, 8000);
+    const buf = await ctx.decodeAudioData(await r.arrayBuffer()), n = Math.ceil(buf.duration * PEAK_RATE), out = new Float32Array(n), per = buf.sampleRate / PEAK_RATE;
+    for (let c = 0; c < buf.numberOfChannels; c++) { const d = buf.getChannelData(c); for (let i = 0; i < d.length; i++) { const j = Math.floor(i / per), a = Math.abs(d[i]); if (a > out[j]) out[j] = a; } }
+    let mx = 0; for (const p of out) mx = Math.max(mx, p); if (mx > 0) for (let i = 0; i < n; i++) out[i] /= mx;
+    peaks[src] = out; if (!dragging) renderTimeline();
+  } catch { peaks[src] = 'fail'; }
+}
+function drawWave(seg, e) {
+  const P = peaks[e.src]; if (!(P instanceof Float32Array)) return false;
+  const w = Math.min(8000, Math.max(1, Math.round(e.duration * pxs))), h = e.type === 'audio' ? 36 : 16, k = document.createElement('canvas');
+  k.className = 'wf'; k.width = w; k.height = h; const x = k.getContext('2d'); x.fillStyle = e.type === 'audio' ? '#ffd9c6cc' : '#ffffffaa';
+  for (let i = 0; i < w; i++) { const s0 = e.source_start + i / pxs * e.speed, s1 = e.source_start + (i + 1) / pxs * e.speed; let m = 0;
+    for (let j = Math.floor(s0 * PEAK_RATE), J = Math.max(j + 1, Math.floor(s1 * PEAK_RATE)); j < J && j < P.length; j++) m = Math.max(m, P[j]);
+    const bh = Math.max(m > 0 ? 1 : 0, m * h); if (e.type === 'audio') x.fillRect(i, (h - bh) / 2, 1, bh); else x.fillRect(i, h - bh, 1, bh); }
+  seg.appendChild(k); seg.dataset.wave = 'drawn'; return true;
+}
+
 function orderedTracks() { const ord = ['effect', 'filter', 'sticker', 'text', 'video', 'audio']; return [...S.tracks].sort((a, b) => ord.indexOf(a.type) - ord.indexOf(b.type) || S.tracks.indexOf(a) - S.tracks.indexOf(b)); }
 const mainTrack = () => S.tracks.find(k => k.type === 'video');
 function renderTimeline() {
@@ -356,11 +454,14 @@ function renderTimeline() {
       const s = document.createElement('div'); s.className = `seg ${e.type}${sel === e.id ? ' sel' : ''}`; s.dataset.id = e.id;
       s.style.left = e.start * pxs + 'px'; s.style.width = Math.max(6, e.duration * pxs) + 'px';
       if (e.type === 'photo') s.style.backgroundImage = `url("${mediaUrl(e.src)}")`;
-      s.innerHTML = `<span class="lb">${e.speed !== 1 ? `${e.speed}× · ` : ''}${esc(segLabel(e))}</span>${e.type === 'audio' ? '<div class="wave"></div>' : ''}
+      if (e.type === 'video' && e.src) { s.dataset.src = e.src; loadThumbs(e.src); if (typeof thumbs[e.src] === 'string' && thumbs[e.src].startsWith('data:')) s.style.backgroundImage = `url("${thumbs[e.src]}")`; }
+      if ((e.type === 'audio' || e.type === 'video') && e.src) loadPeaks(e.src);
+      s.innerHTML = `<span class="lb">${e.speed !== 1 ? `${e.speed}× · ` : ''}${esc(segLabel(e))}</span>${e.type === 'audio' && !(peaks[e.src] instanceof Float32Array) ? '<div class="wave"></div>' : ''}
         ${e.fade_in ? `<div class="fade" style="left:0;width:${e.fade_in * pxs}px;clip-path:polygon(0 0,100% 0,0 100%)"></div>` : ''}${e.fade_out ? `<div class="fade" style="right:0;width:${e.fade_out * pxs}px;clip-path:polygon(0 0,100% 0,100% 100%)"></div>` : ''}
         <div class="edge l"></div><div class="edge r"></div>`;
       const kts = new Set(Object.values(e.keyframes || {}).flat().map(p => +p.t.toFixed(2)));
       for (const kt of kts) s.insertAdjacentHTML('beforeend', `<span class="kfd" style="left:${kt * pxs}px"></span>`);
+      if (e.type === 'audio' || e.type === 'video') drawWave(s, e);
       s.onpointerdown = ev => segDrag(ev, e);
       lane.appendChild(s);
       if (e.transition) { const x = document.createElement('div'); x.className = 'trx' + (selTrx === e.id ? ' sel' : ''); x.style.left = end(e) * pxs + 'px'; x.title = 'Transisi: ' + e.transition.name;
@@ -382,6 +483,10 @@ function segLabel(e) {
 }
 function renderPlayhead() { $('#playhead').style.left = HW + t * pxs + 'px'; $('#tcNow').textContent = tc(t); $('#tcEnd').textContent = tc(total());
   const sc = $('#tlScroll'), x = HW + t * pxs; if (playing && (x > sc.scrollLeft + sc.clientWidth - 40 || x < sc.scrollLeft + HW)) sc.scrollLeft = x - HW - 40; }
+$('#playhead').insertAdjacentHTML('beforeend', '<div class="ph-head" title="Seret playhead"></div>');
+$('#playhead .ph-head').onpointerdown = ev => { ev.preventDefault(); ev.stopPropagation(); if (playing) togglePlay(); const ph = $('#playhead'); ph.classList.add('drag');
+  const go = m => seek((m.clientX - $('#tlInner').getBoundingClientRect().left - HW) / pxs);
+  const up = () => { ph.classList.remove('drag'); removeEventListener('pointermove', go); removeEventListener('pointerup', up); }; addEventListener('pointermove', go); addEventListener('pointerup', up); };
 $('#ruler').onpointerdown = ev => { const r = $('#ruler').getBoundingClientRect(); const go = m => seek((m.clientX - r.left) / pxs); go(ev);
   const up = () => { removeEventListener('pointermove', go); removeEventListener('pointerup', up); }; addEventListener('pointermove', go); addEventListener('pointerup', up); };
 function snapPoints(exclude) { const pts = [0, t]; for (const e of S.elements) if (e.id !== exclude) pts.push(e.start, end(e)); return pts; }
@@ -456,7 +561,7 @@ function toggleKf() {
 
 // ---------- inspector ----------
 function renderInsp(live) {
-  const I = $('#insp'), e = byId(sel);
+  const I = $('#inspBody'), e = byId(sel);
   if (live && I.contains(document.activeElement) && document.activeElement.matches('input')) { I.querySelectorAll('[data-v]').forEach(i => { if (i !== document.activeElement) i.value = (+val(e, i.dataset.v)).toFixed(i.step < 1 ? 2 : 0); }); return; }
   if (!e) {
     const dur = total();
@@ -549,8 +654,8 @@ function renderMedia() {
 addEventListener('keydown', ev => {
   if (ev.target.matches('input,textarea,select')) return; const c = ev.ctrlKey || ev.metaKey, k = ev.key.toLowerCase();
   if (ev.key === ' ') { ev.preventDefault(); togglePlay(); }
-  else if (c && k === 'z') { ev.preventDefault(); ev.shiftKey ? $('#redo').click() : $('#undo').click(); }
-  else if (c && k === 'y') { ev.preventDefault(); $('#redo').click(); }
+  else if (c && k === 'z') { ev.preventDefault(); ev.shiftKey ? redo() : undo(); }
+  else if (c && k === 'y') { ev.preventDefault(); redo(); }
   else if ((c && k === 'b') || (!c && k === 's')) { ev.preventDefault(); split(); }
   else if (c && k === 'd') { ev.preventDefault(); dup(); }
   else if (ev.key === 'Delete' || ev.key === 'Backspace') { ev.preventDefault(); del(); }
@@ -564,7 +669,7 @@ $('#split').onpointerdown = ev => { const y0 = ev.clientY, h0 = $('#tl').offsetH
   const up = () => { removeEventListener('pointermove', mv); removeEventListener('pointerup', up); }; addEventListener('pointermove', mv); addEventListener('pointerup', up); };
 $('#tlScroll').addEventListener('wheel', ev => { if (ev.ctrlKey || ev.metaKey) { ev.preventDefault(); pxs = Math.max(8, Math.min(240, pxs * (ev.deltaY < 0 ? 1.15 : 1 / 1.15))); renderTlbar(); renderTimeline(); } }, {passive: false});
 $('#tlScroll').addEventListener('pointerdown', ev => { if (ev.target.classList.contains('lane') || ev.target.id === 'tracks') { sel = null; selTrx = null; render(); } });
-function render() { if (!S) return; fitStage(); renderStage(); renderTimeline(); renderInsp(); }
+function render() { if (!S) return; fitStage(); renderStage(); renderTimeline(); renderInsp(); updUndoBtns(); }
 addEventListener('resize', render);
 boot();
 </script>
