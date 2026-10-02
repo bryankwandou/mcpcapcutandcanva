@@ -1,0 +1,66 @@
+/* Rakit Studio — shared tokens and components.
+   Layout concept: editor-first dark workspace — fixed bars around a dim "well" where the work sits.
+   Deliberately single (dark) theme: the canvas colours must read true, so the chrome stays neutral. */
+:root {
+  --bg: #121318;          /* app chrome */
+  --surface: #1a1c23;     /* panels */
+  --surface-2: #23262f;   /* raised controls */
+  --well: #0d0e12;        /* area behind the canvas / player */
+  --line: #2e323d;
+  --fg: #ecebe6;
+  --muted: #9a9caa;
+  --accent: #e8b02a;      /* kunyit */
+  --accent-ink: #1d1604;
+  --video: #3fb8a8;
+  --audio: #d9805b;
+  --textc: #b48cff;
+  --fx: #e46a8f;
+  --ok: #4cc38a;
+  --danger: #ef5b5b;
+  --pro: #c9a7ff;
+  --select: #46c2ff;
+  --f-display: "Bricolage Grotesque", "Plus Jakarta Sans", system-ui, sans-serif;
+  --f-body: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --r: 8px;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 13px/1.45 var(--f-body); -webkit-font-smoothing: antialiased; }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; }
+button, select, input, textarea { font: inherit; color: var(--fg); }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--select); outline-offset: 2px; }
+.btn { display: inline-flex; align-items: center; gap: 6px; background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--r); padding: 6px 11px; white-space: nowrap; }
+.btn:hover { border-color: #444a58; background: #2a2e38; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 700; }
+.btn.primary:hover { filter: brightness(1.08); }
+.btn.ghost { background: transparent; border-color: transparent; }
+.btn.ghost:hover { background: var(--surface-2); }
+.btn.icon { padding: 6px; }
+.btn:disabled { opacity: .45; cursor: default; }
+.btn.on { border-color: var(--select); color: var(--select); }
+input[type=text], input[type=number], input[type=search], select, textarea {
+  background: var(--surface-2); border: 1px solid var(--line); border-radius: 6px; padding: 5px 8px; min-width: 0;
+}
+input[type=range] { accent-color: var(--accent); width: 100%; }
+input[type=color] { width: 32px; height: 28px; padding: 0; border: 1px solid var(--line); border-radius: 6px; background: none; cursor: pointer; }
+svg.i { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.label { font-size: 11px; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; font-weight: 600; }
+.tier { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: .03em; padding: 1px 6px; border-radius: 99px; vertical-align: middle; white-space: nowrap; }
+.tier.free { background: #1d3a2c; color: var(--ok); }
+.tier.pro { background: #33284a; color: var(--pro); }
+.tier.note { background: var(--surface-2); color: var(--muted); }
+.mono { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.scroll { overflow: auto; min-height: 0; }
+.row { display: flex; gap: 8px; align-items: center; }
+.grow { flex: 1; min-width: 0; }
+/* modal + toast */
+.modal-back { position: fixed; inset: 0; background: rgba(5, 6, 9, .72); display: flex; align-items: center; justify-content: center; z-index: 50; padding: 16px; }
+.modal { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px; width: min(460px, 100%); max-height: 90vh; overflow: auto; display: grid; gap: 12px; }
+.modal h3 { font-size: 17px; }
+.modal p { margin: 0; color: var(--muted); }
+.modal .actions { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+.toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: #000d; border: 1px solid var(--line); color: var(--fg); padding: 9px 14px; border-radius: 10px; z-index: 60; max-width: min(560px, 92vw); }
+@media (prefers-reduced-motion: no-preference) { .toast { animation: rise .18s ease-out; } @keyframes rise { from { transform: translate(-50%, 8px); opacity: 0; } } }

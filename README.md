@@ -90,7 +90,18 @@ creative-mcp editor [nama_project]     # jalankan bridge + buka editor di browse
   saat klik **🚀 Deploy ke CapCut** (atau tool `editor_deploy`); tutup project di CapCut sebelum deploy.
 - AI juga bisa mengedit via `editor_update_elements` — perubahan muncul di browser dalam ±1 detik.
 
-### Hosting editor di Vercel
+### Dua situs Vercel terpisah (Canva-style & CapCut-style)
+`python scripts/build_sites.py` menghasilkan dua situs statis siap deploy:
+
+| Situs | Folder (Root Directory di Vercel) | Isi |
+|---|---|---|
+| Rakit Desain (ala Canva) | `sites/desain` | Editor desain + halaman Fitur |
+| Rakit Video (ala CapCut) | `sites/video` | Editor video + halaman Fitur |
+
+Di https://vercel.com/new import repo ini **dua kali**. Untuk tiap project, isi *Root Directory* dengan
+`sites/desain` atau `sites/video`, lalu Deploy (tanpa build). Jalankan ulang skrip setiap kali editor berubah.
+
+### Hosting editor di Vercel (satu situs gabungan)
 Repo ini sudah berisi `vercel.json` (static, tanpa build). Di https://vercel.com/new → import repo ini → Deploy. Dashboard ada di `/`, editor desain di `/design.html`, editor video di `/video.html`.
 Lalu set `CREATIVE_EDITOR_URL=https://<nama>.vercel.app` agar `editor_open` memberi link Vercel.
 Editor di Vercel hanya berisi tampilan; file & project tetap di komputer Anda dan diakses lewat bridge
