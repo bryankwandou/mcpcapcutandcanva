@@ -85,7 +85,7 @@ header select { max-width: 220px; }
 body { --gap: 4px; background: #08090c; padding: 0 var(--gap) var(--gap); column-gap: var(--gap); grid-template-rows: 44px minmax(240px, 1fr) var(--gap) var(--tlh, 290px); grid-template-columns: 280px minmax(0, 1fr) 290px; }
 header { margin: 0 calc(-1 * var(--gap)) var(--gap); border-bottom-color: #000; }
 #media, #player, #insp, #tl { border: 1px solid #23262e; border-radius: 8px; overflow: hidden; }
-#media { grid-template-rows: auto auto minmax(0, 1fr); }
+#media { grid-template-rows: auto minmax(0, 1fr); }
 #player { grid-template-rows: 30px minmax(0, 1fr) 40px; }
 #insp { display: grid; grid-template-rows: auto minmax(0, 1fr); padding: 0; gap: 0; overflow: hidden; }
 #inspBody { overflow: auto; padding: 12px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; align-content: start; min-height: 0; min-width: 0; }
@@ -115,6 +115,101 @@ header { margin: 0 calc(-1 * var(--gap)) var(--gap); border-bottom-color: #000; 
 #playhead .ph-head { position: absolute; top: 0; left: -8px; width: 18px; height: 22px; pointer-events: auto; cursor: ew-resize; touch-action: none; }
 #playhead::before { left: -6px; }
 #playhead.drag, #playhead:has(.ph-head:hover) { background: var(--accent); }
+/* ---- desktop-editor workflow layer ---- */
+header { justify-content: space-between; }
+header .hl, header .hr { flex: 1 1 0; display: flex; align-items: center; gap: 6px; min-width: 0; }
+header .hr { justify-content: flex-end; }
+#pname { display: grid; justify-items: center; line-height: 1.2; min-width: 0; max-width: 44%; text-align: center; }
+#pnameT { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+#status { font-size: 10.5px; max-width: 100%; }
+.menuw { position: relative; }
+#menuBtn { padding: 5px 10px; font-size: 13px; }
+.pop { position: absolute; top: calc(100% + 6px); left: 0; z-index: 60; background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 4px; min-width: 230px; display: grid; box-shadow: 0 12px 32px #000a; }
+.pop[hidden] { display: none; }
+.pop button { background: none; border: 0; color: var(--fg); text-align: left; padding: 7px 10px; border-radius: 6px; display: flex; gap: 9px; align-items: center; font-size: 13px; }
+.pop button:hover, .pop button:focus-visible { background: #ffffff12; }
+.pop label { display: grid; gap: 4px; padding: 6px 10px; font-size: 12px; color: var(--muted); }
+.pop hr { border: 0; border-top: 1px solid var(--line); margin: 4px 2px; width: auto; }
+.keys { display: grid; grid-template-columns: 1fr auto; gap: 6px 14px; font-size: 13px; }
+.keys kbd { font: 11.5px var(--f-mono); background: var(--surface-2); border: 1px solid var(--line); border-radius: 4px; padding: 1px 6px; justify-self: end; }
+#mtabs { gap: 0; padding: 4px 4px 0; border-bottom: 1px solid var(--line); scrollbar-width: none; }
+#mtabs button { flex: 1 0 auto; min-width: 46px; padding: 6px 4px 7px; border-radius: 6px 6px 0 0; border-bottom: 2px solid transparent; font-size: 10.5px; }
+#mtabs button.on { background: none; color: var(--accent); border-bottom-color: var(--accent); }
+#mtabs button svg.i { width: 18px; height: 18px; }
+#mwrap { display: grid; grid-template-columns: 78px minmax(0, 1fr); min-height: 0; }
+#msub { border-right: 1px solid #ffffff0d; padding: 6px 4px; display: flex; flex-direction: column; gap: 2px; overflow: auto; }
+#msub button { background: none; border: 0; color: var(--muted); text-align: left; padding: 6px 7px; border-radius: 6px; font-size: 11.5px; line-height: 1.25; }
+#msub button.on { background: var(--surface-2); color: var(--fg); font-weight: 700; }
+#mbody { padding: 8px; gap: 8px; }
+.drop { border: 1.5px dashed #ffffff33; border-radius: 10px; padding: 18px 10px; display: grid; justify-items: center; gap: 4px; text-align: center; color: var(--muted); font-size: 11.5px; cursor: pointer; background: #ffffff05; }
+.drop b { color: var(--fg); font-size: 14px; display: flex; align-items: center; gap: 6px; }
+.drop:hover, .drop.over { border-color: var(--accent); background: #e8b02a12; }
+.mitem { position: relative; cursor: pointer; }
+.mitem:focus-visible { outline: 2px solid var(--select); }
+.mitem .th .tier { right: auto; left: 4px; }
+.mitem .dur { position: absolute; right: 4px; bottom: 4px; font: 10px var(--f-mono); background: #000b; color: #fff; padding: 1px 4px; border-radius: 3px; }
+.mitem .tmp { position: absolute; left: 4px; top: 4px; font-size: 9.5px; background: #000b; color: var(--accent); padding: 1px 5px; border-radius: 3px; }
+.mitem .add { position: absolute; right: 4px; top: 4px; width: 24px; height: 24px; border-radius: 50%; border: 0; background: var(--accent); color: #111; display: flex; align-items: center; justify-content: center; padding: 0; opacity: 0; }
+.mitem .add svg.i { width: 15px; height: 15px; stroke-width: 2.6; }
+.mitem:hover .add, .mitem:focus-within .add, .mitem .add:focus-visible { opacity: 1; }
+@media (hover: none) { .mitem .add { opacity: 1; } }
+.btn.icon.sm { padding: 3px; } .btn.icon.sm svg.i { width: 15px; height: 15px; }
+#safeBtn.on { color: var(--accent); }
+.safe { position: absolute; inset: 0; pointer-events: none; z-index: 20; }
+.safe i { position: absolute; border: 1px dashed #ffffff8c; }
+.safe i.a { inset: 5%; } .safe i.b { inset: 10%; border-color: #e8b02a99; }
+.safe i.c { left: 50%; top: 47%; height: 6%; border-width: 0 0 0 1px; } .safe i.d { top: 50%; left: 47%; width: 6%; border-width: 1px 0 0 0; }
+.rl { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); }
+#zoomSel { padding: 3px 6px; font-size: 12px; }
+#itabs { display: flex; border-bottom: 1px solid var(--line); background: #ffffff04; overflow-x: auto; scrollbar-width: none; min-height: 34px; }
+#itabs button { background: none; border: 0; border-bottom: 2px solid transparent; color: var(--muted); padding: 8px 11px 7px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+#itabs button.on { color: var(--fg); border-bottom-color: var(--accent); }
+#itabs .ttl { padding: 8px 10px; font-size: 12px; font-weight: 700; color: var(--fg); }
+#inspBody { gap: 10px; padding: 10px 12px; }
+.sec { gap: 8px; border-top: 1px solid #ffffff0d; padding-top: 8px; }
+.shd { display: flex; align-items: center; gap: 4px; }
+.shd .stog { background: none; border: 0; color: var(--fg); font-weight: 700; font-size: 12.5px; display: flex; align-items: center; gap: 4px; padding: 2px 0; }
+.shd .stog svg.i { width: 14px; height: 14px; }
+.sec.closed .stog svg.i { transform: rotate(-90deg); }
+.sec.closed .sbody { display: none; }
+.sbody { display: grid; gap: 8px; }
+.sbody[disabled] { opacity: .55; }
+fieldset.sbody { border: 0; margin: 0; padding: 0; min-width: 0; }
+.subtabs { display: flex; gap: 2px; background: var(--well); border-radius: 7px; padding: 2px; }
+.subtabs button { flex: 1; background: none; border: 0; border-radius: 5px; padding: 5px; font-size: 12px; color: var(--muted); }
+.subtabs button.on { background: var(--surface-2); color: var(--fg); font-weight: 700; }
+.subtabs button:disabled { opacity: .5; cursor: not-allowed; }
+.kfl { display: grid; gap: 4px; }
+.kfr { display: grid; grid-template-columns: 14px 64px minmax(0, 1fr) auto auto; gap: 6px; align-items: center; font-size: 12px; background: var(--well); border-radius: 6px; padding: 4px 4px 4px 8px; }
+.kfr.at { outline: 1px solid var(--accent); }
+.kfr svg.i { width: 12px; height: 12px; color: var(--accent); }
+.kfr .mono { font-size: 11px; }
+#inspBody .row { flex-wrap: wrap; }
+.lockmsg { font-size: 12px; color: var(--accent); display: flex; gap: 6px; align-items: center; }
+.thead { padding: 0 6px; gap: 2px; }
+.thead .tic { color: var(--muted); display: flex; margin-right: auto; }
+.thead .tb { background: none; border: 0; color: var(--muted); padding: 3px; border-radius: 4px; display: flex; }
+.thead .tb:hover { background: #ffffff12; color: var(--fg); }
+.thead .tb.on { color: var(--accent); }
+.thead .tb svg.i { width: 14px; height: 14px; }
+.track.main { --th: 66px; }
+.track.main .thead { gap: 4px; }
+.track.main .tbs { display: grid; gap: 0; }
+.cover { width: 46px; height: 54px; border-radius: 5px; background: #000 center/cover; border: 1px solid #ffffff2a; display: flex; align-items: flex-end; justify-content: center; font-size: 9.5px; color: #fff; padding: 0 0 2px; cursor: pointer; overflow: hidden; box-shadow: inset 0 -16px 12px -6px #000c; margin-left: auto; }
+.track.locked .lane { background: repeating-linear-gradient(135deg, #ffffff06 0 6px, transparent 6px 12px); }
+.track.locked .seg { cursor: not-allowed; }
+.track.hidden .seg, .track.muted .seg.audio { opacity: .4; }
+.seg { border-radius: 7px; border: 1.5px solid #00000040; padding: 3px 6px; }
+.seg .lb { font-size: 10.5px; display: inline-flex; gap: 5px; }
+.seg .lb i { font-style: normal; opacity: .75; font-family: var(--f-mono); }
+.seg .edge { width: 7px; background: transparent; z-index: 2; }
+.seg.sel { border: 1.5px solid #fff; box-shadow: 0 0 0 1px #000a; }
+.seg.sel .edge { background: #f2f2f2; }
+.seg.sel .edge::after { content: ""; position: absolute; left: 50%; top: 50%; width: 1.5px; height: 12px; transform: translate(-50%, -50%); background: #333; border-radius: 1px; }
+.seg.sel .edge.l { border-radius: 5px 0 0 5px; } .seg.sel .edge.r { border-radius: 0 5px 5px 0; }
+#tlbar .grp { display: flex; align-items: center; gap: 2px; flex: none; }
+#tlbar .btn:disabled { opacity: .35; }
+.axis { position: absolute; top: 0; bottom: 0; width: 1px; background: #46c2ff; z-index: 6; pointer-events: none; }
 @media (prefers-reduced-motion: no-preference) {
   .seg { transition: border-color 120ms ease, box-shadow 120ms ease, filter 120ms ease; }
   .btn, .mitem, #mtabs button, #split { transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease; }
@@ -125,26 +220,38 @@ header { margin: 0 calc(-1 * var(--gap)) var(--gap); border-bottom-color: #000; 
   #insp, #media { max-height: 360px; } header { margin-bottom: 0; }
   header .hide-sm { display: none; }
 }
-@media (max-width: 560px) { #deploy .lbl, #status { display: none; } #tlZoom { width: 70px !important; } #pctl .tc span { display: none; } #ratioSel { max-width: 74px; } }
+@media (max-width: 560px) { #export .lbl, #status, #demoTag, .rl span { display: none; } #mwrap { grid-template-columns: 64px minmax(0, 1fr); } #tlZoom { width: 70px !important; } #pctl .tc span { display: none; } #ratioSel { max-width: 74px; } }
 </style>
 </head>
 <body>
 <header>
-  <button class="btn ghost icon" id="home" title="Beranda"></button>
-  <select id="draftSel" aria-label="Project" hidden></select><span id="demoTag" class="tier note" hidden>Mode demo</span>
-  <span id="status" class="grow"></span>
-  <button class="btn hide-sm" id="discard">Buang perubahan</button>
-  <button class="btn primary" id="deploy"></button>
+  <div class="hl"><button class="btn ghost icon" id="home" title="Beranda" aria-label="Beranda"></button>
+    <div class="menuw"><button class="btn ghost" id="menuBtn" aria-haspopup="menu" aria-expanded="false">Menu</button>
+      <div id="menuPop" class="pop" role="menu" hidden>
+        <button data-m="new" role="menuitem"></button>
+        <button data-m="open" role="menuitem" id="openBtn"></button>
+        <label id="openRow" hidden><span>Buka project</span><select id="draftSel" aria-label="Project"></select></label>
+        <button data-m="save" role="menuitem"></button>
+        <button data-m="discard" role="menuitem"></button>
+        <hr>
+        <button data-m="keys" role="menuitem"></button>
+      </div></div>
+    <span id="demoTag" class="tier note" hidden>Mode demo</span></div>
+  <div id="pname"><b id="pnameT">Project</b><span id="status"></span></div>
+  <div class="hr"><button class="btn primary" id="export"></button></div>
 </header>
-<aside id="media"><div class="phd"><b>Media</b></div><nav id="mtabs" aria-label="Aset"></nav><div id="mbody"></div></aside>
+<aside id="media"><nav id="mtabs" aria-label="Aset"></nav><div id="mwrap"><nav id="msub" aria-label="Kategori"></nav><div id="mbody"></div></div>
+  <input type="file" id="fileIn" multiple accept="video/*,audio/*,image/*" hidden></aside>
 <section id="player">
-  <div class="phd"><b>Pemutar</b><span class="grow"></span><span id="ratio" class="mono"></span></div>
+  <div class="phd"><b>Pemutar</b><span class="grow"></span><button class="btn ghost icon sm" id="safeBtn" title="Panduan area aman" aria-label="Panduan area aman" aria-pressed="false"></button><span id="ratio" class="mono"></span></div>
   <div id="stageWrap"><div id="stage"></div></div>
   <div id="pctl"><div class="side"><span class="tc"><b id="tcNow">00:00:00</b> <span>/ <span id="tcEnd">00:00:00</span></span></span></div>
-    <div class="mid"><button class="btn icon ghost" id="play" title="Putar (Spasi)"></button></div>
-    <div class="side r"><select id="ratioSel" aria-label="Rasio kanvas" title="Rasio kanvas (pratinjau)"></select><button class="btn icon ghost" id="fs" title="Layar penuh"></button></div></div>
+    <div class="mid"><button class="btn icon ghost" id="play" title="Putar (Spasi)" aria-label="Putar"></button></div>
+    <div class="side r"><label class="rl"><span>Rasio</span><select id="ratioSel" aria-label="Rasio kanvas" title="Rasio kanvas (pratinjau)"></select></label>
+      <select id="zoomSel" aria-label="Zoom pemutar" title="Zoom pemutar"><option value="1">Fit</option><option value="0.75">75%</option><option value="0.5">50%</option></select>
+      <button class="btn icon ghost" id="fs" title="Layar penuh" aria-label="Layar penuh"></button></div></div>
 </section>
-<aside id="insp"><div class="phd"><b>Properti</b></div><div id="inspBody"></div></aside>
+<aside id="insp"><nav id="itabs" aria-label="Properti"></nav><div id="inspBody"></div></aside>
 <div id="split" title="Seret untuk mengubah tinggi timeline"></div>
 <section id="tl">
   <div id="tlbar"></div>
@@ -154,31 +261,54 @@ header { margin: 0 calc(-1 * var(--gap)) var(--gap); border-bottom-color: #000; 
 <script>
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 ICONS.fullscreen = 'M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5'; ICONS.fsExit = 'M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5';
+ICONS.select = 'M5 3l14 7-6 2-2 6z'; ICONS.freeze = 'M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9M9.5 4.5L12 7l2.5-2.5M9.5 19.5L12 17l2.5 2.5';
+ICONS.axis = 'M12 3v18M8 7l4-4 4 4M5 12h3M16 12h3'; ICONS.keyboard = 'M3 6h18v12H3zM7 10h.01M11 10h.01M15 10h.01M7 14h10';
+ICONS.chev = 'M6 9l6 6 6-6'; ICONS.reset = 'M4 12a8 8 0 1 0 2.3-5.6M4 4v5h5';
 ICONS.magnet = 'M6 4v7a6 6 0 0 0 12 0V4h-4v7a2 2 0 0 1-4 0V4zM6 8h4M14 8h4';
-const FPS = 30, HW = 92, KF_PROPS = ['x', 'y', 'scale', 'rotation', 'alpha'];
+const FPS = 30, HW = 110, KF_PROPS = ['x', 'y', 'scale', 'rotation', 'alpha'];
 document.body.style.setProperty('--hw', HW + 'px');
 let S = null, DRAFT = PARAMS.draft || '', DEMO = false, sel = null, selTrx = null, t = 0, playing = false, pxs = 70, version = 0, snapOn = true, tab = 'media';
+let sub = {}, itab = {}, spMode = 'normal', safeOn = false, zoomF = 1, axisOn = false, linkOn = false; const closed = new Set();
 const undoS = [], redoS = [], media = {};
 let LIB = [], FILES = [];
 
 // ---------- boot ----------
 $('#home').innerHTML = icon('home'); $('#play').innerHTML = icon('play'); $('#fs').innerHTML = icon('fullscreen');
-$('#deploy').innerHTML = `${icon('send')}<span class="lbl"> Deploy ke CapCut</span>`;
+$('#export').innerHTML = `${icon('upload')}<span class="lbl"> Ekspor</span>`; $('#safeBtn').innerHTML = icon('grid');
+$('#menuBtn').innerHTML = `Menu ${icon('chev')}`;
 $('#home').onclick = () => Studio.go('index.html');
+const MENU = {new: ['plus', 'Project baru'], open: ['folder', 'Buka project'], save: ['download', 'Simpan (Ctrl+S)'], discard: ['undo', 'Buang perubahan'], keys: ['keyboard', 'Pintasan keyboard']};
+$$('#menuPop [data-m]').forEach(b => { const [ic, l] = MENU[b.dataset.m]; b.innerHTML = `${icon(ic)}${l}`; });
+const menu = open => { $('#menuPop').hidden = !open; $('#menuBtn').setAttribute('aria-expanded', open); };
+$('#menuBtn').onclick = ev => { ev.stopPropagation(); menu($('#menuPop').hidden); };
+document.addEventListener('pointerdown', ev => { if (!ev.target.closest('.menuw')) menu(false); });
+$('#menuPop').onclick = ev => { const b = ev.target.closest('[data-m]'); if (!b) return; menu(false); ({new: newProjectInfo, open: openInfo, save: saveNow, discard: discard, keys: showKeys})[b.dataset.m](); };
+function newProjectInfo() {
+  Studio.modal(`<h3>Project baru</h3><p>Project video dibuat di CapCut: buat project kosong di CapCut, simpan, lalu buka Studio lagi. Project itu akan muncul di Menu → Buka project.</p><p>${DEMO ? 'Saat ini Anda di mode demo; contoh project tersimpan di browser ini.' : 'Anda juga bisa meminta AI membuat project lewat creative-mcp.'}</p><div class="actions"><button class="btn primary" data-close>Mengerti</button></div>`).el.querySelector('[data-close]').onclick = ev => ev.target.closest('.modal-back').remove();
+}
+function openInfo() {
+  Studio.modal(`<h3>Buka project</h3><p>Hubungkan komputer (jalankan <span class="mono">creative-mcp studio</span>) untuk membuka project CapCut Anda. Di mode demo hanya ada satu contoh project.</p><div class="actions"><button class="btn primary" data-close>Mengerti</button></div>`).el.querySelector('[data-close]').onclick = ev => ev.target.closest('.modal-back').remove();
+}
+function showKeys() {
+  const K = [['Putar / jeda', 'Spasi'], ['Potong di playhead', 'S / Ctrl+B'], ['Hapus', 'Delete'], ['Duplikat', 'Ctrl+D'], ['Tambah/hapus keyframe', 'K'], ['Urungkan', 'Ctrl+Z'], ['Ulangi', 'Ctrl+Y / Ctrl+Shift+Z'], ['Simpan', 'Ctrl+S'],
+    ['Mundur / maju 1 frame', '← / →'], ['Mundur / maju 1 detik', 'Shift+← / →'], ['Ke awal / akhir', 'Home / End'], ['Zoom timeline', 'Ctrl + gulir'], ['Batal pilih', 'Esc']];
+  Studio.modal(`<h3>Pintasan keyboard</h3><div class="keys">${K.map(([a, b]) => `<span>${a}</span><kbd>${b}</kbd>`).join('')}</div><div class="actions"><button class="btn primary" data-close>Tutup</button></div>`).el.querySelector('[data-close]').onclick = ev => ev.target.closest('.modal-back').remove();
+}
 async function boot() {
   await Studio.connect();
   if (Studio.connected) {
     const drafts = await Studio.api('/api/drafts').catch(() => []);
     if (!drafts.length) { DEMO = true; Studio.toast('Belum ada project CapCut. Membuka mode demo.'); }
     else {
-      $('#draftSel').hidden = false; $('#draftSel').innerHTML = drafts.map(d => `<option>${esc(d.name)}</option>`).join('');
+      $('#openRow').hidden = false; $('#openBtn').hidden = true; $('#draftSel').innerHTML = drafts.map(d => `<option>${esc(d.name)}</option>`).join('');
       if (!drafts.some(d => d.name === DRAFT)) DRAFT = drafts[0].name; $('#draftSel').value = DRAFT;
-      $('#draftSel').onchange = e => { DRAFT = e.target.value; sel = null; undoS.length = redoS.length = 0; load(); };
+      $('#draftSel').onchange = e => { menu(false); DRAFT = e.target.value; $('#pnameT').textContent = DRAFT; sel = null; undoS.length = redoS.length = 0; load(); };
       LIB = await Studio.api('/api/capcut-library').catch(() => []); FILES = await Studio.api('/api/library').catch(() => []);
       await load(); setInterval(pollRemote, 1000);
     }
   } else DEMO = true;
   if (DEMO) { $('#demoTag').hidden = false; loadDemo(); }
+  $('#pnameT').textContent = DEMO ? 'Contoh project' : DRAFT;
   renderTabs(); renderTlbar(); render();
 }
 async function load() {
@@ -211,9 +341,10 @@ function loadDemo() {
   LIB = [{key: 'demo:sticker:bintang', kind: 'sticker', name: 'Bintang', vip: false, preview: starPng()}, {key: 'demo:sticker:bintang-pro', kind: 'sticker', name: 'Bintang emas', vip: true, preview: starPng('#E8B02A')},
     {key: 'demo:effect:shake', kind: 'effect', name: 'Getar', vip: false}, {key: 'demo:effect:glitch', kind: 'effect', name: 'Glitch', vip: true},
     {key: 'demo:filter:hangat', kind: 'filter', name: 'Hangat', vip: false}, {key: 'demo:filter:film', kind: 'filter', name: 'Film klasik', vip: true},
+    {key: 'demo:adjust:terang', kind: 'adjust', name: 'Kecerahan +', vip: false}, {key: 'demo:adjust:kontras', kind: 'adjust', name: 'Kontras lembut', vip: false},
     {key: 'demo:transition:fade', kind: 'transition', name: 'Larut', vip: false}, {key: 'demo:transition:zoom', kind: 'transition', name: 'Zoom putar', vip: true}];
   let saved = null; try { saved = JSON.parse(ls('demoScene') || 'null'); } catch {}
-  if (saved?.v === 3) S = saved;
+  if (saved?.v === 3) { S = saved; S.elements = S.elements.filter(e => !/^blob:/.test(e.src || '')); } // session-only imports do not survive a reload
   else {
     const vt = uid(), tt = uid(), at = uid(), st = uid();
     const clip = (i, start, extra = {}) => ({id: uid(), track: vt, type: 'photo', src: pics[i].src, name: pics[i].l, start, duration: 3, x: 0, y: 0, scale: 1, rotation: 0, alpha: 1, volume: 1, speed: 1, source_start: 0, fade_in: 0, fade_out: 0, keyframes: {}, ...extra});
@@ -246,22 +377,33 @@ function save() {
 const restore = j => { S = JSON.parse(j); if (sel && !S.elements.some(e => e.id === sel)) sel = null; render(); save(); };
 function undo() { if (undoS.length) { redoS.push(JSON.stringify(S)); restore(undoS.pop()); } }
 function redo() { if (redoS.length) { undoS.push(JSON.stringify(S)); restore(redoS.pop()); } }
-$('#deploy').onclick = async () => {
-  if (DEMO) return Studio.modal(`<h3>Deploy ke CapCut</h3><p>Ini mode demo. Untuk menulis hasil edit ke project CapCut di komputer Anda, jalankan <span class="mono">creative-mcp studio</span> lalu buka project dari menu Project video.</p><div class="actions"><button class="btn primary" onclick="this.closest('.modal-back').remove()">Mengerti</button></div>`);
-  if (!await Studio.confirm('Deploy ke CapCut?', `Semua perubahan ditulis ke project "${DRAFT}". Tutup project ini di CapCut dulu, lalu buka lagi setelah deploy. Cadangan .json.bak dibuat otomatis.`, 'Deploy')) return;
-  clearTimeout(saveT); await Studio.api('/api/scene', {method: 'PUT', body: JSON.stringify(S)});
-  try { const r = await Studio.api('/api/deploy?draft=' + encodeURIComponent(DRAFT), {method: 'POST'}); Studio.toast(`Deploy selesai: ${r.elements} elemen (+${r.added}, −${r.removed}). Buka ulang project di CapCut.`, 6000); await load(); }
-  catch (err) { Studio.toast('Deploy gagal: ' + err.message, 6000); }
+function saveNow() {
+  clearTimeout(saveT);
+  if (DEMO) return status(lsSet('demoScene', JSON.stringify(S)) ? 'Tersimpan di browser (demo)' : 'Demo tidak bisa disimpan di browser ini');
+  Studio.api('/api/scene', {method: 'PUT', body: JSON.stringify(S)}).then(r => { version = r.version; status('Pratinjau tersimpan, belum di-deploy'); Studio.toast('Tersimpan'); }).catch(err => status('Gagal menyimpan: ' + err.message));
+}
+$('#export').onclick = () => {
+  const closeBtn = m => m.el.querySelectorAll('[data-close]').forEach(b => b.onclick = () => m.close());
+  if (DEMO) return closeBtn(Studio.modal(`<h3>Ekspor video</h3><p>Studio tidak merender file video. Rendering akhir (resolusi, frame rate, efek dan transisi asli) dilakukan oleh CapCut di komputer Anda.</p><p>Ini mode demo. Jalankan <span class="mono">creative-mcp studio</span> lalu buka project CapCut dari Menu → Buka project. Setelah itu tombol Ekspor menawarkan <b>Deploy ke CapCut</b>.</p><div class="actions"><button class="btn primary" data-close>Mengerti</button></div>`));
+  const m = Studio.modal(`<h3>Ekspor</h3><p>Hasil edit dikirim ke project <b>${esc(DRAFT)}</b> di CapCut, lalu Anda mengekspor video final dari CapCut (tombol ekspor di CapCut).</p>
+    <p>Tutup project ini di CapCut dulu, lalu buka lagi setelah deploy. Cadangan .json.bak dibuat otomatis.</p><div class="actions"><button class="btn" data-close>Batal</button><button class="btn primary" id="xDeploy">${icon('send')} Deploy ke CapCut</button></div>`);
+  closeBtn(m);
+  m.el.querySelector('#xDeploy').onclick = async () => { m.close();
+    clearTimeout(saveT); await Studio.api('/api/scene', {method: 'PUT', body: JSON.stringify(S)});
+    try { const r = await Studio.api('/api/deploy?draft=' + encodeURIComponent(DRAFT), {method: 'POST'}); Studio.toast(`Deploy selesai: ${r.elements} elemen (+${r.added}, −${r.removed}). Buka ulang project di CapCut lalu ekspor.`, 6000); await load(); }
+    catch (err) { Studio.toast('Deploy gagal: ' + err.message, 6000); } };
 };
-$('#discard').onclick = async () => {
+async function discard() {
   if (!await Studio.confirm('Buang semua perubahan?', DEMO ? 'Contoh project dikembalikan ke awal.' : 'Pratinjau dikembalikan ke isi project CapCut yang terakhir disimpan.', 'Buang', true)) return;
   if (DEMO) { try { localStorage.removeItem('demoScene'); } catch {} loadDemo(); render(); return; }
   await Studio.api('/api/discard?draft=' + encodeURIComponent(DRAFT), {method: 'POST'}); await load();
-};
+}
 
 // ---------- model helpers ----------
 const byId = id => S.elements.find(e => e.id === id);
 const trackOf = e => S.tracks.find(k => k.id === e.track);
+const isLocked = e => !!(e && trackOf(e)?.locked);
+const lockToast = () => Studio.toast('Track ini dikunci. Buka kunci di kepala track untuk mengedit.');
 const kindOf = type => type === 'photo' ? 'video' : type;
 const compatible = (trackType, elType) => trackType === kindOf(elType);
 const end = e => e.start + e.duration;
@@ -289,13 +431,15 @@ function visible(e) { // a transition lets the next clip fade in over the last h
 
 // ---------- player ----------
 let sw = 0, sh = 0;
-function fitStage() { const r = $('#stageWrap').getBoundingClientRect(), ar = S.width / S.height; sh = Math.max(50, Math.min(r.height - 20, (r.width - 20) / ar)); sw = sh * ar; Object.assign($('#stage').style, {width: sw + 'px', height: sh + 'px'}); $('#ratio').textContent = `${S.width}×${S.height}`; renderRatio(); }
+function fitStage() { const r = $('#stageWrap').getBoundingClientRect(), ar = S.width / S.height; sh = Math.max(50, Math.min(r.height - 20, (r.width - 20) / ar) * zoomF); sw = sh * ar; Object.assign($('#stage').style, {width: sw + 'px', height: sh + 'px'}); $('#ratio').textContent = `${S.width}×${S.height}`; renderRatio(); }
 const RATIOS = [['9:16', 1080, 1920], ['16:9', 1920, 1080], ['1:1', 1080, 1080], ['4:5', 1080, 1350]];
 function renderRatio() {
   const cur = RATIOS.find(([, w, h]) => w * S.height === h * S.width), sel = $('#ratioSel');
   sel.innerHTML = (cur ? '' : `<option value="">${S.width}×${S.height}</option>`) + RATIOS.map(([l]) => `<option value="${l}">${l}</option>`).join('');
   sel.value = cur ? cur[0] : '';
 }
+$('#zoomSel').onchange = ev => { zoomF = +ev.target.value; fitStage(); renderStage(); };
+$('#safeBtn').onclick = () => { safeOn = !safeOn; $('#safeBtn').classList.toggle('on', safeOn); $('#safeBtn').setAttribute('aria-pressed', safeOn); renderStage(); };
 $('#ratioSel').onchange = ev => { const r = RATIOS.find(([l]) => l === ev.target.value); if (!r) return; snap(); S.width = r[1]; S.height = r[2]; commit(); Studio.toast(`Rasio kanvas ${r[0]} (${r[1]}×${r[2]})`); };
 $('#fs').onclick = async () => {
   try { if (document.fullscreenElement) await document.exitFullscreen(); else if ($('#player').requestFullscreen) await $('#player').requestFullscreen(); else throw new Error('unsupported'); }
@@ -308,12 +452,13 @@ function renderStage() {
   const st = $('#stage'); st.innerHTML = ''; let fxRow = 0;
   for (const e of [...S.elements].sort((a, b) => zOrder(a) - zOrder(b))) {
     if (e.type === 'audio') { syncAudio(e); continue; }
+    if (trackOf(e)?.hidden) { media[e.id]?.pause?.(); continue; }
     if (!visible(e)) { media[e.id]?.pause?.(); continue; }
     if (e.type === 'effect' || e.type === 'filter') { st.insertAdjacentHTML('beforeend', `<div class="fxnote" style="top:${8 + fxRow++ * 26}px">${icon(e.type === 'effect' ? 'wand' : 'filter')} ${esc(e.label || e.type)}</div>`); continue; }
     const d = document.createElement('div'); d.className = `el ${e.type}${sel === e.id ? ' sel' : ''}`; d.dataset.id = e.id;
     const scale = val(e, 'scale'); let alpha = val(e, 'alpha');
     const tw = trxWindow(e); if (tw && t < e.start + tw / 2) alpha *= Math.max(0, Math.min(1, (t - (e.start - tw / 2)) / tw));
-    if (e.type === 'text') { d.textContent = e.text; d.style.color = e.color || '#fff'; d.style.fontSize = (e.font_size || 8) * sh / 300 * scale + 'px'; }
+    if (e.type === 'text') { d.textContent = e.text; d.style.textAlign = e.text_align || 'center'; d.style.color = e.color || '#fff'; d.style.fontSize = (e.font_size || 8) * sh / 300 * scale + 'px'; }
     else if (e.type === 'sticker') { const s = 120 * scale * sh / 600; d.style.width = d.style.height = s + 'px';
       d.innerHTML = e.preview ? `<img src="${esc(mediaUrl(e.preview))}" alt="">` : `<div class="ph">${icon('star')}<br>${esc(e.label || 'Stiker')}</div>`; }
     else { d.style.width = sw * scale + 'px'; d.style.height = sh * scale + 'px'; d.appendChild(mediaNode(e)); }
@@ -323,6 +468,7 @@ function renderStage() {
     if (sel === e.id && !playing) d.insertAdjacentHTML('beforeend', '<div class="h scale" data-h="scale"></div><div class="h rot" data-h="rot"></div>');
     d.onpointerdown = ev => stageDrag(ev, e, d);
   }
+  if (safeOn) st.insertAdjacentHTML('beforeend', '<div class="safe" title="Area aman"><i class="a"></i><i class="b"></i><i class="c"></i><i class="d"></i></div>');
 }
 function mediaNode(e) {
   let m = media[e.id];
@@ -331,7 +477,7 @@ function mediaNode(e) {
     m.src = mediaUrl(e.src); m.dataset.src = e.src; media[e.id] = m;
   }
   if (e.type === 'video') {
-    const want = Math.max(0, e.source_start + (t - e.start) * e.speed); m.playbackRate = Math.max(.0625, Math.min(16, e.speed)); m.volume = Math.min(1, fadeVol(e));
+    const want = Math.max(0, e.source_start + (t - e.start) * e.speed); m.playbackRate = Math.max(.0625, Math.min(16, e.speed)); m.volume = Math.min(1, fadeVol(e)); m.muted = !!trackOf(e)?.muted;
     if (Math.abs(m.currentTime - want) > .3) m.currentTime = want;
     if (playing && m.paused && t >= e.start) m.play().catch(() => {}); if (!playing && !m.paused) m.pause();
   }
@@ -340,13 +486,14 @@ function mediaNode(e) {
 function fadeVol(e) { const tl = t - e.start; let v = val(e, 'volume'); if (e.fade_in > 0 && tl < e.fade_in) v *= tl / e.fade_in; if (e.fade_out > 0 && end(e) - t < e.fade_out) v *= (end(e) - t) / e.fade_out; return Math.max(0, v); }
 function syncAudio(e) {
   let a = media[e.id]; if (!a || a.dataset.src !== e.src) { a = media[e.id] = new Audio(mediaUrl(e.src)); a.dataset.src = e.src; }
-  if (!playing || t < e.start || t >= end(e)) { a.pause(); return; }
+  if (!playing || t < e.start || t >= end(e) || trackOf(e)?.muted) { a.pause(); return; }
   const want = e.source_start + (t - e.start) * e.speed; if (Math.abs(a.currentTime - want) > .3) a.currentTime = want;
   a.playbackRate = Math.max(.0625, Math.min(16, e.speed)); a.volume = Math.min(1, fadeVol(e)); if (a.paused) a.play().catch(() => {});
 }
 function stageDrag(ev, e, node) {
   ev.preventDefault(); ev.stopPropagation(); if (playing) togglePlay();
   if (sel !== e.id) { sel = e.id; selTrx = null; render(); node = $(`.el[data-id="${e.id}"]`); if (!node) return; }
+  if (isLocked(e)) return lockToast();
   snap(); dragging = true;
   const mode = ev.target.dataset.h || 'move', r = node.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
   const sx = ev.clientX, sy = ev.clientY, ox = val(e, 'x'), oy = val(e, 'y'), os = val(e, 'scale'), d0 = Math.hypot(sx - cx, sy - cy) || 1;
@@ -376,15 +523,16 @@ function seek(v) { t = Math.max(0, Math.min(total(), v)); renderStage(); renderP
 // ---------- timeline ----------
 function fitTl() { const w = (document.body.clientWidth || 1200) - HW - 60; pxs = Math.max(8, Math.min(160, w / (total() + 2))); }
 function renderTlbar() {
-  const ib = (id, ic, tip, on) => `<button class="btn ghost icon${on ? ' on' : ''}" id="${id}" title="${tip}" aria-label="${tip}">${icon(ic)}</button>`;
-  $('#tlbar').innerHTML = `${ib('bUndo', 'undo', 'Urungkan (Ctrl+Z)')}${ib('bRedo', 'redo', 'Ulangi (Ctrl+Y)')}<span class="sep"></span>
-    ${ib('bSplit', 'scissors', 'Potong di playhead (S / Ctrl+B)')}${ib('bDel', 'trash', 'Hapus (Delete)')}${ib('bDup', 'copy', 'Duplikat (Ctrl+D)')}${ib('bKf', 'diamond', 'Tambah/hapus keyframe di playhead')}
-    <span class="sep"></span>${ib('bSnap', 'magnet', 'Snap ke playhead & tepi klip', snapOn)}
-    <span class="grow"></span><span class="zoom">${ib('bFit', 'resize', 'Pas ke layar')}${ib('bZo', 'zoomOut', 'Perkecil timeline')}
-    <input type="range" id="tlZoom" min="8" max="240" value="${Math.round(pxs)}" style="width:110px" aria-label="Zoom timeline" title="Zoom timeline (Ctrl + gulir)">${ib('bZi', 'zoomIn', 'Perbesar timeline')}</span>`;
+  const ib = (id, ic, tip, on, dis) => `<button class="btn ghost icon${on ? ' on' : ''}" id="${id}" title="${tip}" aria-label="${tip}"${on !== undefined ? ` aria-pressed="${!!on}"` : ''}${dis ? ' disabled' : ''}>${icon(ic)}</button>`;
+  $('#tlbar').innerHTML = `<span class="grp">${ib('bUndo', 'undo', 'Urungkan (Ctrl+Z)')}${ib('bRedo', 'redo', 'Ulangi (Ctrl+Y)')}<span class="sep"></span>
+    ${ib('bSel', 'select', 'Pilih', true)}${ib('bSplit', 'scissors', 'Potong di playhead (S / Ctrl+B)')}${ib('bDel', 'trash', 'Hapus (Delete)')}${ib('bDup', 'copy', 'Duplikat (Ctrl+D)')}${ib('bKf', 'diamond', 'Tambah/hapus keyframe di playhead (K)')}${ib('bFreeze', 'freeze', 'Bekukan frame (segera)', undefined, true)}</span>
+    <span class="grow"></span><span class="grp">${ib('bSnap', 'magnet', 'Track utama: magnet & snap ke playhead/tepi klip', snapOn)}${ib('bLink', 'link', 'Tautkan klip (segera)', linkOn, true)}${ib('bAxis', 'axis', 'Sumbu pratinjau: arahkan kursor di timeline untuk melihat frame', axisOn)}<span class="sep"></span>
+    ${ib('bZo', 'zoomOut', 'Perkecil timeline')}<input type="range" id="tlZoom" min="8" max="240" value="${Math.round(pxs)}" style="width:100px" aria-label="Zoom timeline" title="Zoom timeline (Ctrl + gulir)">${ib('bZi', 'zoomIn', 'Perbesar timeline')}${ib('bFit', 'resize', 'Pas ke layar')}</span>`;
   $('#bUndo').onclick = undo; $('#bRedo').onclick = redo; $('#bUndo').disabled = !undoS.length; $('#bRedo').disabled = !redoS.length;
+  $('#bSel').onclick = () => Studio.toast('Mode pilih: klik klip untuk memilih, seret untuk memindah, tarik ujungnya untuk memangkas.');
   $('#bSplit').onclick = split; $('#bDel').onclick = del; $('#bDup').onclick = dup; $('#bKf').onclick = toggleKf;
   $('#bSnap').onclick = () => { snapOn = !snapOn; renderTlbar(); };
+  $('#bAxis').onclick = () => { axisOn = !axisOn; renderTlbar(); if (!axisOn) { $$('.axis').forEach(x => x.remove()); renderStage(); } };
   $('#tlZoom').oninput = e => { pxs = +e.target.value; renderTimeline(); };
   $('#bZo').onclick = () => { pxs = Math.max(8, pxs / 1.3); renderTlbar(); renderTimeline(); }; $('#bZi').onclick = () => { pxs = Math.min(240, pxs * 1.3); renderTlbar(); renderTimeline(); };
   $('#bFit').onclick = () => { fitTl(); renderTlbar(); renderTimeline(); };
@@ -447,8 +595,17 @@ function renderTimeline() {
   const names = {video: 'Video', audio: 'Audio', text: 'Teks', sticker: 'Stiker', effect: 'Efek', filter: 'Filter'}, icons = {video: 'film', audio: 'music', text: 'text', sticker: 'star', effect: 'wand', filter: 'filter'};
   for (const k of orderedTracks()) {
     const els = S.elements.filter(e => e.track === k.id); if (!els.length && k !== mainTrack()) continue;
-    const row = document.createElement('div'); row.className = 'track' + (k === mainTrack() ? ' main' : ''); row.dataset.track = k.id;
-    row.innerHTML = `<div class="thead" title="${k === mainTrack() ? 'Track utama' : ''}">${icon(icons[k.type] || 'film')}${names[k.type] || k.type}</div><div class="lane"></div>`;
+    const row = document.createElement('div'), isMain = k === mainTrack(); row.className = 'track' + (isMain ? ' main' : '') + (k.locked ? ' locked' : '') + (k.hidden ? ' hidden' : '') + (k.muted ? ' muted' : ''); row.dataset.track = k.id;
+    const tb = (f, on, ic, tip) => `<button class="tb${on ? ' on' : ''}" data-tf="${f}" title="${tip}" aria-label="${tip}" aria-pressed="${!!on}">${icon(ic)}</button>`;
+    const btns = tb('locked', k.locked, k.locked ? 'lock' : 'unlock', k.locked ? 'Buka kunci track' : 'Kunci track')
+      + (k.type !== 'audio' ? tb('hidden', k.hidden, k.hidden ? 'eyeoff' : 'eye', k.hidden ? 'Tampilkan track' : 'Sembunyikan track') : '')
+      + (k.type === 'audio' || k.type === 'video' ? tb('muted', k.muted, k.muted ? 'mute' : 'volume', k.muted ? 'Bunyikan track' : 'Bisukan track') : '');
+    const first = isMain && els.slice().sort((a, b) => a.start - b.start)[0], cov = first && first.type === 'photo' ? mediaUrl(first.src) : first && typeof thumbs[first.src] === 'string' && thumbs[first.src].startsWith('data:') ? thumbs[first.src] : '';
+    row.innerHTML = isMain ? `<div class="thead" title="Track utama"><span class="tbs">${btns}</span><button class="cover" id="cover" title="Sampul video" style="${cov ? `background-image:url('${esc(cov)}')` : ''}">Sampul</button></div><div class="lane"></div>`
+      : `<div class="thead" title="${names[k.type] || k.type}"><span class="tic">${icon(icons[k.type] || 'film')}</span>${btns}</div><div class="lane"></div>`;
+    row.querySelectorAll('[data-tf]').forEach(b => b.onclick = ev => { ev.stopPropagation(); snap(); const f = b.dataset.tf; if (k[f]) delete k[f]; else k[f] = true; commit();
+      Studio.toast({locked: k.locked ? 'Track dikunci' : 'Kunci track dibuka', hidden: k.hidden ? 'Track disembunyikan dari pemutar' : 'Track ditampilkan', muted: k.muted ? 'Track dibisukan' : 'Suara track aktif'}[f]); });
+    const cv = row.querySelector('#cover'); if (cv) cv.onclick = () => Studio.toast('Sampul memakai frame pertama. Sampul kustom diatur di CapCut saat ekspor.');
     const lane = row.querySelector('.lane');
     for (const e of els) {
       const s = document.createElement('div'); s.className = `seg ${e.type}${sel === e.id ? ' sel' : ''}`; s.dataset.id = e.id;
@@ -456,7 +613,7 @@ function renderTimeline() {
       if (e.type === 'photo') s.style.backgroundImage = `url("${mediaUrl(e.src)}")`;
       if (e.type === 'video' && e.src) { s.dataset.src = e.src; loadThumbs(e.src); if (typeof thumbs[e.src] === 'string' && thumbs[e.src].startsWith('data:')) s.style.backgroundImage = `url("${thumbs[e.src]}")`; }
       if ((e.type === 'audio' || e.type === 'video') && e.src) loadPeaks(e.src);
-      s.innerHTML = `<span class="lb">${e.speed !== 1 ? `${e.speed}× · ` : ''}${esc(segLabel(e))}</span>${e.type === 'audio' && !(peaks[e.src] instanceof Float32Array) ? '<div class="wave"></div>' : ''}
+      s.innerHTML = `<span class="lb">${e.speed !== 1 ? `${e.speed}× · ` : ''}${esc(segLabel(e))}<i>${e.duration.toFixed(1)}s</i></span>${e.type === 'audio' && !(peaks[e.src] instanceof Float32Array) ? '<div class="wave"></div>' : ''}
         ${e.fade_in ? `<div class="fade" style="left:0;width:${e.fade_in * pxs}px;clip-path:polygon(0 0,100% 0,0 100%)"></div>` : ''}${e.fade_out ? `<div class="fade" style="right:0;width:${e.fade_out * pxs}px;clip-path:polygon(0 0,100% 0,100% 100%)"></div>` : ''}
         <div class="edge l"></div><div class="edge r"></div>`;
       const kts = new Set(Object.values(e.keyframes || {}).flat().map(p => +p.t.toFixed(2)));
@@ -468,7 +625,7 @@ function renderTimeline() {
         x.onpointerdown = ev => { ev.stopPropagation(); selTrx = e.id; sel = e.id; render(); }; lane.appendChild(x); }
     }
     lane.ondragover = ev => ev.preventDefault();
-    lane.ondrop = ev => dropOnLane(ev, k);
+    lane.ondrop = ev => k.locked ? (ev.preventDefault(), lockToast()) : dropOnLane(ev, k);
     tracks.appendChild(row);
   }
   const extra = document.createElement('div'); extra.className = 'track'; extra.innerHTML = '<div class="thead" style="opacity:.6">＋ Track baru</div><div class="lane"></div>';
@@ -495,6 +652,7 @@ function showSnap(at) { $$('.snapline').forEach(x => x.remove()); if (at !== nul
 function segDrag(ev, e) {
   ev.preventDefault(); ev.stopPropagation(); if (playing) togglePlay();
   if (sel !== e.id || selTrx) { sel = e.id; selTrx = null; render(); }
+  if (isLocked(e)) return;
   snap(); dragging = true;
   const mode = ev.target.classList.contains('l') ? 'l' : ev.target.classList.contains('r') ? 'r' : 'move';
   const sx = ev.clientX, o = {start: e.start, duration: e.duration, source_start: e.source_start, track: e.track}, pts = snapPoints(e.id); let moved = false;
@@ -542,16 +700,17 @@ function setTransition(e, data) { if (!['video', 'photo'].includes(e.type)) retu
 function split() {
   let e = byId(sel); if (!e || t <= e.start + .05 || t >= end(e) - .05) e = S.elements.filter(o => kindOf(o.type) === 'video' && t > o.start + .05 && t < end(o) - .05).sort((a, b) => zOrder(b) - zOrder(a))[0];
   if (!e) return Studio.toast('Letakkan playhead di tengah klip yang ingin dipotong.');
+  if (isLocked(e)) return lockToast();
   snap(); const cut = +(t - e.start).toFixed(3), b = JSON.parse(JSON.stringify(e));
   b.id = uid(); b.clone_of = e.clone_of || e.id; b.start = +t.toFixed(3); b.duration = +(e.duration - cut).toFixed(3); b.source_start = +(e.source_start + cut * e.speed).toFixed(3);
   b.fade_in = 0; e.fade_out = 0; e.duration = cut; delete e.transition;
   for (const [k, kf] of Object.entries(e.keyframes || {})) { e.keyframes[k] = kf.filter(p => p.t <= cut); b.keyframes[k] = kf.filter(p => p.t >= cut).map(p => ({t: +(p.t - cut).toFixed(3), v: p.v})); }
   S.elements.push(b); sel = b.id; commit();
 }
-function del() { if (selTrx) { const e = byId(selTrx); snap(); delete e.transition; selTrx = null; return commit(); } if (!sel) return; snap(); S.elements = S.elements.filter(e => e.id !== sel); sel = null; commit(); }
-function dup() { const e = byId(sel); if (!e) return; snap(); const c = JSON.parse(JSON.stringify(e)); c.id = uid(); delete c.clone_of; c.start = end(e); delete c.transition; S.elements.push(c); resolveOverlap(c); sel = c.id; commit(); }
+function del() { if (isLocked(byId(sel))) return lockToast(); if (selTrx) { const e = byId(selTrx); snap(); delete e.transition; selTrx = null; return commit(); } if (!sel) return; snap(); S.elements = S.elements.filter(e => e.id !== sel); sel = null; commit(); }
+function dup() { const e = byId(sel); if (!e) return; if (isLocked(e)) return lockToast(); snap(); const c = JSON.parse(JSON.stringify(e)); c.id = uid(); delete c.clone_of; c.start = end(e); delete c.transition; S.elements.push(c); resolveOverlap(c); sel = c.id; commit(); }
 function toggleKf() {
-  const e = byId(sel); if (!e) return Studio.toast('Pilih klip dulu.'); const tl = +(t - e.start).toFixed(3);
+  const e = byId(sel); if (!e) return Studio.toast('Pilih klip dulu.'); if (isLocked(e)) return lockToast(); const tl = +(t - e.start).toFixed(3);
   if (tl < 0 || tl > e.duration) return Studio.toast('Playhead harus berada di dalam klip yang dipilih.');
   const props = e.type === 'audio' ? ['volume'] : ['effect', 'filter'].includes(e.type) ? [] : KF_PROPS; if (!props.length) return Studio.toast('Efek dan filter tidak memakai keyframe.');
   snap(); const has = props.some(k => kfAt(e, k));
@@ -560,92 +719,175 @@ function toggleKf() {
 }
 
 // ---------- inspector ----------
+const PNAMES = {x: 'Posisi X', y: 'Posisi Y', scale: 'Skala', rotation: 'Rotasi', alpha: 'Opacity', volume: 'Volume'};
+function inspTabs(e) {
+  if (e.type === 'video') return [['video', 'Video'], ['anim', 'Animasi'], ['speed', 'Kecepatan'], ['audio', 'Audio']];
+  if (e.type === 'photo') return [['video', 'Video'], ['anim', 'Animasi']];
+  if (e.type === 'sticker') return [['video', 'Stiker'], ['anim', 'Animasi']];
+  if (e.type === 'text') return [['text', 'Teks'], ['anim', 'Animasi']];
+  if (e.type === 'audio') return [['audio', 'Dasar'], ['speed', 'Kecepatan']];
+  return [['basic', e.type === 'effect' ? 'Efek' : 'Filter']];
+}
 function renderInsp(live) {
-  const I = $('#inspBody'), e = byId(sel);
+  const I = $('#inspBody'), e = byId(sel), N = $('#itabs');
   if (live && I.contains(document.activeElement) && document.activeElement.matches('input')) { I.querySelectorAll('[data-v]').forEach(i => { if (i !== document.activeElement) i.value = (+val(e, i.dataset.v)).toFixed(i.step < 1 ? 2 : 0); }); return; }
   if (!e) {
-    const dur = total();
+    const dur = total(); N.innerHTML = '<span class="ttl">Project</span>';
     I.innerHTML = `<h3>${DEMO ? 'Contoh project' : esc(DRAFT)}</h3><div class="sec"><div class="label">Project</div>
       <div class="prop" style="grid-template-columns:110px 1fr"><span>Kanvas</span><span class="mono">${S.width}×${S.height}</span><span>Durasi</span><span class="mono">${tc(dur)}</span><span>Track</span><span class="mono">${S.tracks.length}</span><span>Elemen</span><span class="mono">${S.elements.length}</span></div></div>
-      <div class="sec"><div class="label">Cara pakai</div><p style="margin:0;color:var(--muted)">Seret media dari panel kiri ke timeline. Klik klip untuk mengatur posisi, kecepatan, keyframe, audio, dan transisi. Spasi = putar, S = potong, Delete = hapus.</p></div>
+      <div class="sec"><div class="label">Cara pakai</div><p style="margin:0;color:var(--muted)">Seret media dari panel kiri ke timeline, atau klik ＋ pada kartu untuk menaruhnya di playhead. Pilih klip untuk membuka tab Video, Animasi, Kecepatan, dan Audio di sini. Spasi = putar, S = potong, Delete = hapus.</p></div>
       ${DEMO ? '<div class="sec"><p style="margin:0;color:var(--muted)">Ini contoh project yang dibuat Studio. Hubungkan komputer untuk mengedit project CapCut asli.</p></div>' : ''}`;
     return;
   }
+  const locked = isLocked(e);
   if (selTrx === e.id && e.transition) {
-    I.innerHTML = `<h3>Transisi</h3><div class="sec"><div class="row"><b class="grow">${esc(e.transition.name)}</b>${e.transition.vip ? '<span class="tier pro">PRO</span>' : '<span class="tier free">Gratis</span>'}</div>
+    N.innerHTML = '<span class="ttl">Transisi</span>';
+    I.innerHTML = `<div class="sec"><div class="row"><b class="grow">${esc(e.transition.name)}</b>${e.transition.vip ? '<span class="tier pro">PRO</span>' : '<span class="tier free">Gratis</span>'}</div>
       <div class="prop" style="grid-template-columns:74px 1fr 58px"><span>Durasi</span><input type="range" id="trD" min="0.1" max="3" step="0.1" value="${e.transition.duration}"><input type="number" id="trDn" step="0.1" value="${e.transition.duration}"></div>
       <p style="margin:0;color:var(--muted);font-size:12px">Pratinjau di sini berupa crossfade sederhana. Gerakan asli transisi dirender oleh CapCut setelah deploy.</p>
       <button class="btn" id="trDel">${icon('trash')} Hapus transisi</button></div>`;
-    const setD = v => { snap(); e.transition.duration = Math.max(.1, +v); commit(); };
+    const setD = v => { if (locked) return lockToast(); snap(); e.transition.duration = Math.max(.1, +v); commit(); };
     $('#trD').onchange = ev => setD(ev.target.value); $('#trDn').onchange = ev => setD(ev.target.value); $('#trDel').onclick = del; return;
   }
-  const names = {video: 'Video', photo: 'Foto', audio: 'Audio', text: 'Teks', sticker: 'Stiker', effect: 'Efek', filter: 'Filter'};
+  const tabs = inspTabs(e); let cur = itab[e.type]; if (!tabs.some(([k]) => k === cur)) cur = tabs[0][0];
+  N.innerHTML = tabs.map(([k, l]) => `<button data-it="${k}" class="${k === cur ? 'on' : ''}" role="tab" aria-selected="${k === cur}">${l}</button>`).join('');
+  N.querySelectorAll('[data-it]').forEach(b => b.onclick = () => { itab[e.type] = b.dataset.it; renderInsp(); });
   const prop = (k, l, lo, hi, step) => `<div class="prop"><span>${l}</span><input type="range" data-r="${k}" min="${lo}" max="${hi}" step="${step}" value="${val(e, k)}"><input type="number" data-v="${k}" step="${step}" value="${(+val(e, k)).toFixed(step < 1 ? 2 : 0)}">
-    <button class="kf${e.keyframes?.[k]?.length ? ' has' : ''}${kfAt(e, k) ? ' at' : ''}" data-kf="${k}" title="Keyframe ${l.toLowerCase()} di playhead">${icon('diamond')}</button></div>`;
-  let h = `<div class="row"><h3 class="grow">${names[e.type]}${e.label ? ': ' + esc(e.label) : ''}</h3>${e.vip ? '<span class="tier pro">PRO</span>' : e.lib ? '<span class="tier free">Gratis</span>' : ''}</div>
-    <div class="sec"><div class="label">Waktu</div><div class="prop" style="grid-template-columns:74px 1fr 74px 1fr"><span>Mulai</span><input type="number" id="pStart" step="0.1" value="${e.start.toFixed(2)}"><span>Durasi</span><input type="number" id="pDur" step="0.1" value="${e.duration.toFixed(2)}"></div></div>`;
-  if (e.type === 'text') h += `<div class="sec"><div class="label">Teks</div><textarea id="pText" rows="3">${esc(e.text)}</textarea>
-    <div class="prop" style="grid-template-columns:74px 1fr 74px 1fr"><span>Warna</span><input type="color" id="pColor" value="${/^#[0-9a-f]{6}$/i.test(e.color) ? e.color : '#ffffff'}"><span>Ukuran</span><input type="number" id="pFs" step="0.5" value="${e.font_size}"></div></div>`;
-  if (['video', 'photo', 'text', 'sticker'].includes(e.type)) h += `<div class="sec"><div class="label">Dasar · posisi & skala</div>
-    ${prop('x', 'Posisi X', -1.5, 1.5, .01)}${prop('y', 'Posisi Y', -1.5, 1.5, .01)}${prop('scale', 'Skala', .05, 5, .01)}${prop('rotation', 'Rotasi', -180, 180, 1)}${prop('alpha', 'Opacity', 0, 1, .01)}
-    <button class="btn" id="pReset">Reset posisi</button></div>`;
-  if (e.type === 'video' || e.type === 'audio') h += `<div class="sec"><div class="label">Kecepatan</div><div class="chips">${[.5, 1, 1.5, 2, 3].map(s => `<button class="btn${e.speed === s ? ' on' : ''}" data-sp="${s}">${s}×</button>`).join('')}</div>
-    <div class="prop" style="grid-template-columns:74px 1fr 58px"><span>Kustom</span><input type="range" id="pSp" min="0.1" max="10" step="0.1" value="${e.speed}"><input type="number" id="pSpn" min="0.1" max="10" step="0.1" value="${e.speed}"></div>
-    <p style="margin:0;color:var(--muted);font-size:12px">Durasi klip menyesuaikan kecepatan. Kurva kecepatan belum tersedia.</p></div>
-    <div class="sec"><div class="label">Audio</div>${prop('volume', 'Volume', 0, 2, .01)}
-    <div class="prop" style="grid-template-columns:74px 1fr 74px 1fr"><span>Fade in</span><input type="number" id="pFi" min="0" step="0.1" value="${e.fade_in}"><span>Fade out</span><input type="number" id="pFo" min="0" step="0.1" value="${e.fade_out}"></div></div>`;
-  if (['video', 'photo'].includes(e.type)) { const trs = LIB.filter(i => i.kind === 'transition');
-    h += `<div class="sec"><div class="label">Transisi ke klip berikutnya</div><select id="pTr"><option value="">Tanpa transisi</option>${trs.map(i => `<option value="${esc(i.key)}" ${e.transition?.key === i.key ? 'selected' : ''}>${esc(i.name)}${i.vip ? ' (PRO)' : ''}</option>`).join('')}</select>
-      ${trs.length ? '' : '<p style="margin:0;color:var(--muted);font-size:12px">Belum ada transisi di library. Scan project CapCut Anda dari Beranda → Library CapCut.</p>'}</div>`; }
-  if (['effect', 'filter'].includes(e.type)) h += `<div class="sec"><p style="margin:0;color:var(--muted)">${e.type === 'effect' ? 'Efek' : 'Filter'} ini berasal dari library CapCut Anda. Tampilan aslinya dirender oleh CapCut; di sini ditandai dengan label di pojok player.</p></div>`;
+    <button class="kf${e.keyframes?.[k]?.length ? ' has' : ''}${kfAt(e, k) ? ' at' : ''}" data-kf="${k}" title="Keyframe ${l.toLowerCase()} di playhead" aria-label="Keyframe ${l.toLowerCase()}">${icon('diamond')}</button></div>`;
+  const sec = (id, title, body, reset = true) => `<div class="sec${closed.has(id) ? ' closed' : ''}" data-sec="${id}"><div class="shd"><button class="stog" aria-expanded="${!closed.has(id)}">${icon('chev')}${title}</button><span class="grow"></span>${reset ? `<button class="btn ghost icon sm" data-reset="${id}" title="Atur ulang ${title.toLowerCase()}" aria-label="Atur ulang ${title.toLowerCase()}">${icon('reset')}</button>` : ''}</div><fieldset class="sbody"${locked ? ' disabled' : ''}>${body}</fieldset></div>`;
+  const names = {video: 'Video', photo: 'Foto', audio: 'Audio', text: 'Teks', sticker: 'Stiker', effect: 'Efek', filter: 'Filter'};
+  let h = `<div class="row"><h3 class="grow" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${names[e.type]}: ${esc(segLabel(e))}</h3>${e.vip ? '<span class="tier pro">PRO</span>' : e.lib ? '<span class="tier free">Gratis</span>' : ''}</div>`;
+  if (locked) h += `<div class="lockmsg">${icon('lock')} Track dikunci — buka kunci di kepala track untuk mengedit.</div>`;
+  const timing = sec('waktu', 'Waktu', `<div class="prop" style="grid-template-columns:52px 1fr 52px 1fr"><span>Mulai</span><input type="number" id="pStart" step="0.1" value="${e.start.toFixed(2)}"><span>Durasi</span><input type="number" id="pDur" step="0.1" value="${e.duration.toFixed(2)}"></div>`, false);
+  const basic = `${prop('x', 'Posisi X', -1.5, 1.5, .01)}${prop('y', 'Posisi Y', -1.5, 1.5, .01)}${prop('scale', 'Skala', .05, 5, .01)}${prop('rotation', 'Rotasi', -180, 180, 1)}${prop('alpha', 'Opacity', 0, 1, .01)}`;
+  const audioSec = () => sec('audio', e.type === 'audio' ? 'Dasar' : 'Audio', `${prop('volume', 'Volume', 0, 2, .01)}
+    <div class="prop" style="grid-template-columns:58px 1fr 58px 1fr"><span>Fade in</span><input type="number" id="pFi" min="0" step="0.1" value="${e.fade_in}"><span>Fade out</span><input type="number" id="pFo" min="0" step="0.1" value="${e.fade_out}"></div>
+    ${trackOf(e)?.muted ? '<p style="margin:0;color:var(--accent);font-size:12px">Track ini sedang dibisukan.</p>' : ''}`);
+  if (cur === 'video') {
+    h += timing + sec('dasar', 'Dasar', `${basic}<div class="prop" style="grid-template-columns:66px 1fr"><span>Campuran</span><select disabled title="Mode campuran (segera)"><option>Normal (segera)</option></select></div>`);
+    if (['video', 'photo'].includes(e.type)) { const trs = LIB.filter(i => i.kind === 'transition');
+      h += sec('trans', 'Transisi ke klip berikutnya', `<select id="pTr"><option value="">Tanpa transisi</option>${trs.map(i => `<option value="${esc(i.key)}" ${e.transition?.key === i.key ? 'selected' : ''}>${esc(i.name)}${i.vip ? ' (PRO)' : ''}</option>`).join('')}</select>
+        ${trs.length ? '' : '<p style="margin:0;color:var(--muted);font-size:12px">Belum ada transisi di library. Scan project CapCut Anda dari Beranda → Library CapCut.</p>'}`); }
+  } else if (cur === 'text') {
+    const al = e.text_align || 'center';
+    h += timing + sec('teks', 'Teks', `<textarea id="pText" rows="3">${esc(e.text)}</textarea>
+      <div class="prop" style="grid-template-columns:52px 1fr 52px 1fr"><span>Warna</span><input type="color" id="pColor" value="${/^#[0-9a-f]{6}$/i.test(e.color) ? e.color : '#ffffff'}"><span>Ukuran</span><input type="number" id="pFs" step="0.5" value="${e.font_size}"></div>
+      <div class="prop" style="grid-template-columns:52px 1fr"><span>Rata</span><div class="subtabs">${[['left', 'alignL', 'Kiri'], ['center', 'alignC', 'Tengah'], ['right', 'alignR', 'Kanan']].map(([v, ic, l]) => `<button type="button" data-al="${v}" class="${al === v ? 'on' : ''}" title="Rata ${l.toLowerCase()}" aria-label="Rata ${l.toLowerCase()}">${icon(ic)}</button>`).join('')}</div></div>`)
+      + sec('dasar', 'Dasar', basic);
+  } else if (cur === 'anim') {
+    const rows = Object.entries(e.keyframes || {}).flatMap(([k, a]) => a.map(p => ({k, ...p}))).sort((a, b) => a.t - b.t || a.k.localeCompare(b.k));
+    h += sec('kf', 'Keyframe', `${rows.length ? `<div class="kfl">${rows.map(r => `<div class="kfr${Math.abs(r.t - (t - e.start)) < .04 ? ' at' : ''}">${icon('diamond')}<span class="mono">${tc(e.start + r.t)}</span><span>${PNAMES[r.k] || r.k} = <span class="mono">${(+r.v).toFixed(r.k === 'rotation' ? 0 : 2)}</span></span>
+      <button type="button" class="btn ghost icon sm" data-kj="${r.k}|${r.t}" title="Lompat ke keyframe" aria-label="Lompat ke keyframe">${icon('position')}</button><button type="button" class="btn ghost icon sm" data-kd="${r.k}|${r.t}" title="Hapus keyframe" aria-label="Hapus keyframe">${icon('trash')}</button></div>`).join('')}</div>`
+      : '<p style="margin:0;color:var(--muted);font-size:12px">Belum ada keyframe. Klik ikon ◆ di samping properti (tab Video/Teks) atau tombol keyframe di timeline.</p>'}`)
+      + sec('animin', 'Animasi masuk/keluar', '<p style="margin:0;color:var(--muted);font-size:12px">Preset animasi masuk, keluar, dan kombo akan tersedia di sini (segera). Saat ini pakai keyframe.</p>', false);
+  } else if (cur === 'speed') {
+    h += `<div class="subtabs" role="tablist"><button class="on" aria-selected="true">Normal</button><button disabled title="Segera">Kurva · segera</button></div>`
+      + sec('speed', 'Kecepatan', `<div class="chips">${[.5, 1, 1.5, 2, 3].map(sp => `<button type="button" class="btn${e.speed === sp ? ' on' : ''}" data-sp="${sp}">${sp}×</button>`).join('')}</div>
+      <div class="prop" style="grid-template-columns:52px 1fr 58px"><span>Kustom</span><input type="range" id="pSp" min="0.1" max="10" step="0.1" value="${e.speed}"><input type="number" id="pSpn" min="0.1" max="10" step="0.1" value="${e.speed}"></div>
+      <p style="margin:0;color:var(--muted);font-size:12px">Durasi ${e.duration.toFixed(1)} dtk — menyesuaikan kecepatan.</p>`);
+  } else if (cur === 'audio') h += (e.type === 'audio' ? timing : '') + audioSec();
+  else h += timing + `<div class="sec"><p style="margin:0;color:var(--muted)">${e.type === 'effect' ? 'Efek' : 'Filter'} ini berasal dari library CapCut Anda. Tampilan aslinya dirender oleh CapCut; di sini ditandai dengan label di pojok player.</p></div>`;
   h += `<div class="sec"><div class="row"><button class="btn" id="pSplit">${icon('scissors')} Potong</button><button class="btn" id="pDup">${icon('copy')} Duplikat</button><button class="btn" id="pDel">${icon('trash')} Hapus</button></div></div>`;
   I.innerHTML = h;
+  I.querySelectorAll('.stog').forEach(b => b.onclick = () => { const id = b.closest('.sec').dataset.sec; closed.has(id) ? closed.delete(id) : closed.add(id); renderInsp(); });
+  const RESET = {
+    dasar: () => { for (const k of KF_PROPS) delete e.keyframes[k]; Object.assign(e, {x: 0, y: 0, scale: 1, rotation: 0, alpha: 1}); },
+    teks: () => Object.assign(e, {color: '#FFFFFF', font_size: 8, text_align: 'center'}),
+    audio: () => { delete e.keyframes.volume; Object.assign(e, {volume: 1, fade_in: 0, fade_out: 0}); },
+    kf: () => { e.keyframes = {}; },
+    trans: () => { delete e.transition; },
+    speed: () => { const src = e.duration * e.speed; e.speed = 1; e.duration = +src.toFixed(3); },
+  };
+  I.querySelectorAll('[data-reset]').forEach(b => b.onclick = () => { if (locked) return lockToast(); snap(); RESET[b.dataset.reset]?.(); commit(); Studio.toast('Diatur ulang'); });
   const num = (id, fn) => { const x = $('#' + id); if (x) x.onchange = () => { snap(); fn(+x.value); commit(); }; };
   num('pStart', v => e.start = Math.max(0, v)); num('pDur', v => e.duration = Math.max(.1, v)); num('pFs', v => e.font_size = Math.max(1, v));
   num('pFi', v => e.fade_in = Math.max(0, Math.min(v, e.duration))); num('pFo', v => e.fade_out = Math.max(0, Math.min(v, e.duration)));
   const tx = $('#pText'); if (tx) { tx.onfocus = snap; tx.oninput = () => { e.text = tx.value; renderStage(); }; tx.onchange = commit; }
   const co = $('#pColor'); if (co) { co.oninput = () => { snap(); e.color = co.value; renderStage(); }; co.onchange = commit; }
+  I.querySelectorAll('[data-al]').forEach(b => b.onclick = () => { snap(); e.text_align = b.dataset.al; commit(); });
   I.querySelectorAll('[data-r]').forEach(r => { r.oninput = () => { snap(); setVal(e, r.dataset.r, +r.value); renderStage(); renderInsp(true); }; r.onchange = commit; });
   I.querySelectorAll('[data-v]').forEach(n => { n.onchange = () => { snap(); setVal(e, n.dataset.v, +n.value); commit(); }; });
-  I.querySelectorAll('[data-kf]').forEach(b => b.onclick = () => { const k = b.dataset.kf, tl = +(t - e.start).toFixed(3);
+  I.querySelectorAll('[data-kf]').forEach(b => b.onclick = () => { if (locked) return lockToast(); const k = b.dataset.kf, tl = +(t - e.start).toFixed(3);
     if (tl < 0 || tl > e.duration) return Studio.toast('Pindahkan playhead ke dalam klip ini dulu.');
     snap(); const cur = val(e, k); if (kfAt(e, k)) { e.keyframes[k] = e.keyframes[k].filter(p => Math.abs(p.t - tl) >= .04); if (!e.keyframes[k].length) { delete e.keyframes[k]; e[k] = cur; } }
     else (e.keyframes[k] ||= []).push({t: tl, v: cur}); commit(); });
+  I.querySelectorAll('[data-kj]').forEach(b => b.onclick = () => { const [, kt] = b.dataset.kj.split('|'); seek(e.start + +kt); });
+  I.querySelectorAll('[data-kd]').forEach(b => b.onclick = () => { if (locked) return lockToast(); const [k, kt] = b.dataset.kd.split('|'); snap();
+    const cv = val(e, k); e.keyframes[k] = (e.keyframes[k] || []).filter(p => p.t !== +kt); if (!e.keyframes[k].length) { delete e.keyframes[k]; e[k] = cv; } commit(); Studio.toast('Keyframe dihapus'); });
   const setSpeed = v => { snap(); v = Math.max(.1, Math.min(10, +v)); const src = e.duration * e.speed; e.speed = +v.toFixed(2); e.duration = +(src / e.speed).toFixed(3); commit(); };
   I.querySelectorAll('[data-sp]').forEach(b => b.onclick = () => setSpeed(b.dataset.sp)); const sp = $('#pSp'); if (sp) sp.onchange = () => setSpeed(sp.value); const spn = $('#pSpn'); if (spn) spn.onchange = () => setSpeed(spn.value);
   const tr = $('#pTr'); if (tr) tr.onchange = () => { snap(); const i = LIB.find(x => x.key === tr.value); if (i) e.transition = {key: i.key, name: i.name, duration: e.transition?.duration || .5, vip: i.vip}; else delete e.transition; commit(); };
-  const rs = $('#pReset'); if (rs) rs.onclick = () => { snap(); for (const k of KF_PROPS) delete e.keyframes[k]; Object.assign(e, {x: 0, y: 0, scale: 1, rotation: 0, alpha: 1}); commit(); };
   $('#pSplit').onclick = split; $('#pDup').onclick = dup; $('#pDel').onclick = del;
 }
 
 // ---------- media panel ----------
-const TABS = [['media', 'film', 'Media'], ['audio', 'music', 'Audio'], ['text', 'text', 'Teks'], ['sticker', 'star', 'Stiker'], ['effect', 'wand', 'Efek'], ['transition', 'transition', 'Transisi'], ['filter', 'filter', 'Filter']];
-function renderTabs() { $('#mtabs').innerHTML = TABS.map(([k, i, l]) => `<button data-t="${k}" class="${k === tab ? 'on' : ''}">${icon(i)}${l}</button>`).join(''); $$('#mtabs button').forEach(b => b.onclick = () => { tab = b.dataset.t; renderTabs(); }); renderMedia(); }
-function mitem(thumb, name, data, badge = '') {
-  const b = document.createElement('button'); b.className = 'mitem'; b.draggable = true; b.title = name + (data.lib ? '' : ' · klik untuk menambah di playhead');
-  b.innerHTML = `<div class="th">${thumb}${badge}</div><div class="nm">${esc(name)}</div>`;
-  b.ondragstart = ev => ev.dataTransfer.setData('text/plain', JSON.stringify(data)); b.onclick = () => addAtPlayhead(data); return b;
+const TABS = [['media', 'film', 'Media'], ['audio', 'music', 'Audio'], ['text', 'text', 'Teks'], ['sticker', 'star', 'Stiker'], ['effect', 'wand', 'Efek'], ['transition', 'transition', 'Transisi'], ['filter', 'filter', 'Filter'], ['adjust', 'adjust', 'Penyesuaian']];
+const LIBSUB = [['all', 'Semua'], ['free', 'Gratis'], ['pro', 'PRO']];
+const SUBS = {media: [['local', 'Lokal'], ['library', 'Library']], audio: [['music', 'Musik'], ['sfx', 'Efek suara']], text: [['default', 'Teks default'], ['template', 'Template']],
+  sticker: LIBSUB, effect: LIBSUB, transition: LIBSUB, filter: LIBSUB, adjust: [['all', 'Penyesuaian'], ['free', 'Gratis']]};
+function renderTabs() {
+  $('#mtabs').innerHTML = TABS.map(([k, i, l]) => `<button data-t="${k}" class="${k === tab ? 'on' : ''}" aria-pressed="${k === tab}">${icon(i)}${l}</button>`).join('');
+  $$('#mtabs button').forEach(b => b.onclick = () => { tab = b.dataset.t; renderTabs(); });
+  const cur = sub[tab] || SUBS[tab][0][0];
+  $('#msub').innerHTML = SUBS[tab].map(([k, l]) => `<button data-s="${k}" class="${k === cur ? 'on' : ''}" aria-pressed="${k === cur}">${l}</button>`).join('');
+  $$('#msub button').forEach(b => b.onclick = () => { sub[tab] = b.dataset.s; renderTabs(); });
+  renderMedia();
 }
+const fmtDur = d => d ? (d >= 60 ? `${Math.floor(d / 60)}:${String(Math.round(d % 60)).padStart(2, '0')}` : `00:${String(Math.round(d)).padStart(2, '0')}`) : '';
+function mitem(thumb, name, data, {vip, dur, temp} = {}) {
+  const b = document.createElement('div'); b.className = 'mitem'; b.draggable = true; b.tabIndex = 0; b.setAttribute('role', 'button'); b.title = name + ' · klik atau ＋ untuk menambah di playhead';
+  b.innerHTML = `<div class="th">${thumb}${vip ? '<span class="tier pro">PRO</span>' : ''}${temp ? '<span class="tmp">sementara</span>' : ''}${dur ? `<span class="dur">${fmtDur(dur)}</span>` : ''}
+    <button class="add" type="button" title="Tambah di playhead" aria-label="Tambah ${esc(name)} di playhead">${icon('plus')}</button></div><div class="nm">${esc(name)}</div>`;
+  b.ondragstart = ev => ev.dataTransfer.setData('text/plain', JSON.stringify(data));
+  b.onclick = () => addAtPlayhead(data); b.onkeydown = ev => { if (ev.key === 'Enter' && ev.target === b) addAtPlayhead(data); };
+  b.querySelector('.add').onclick = ev => { ev.stopPropagation(); addAtPlayhead(data); }; return b;
+}
+function importFiles(list) {
+  let n = 0;
+  for (const f of list) {
+    const type = /^video\//.test(f.type) ? 'video' : /^audio\//.test(f.type) ? 'audio' : /^image\//.test(f.type) ? 'photo' : null; if (!type) continue;
+    const item = {type, name: f.name, path: URL.createObjectURL(f), temp: true}; FILES.unshift(item); n++;
+    if (type !== 'photo') { const m = document.createElement(type === 'video' ? 'video' : 'audio'); m.preload = 'metadata';
+      m.onloadedmetadata = () => { if (isFinite(m.duration)) { item.dur = +m.duration.toFixed(2); renderMedia(); } m.removeAttribute('src'); }; m.src = item.path; }
+  }
+  if (!n) return Studio.toast('Format tidak didukung. Pilih video, audio, atau gambar.');
+  Studio.toast(`${n} file diimpor sementara (hanya sesi ini${DEMO ? ', tidak masuk project CapCut' : ''}).`); renderMedia();
+}
+$('#fileIn').onchange = ev => { importFiles([...ev.target.files]); ev.target.value = ''; };
 function renderMedia() {
-  const B = $('#mbody'); B.innerHTML = ''; const grid = document.createElement('div'); grid.className = 'mgrid';
+  const B = $('#mbody'); B.innerHTML = ''; const grid = document.createElement('div'); grid.className = 'mgrid'; const cur = sub[tab] || SUBS[tab][0][0];
   const note = txt => B.insertAdjacentHTML('beforeend', `<p style="margin:0;color:var(--muted);font-size:12px">${txt}</p>`);
-  if (tab === 'media' || tab === 'audio') {
-    const items = FILES.filter(f => tab === 'audio' ? f.type === 'audio' : f.type !== 'audio');
-    note(DEMO ? 'Gambar & musik contoh buatan Studio. Hubungkan komputer untuk memakai file Anda sendiri.' : 'File dari folder Video, Gambar, Musik, Unduhan & Desktop di komputer Anda.');
-    if (!items.length) note('Tidak ada file.');
-    for (const f of items.slice(0, 200)) grid.appendChild(mitem(f.type === 'photo' ? `<img loading="lazy" src="${esc(mediaUrl(f.path))}" alt="">` : icon(f.type === 'audio' ? 'music' : 'film'), f.name, {type: f.type, path: f.path, dur: f.dur, name: f.name}));
+  const fileItem = f => mitem(f.type === 'photo' ? `<img loading="lazy" src="${esc(mediaUrl(f.path))}" alt="">` : icon(f.type === 'audio' ? 'music' : 'film'), f.name, {type: f.type, path: f.path, dur: f.dur, name: f.name}, {dur: f.type === 'photo' ? 3 : f.dur, temp: f.temp});
+  if (tab === 'media' && cur === 'local') {
+    const dz = document.createElement('div'); dz.className = 'drop'; dz.tabIndex = 0; dz.setAttribute('role', 'button');
+    dz.innerHTML = `<b>${icon('upload')} Impor</b><span>Klik atau lepas video, audio, foto di sini</span>${DEMO ? '<span>Mode demo: file hanya untuk pratinjau sesi ini. Hubungkan komputer untuk memakai file di project CapCut.</span>' : ''}`;
+    dz.onclick = () => $('#fileIn').click(); dz.onkeydown = ev => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); $('#fileIn').click(); } };
+    dz.ondragover = ev => { if ([...ev.dataTransfer.types].includes('Files')) { ev.preventDefault(); dz.classList.add('over'); } };
+    dz.ondragleave = () => dz.classList.remove('over');
+    dz.ondrop = ev => { ev.preventDefault(); dz.classList.remove('over'); importFiles([...ev.dataTransfer.files]); };
+    B.appendChild(dz);
+    const items = FILES.filter(f => f.type !== 'audio');
+    note(DEMO ? 'Gambar contoh buatan Studio, plus file yang Anda impor.' : 'File dari folder Video, Gambar, Unduhan & Desktop di komputer Anda.');
+    for (const f of items.slice(0, 200)) grid.appendChild(fileItem(f));
+  } else if (tab === 'media') note('Library stok tidak disertakan. Pakai file Anda sendiri (Lokal) atau elemen dari library CapCut di tab Stiker, Efek, Transisi, dan Filter.');
+  else if (tab === 'audio') {
+    const items = FILES.filter(f => f.type === 'audio' && (cur === 'sfx' ? (f.dur || 99) < 6 : (f.dur || 99) >= 6));
+    note(cur === 'sfx' ? 'Audio pendek (< 6 detik) dari file Anda.' : DEMO ? 'Musik contoh buatan Studio, plus audio yang Anda impor.' : 'Musik dari folder Musik, Unduhan & Desktop di komputer Anda.');
+    if (!items.length) note('Tidak ada file. Impor audio dari Media → Lokal.');
+    for (const f of items.slice(0, 200)) grid.appendChild(fileItem(f));
   } else if (tab === 'text') {
-    for (const [l, d] of [['Judul', {new: 'text', text: 'JUDUL', font_size: 14, y: .5}], ['Subjudul', {new: 'text', text: 'Subjudul', font_size: 9}], ['Caption', {new: 'text', text: 'Tulis caption di sini', font_size: 7, y: -.6}], ['Sorotan', {new: 'text', text: 'PROMO!', font_size: 12, color: '#F4C95D'}]])
-      grid.appendChild(mitem(`<b style="font-size:${10 + d.font_size}px;color:${d.color || '#fff'}">${l}</b>`, l, d));
-    note('Klik untuk menambah di posisi playhead, atau seret ke timeline.');
+    const P = cur === 'template' ? [['Judul tebal', {new: 'text', text: 'BIG SALE', font_size: 16, color: '#F4C95D', y: .4}], ['Lower third', {new: 'text', text: 'Nama · Jabatan', font_size: 7, y: -.7}], ['Kutipan', {new: 'text', text: '"Tulis kutipan"', font_size: 9, color: '#36C5B1'}], ['Ajakan', {new: 'text', text: 'Ikuti untuk lanjut →', font_size: 8, color: '#FF8C5A', y: -.55}]]
+      : [['Judul', {new: 'text', text: 'JUDUL', font_size: 14, y: .5}], ['Subjudul', {new: 'text', text: 'Subjudul', font_size: 9}], ['Caption', {new: 'text', text: 'Tulis caption di sini', font_size: 7, y: -.6}], ['Sorotan', {new: 'text', text: 'PROMO!', font_size: 12, color: '#F4C95D'}]];
+    for (const [l, d] of P) grid.appendChild(mitem(`<b style="font-size:${10 + Math.min(14, d.font_size)}px;color:${d.color || '#fff'}">${l}</b>`, l, d, {dur: 3}));
+    note('Klik ＋ untuk menambah di posisi playhead, atau seret ke timeline.');
   } else {
-    const items = LIB.filter(i => i.kind === tab || (tab === 'filter' && i.kind === 'adjust'));
+    const items = LIB.filter(i => i.kind === tab && (cur === 'free' ? !i.vip : cur === 'pro' ? i.vip : true));
     note(DEMO ? 'Item contoh. Di project asli, isinya adalah elemen yang pernah Anda pakai di CapCut (scan dari Beranda → Library CapCut).' : 'Elemen dari project CapCut Anda. PRO = butuh langganan CapCut saat dirender.');
     if (!items.length) note('Belum ada. Scan project CapCut Anda dari Beranda → Library CapCut.');
     if (tab === 'transition') note('Seret ke klip di timeline, atau pilih klip lalu klik transisi.');
     const ic = {sticker: 'star', effect: 'wand', transition: 'transition', filter: 'filter', adjust: 'adjust'};
     for (const i of items) grid.appendChild(mitem(i.preview ? `<img src="${esc(mediaUrl(i.preview))}" alt="" style="object-fit:contain;padding:10px">` : icon(ic[i.kind] || 'sparkles'), i.name,
-      {lib: i.key, kind: i.kind, name: i.name, vip: i.vip, preview: i.preview}, `<span class="tier ${i.vip ? 'pro' : 'free'}">${i.vip ? 'PRO' : 'Gratis'}</span>`));
+      {lib: i.key, kind: i.kind, name: i.name, vip: i.vip, preview: i.preview}, {vip: i.vip}));
   }
   B.appendChild(grid);
 }
@@ -656,8 +898,10 @@ addEventListener('keydown', ev => {
   if (ev.key === ' ') { ev.preventDefault(); togglePlay(); }
   else if (c && k === 'z') { ev.preventDefault(); ev.shiftKey ? redo() : undo(); }
   else if (c && k === 'y') { ev.preventDefault(); redo(); }
+  else if (c && k === 's') { ev.preventDefault(); saveNow(); }
   else if ((c && k === 'b') || (!c && k === 's')) { ev.preventDefault(); split(); }
   else if (c && k === 'd') { ev.preventDefault(); dup(); }
+  else if (!c && k === 'k') { ev.preventDefault(); toggleKf(); }
   else if (ev.key === 'Delete' || ev.key === 'Backspace') { ev.preventDefault(); del(); }
   else if (ev.key === 'ArrowLeft') { ev.preventDefault(); seek(t - (ev.shiftKey ? 1 : 1 / FPS)); }
   else if (ev.key === 'ArrowRight') { ev.preventDefault(); seek(t + (ev.shiftKey ? 1 : 1 / FPS)); }
@@ -668,6 +912,10 @@ $('#split').onpointerdown = ev => { const y0 = ev.clientY, h0 = $('#tl').offsetH
   const mv = m => { document.body.style.setProperty('--tlh', Math.max(150, Math.min(innerHeight - 260, h0 - (m.clientY - y0))) + 'px'); fitStage(); renderStage(); };
   const up = () => { removeEventListener('pointermove', mv); removeEventListener('pointerup', up); }; addEventListener('pointermove', mv); addEventListener('pointerup', up); };
 $('#tlScroll').addEventListener('wheel', ev => { if (ev.ctrlKey || ev.metaKey) { ev.preventDefault(); pxs = Math.max(8, Math.min(240, pxs * (ev.deltaY < 0 ? 1.15 : 1 / 1.15))); renderTlbar(); renderTimeline(); } }, {passive: false});
+$('#tlScroll').addEventListener('pointermove', ev => { if (!axisOn || dragging || playing) return; const x = ev.clientX - $('#tlInner').getBoundingClientRect().left - HW; if (x < 0) return;
+  let ax = $('.axis'); if (!ax) { ax = document.createElement('div'); ax.className = 'axis'; $('#tlInner').appendChild(ax); } ax.style.left = HW + x + 'px';
+  const keep = t; t = Math.min(total(), x / pxs); renderStage(); t = keep; });
+$('#tlScroll').addEventListener('pointerleave', () => { if (!axisOn) return; $$('.axis').forEach(x => x.remove()); renderStage(); });
 $('#tlScroll').addEventListener('pointerdown', ev => { if (ev.target.classList.contains('lane') || ev.target.id === 'tracks') { sel = null; selTrx = null; render(); } });
 function render() { if (!S) return; fitStage(); renderStage(); renderTimeline(); renderInsp(); updUndoBtns(); }
 addEventListener('resize', render);
