@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Creative Live Editor</title>
+<style>
+:root{--bg:#0f1115;--panel:#171a21;--line:#2a2f3a;--text:#e6e8ee;--muted:#8b93a7;--acc:#4f8cff;--warn:#ffb020;
+--video:#3a6df0;--sticker:#d69e2e;--effect:#c0392b;--filter:#16a085;--photo:#1fa37a;--audio:#b0562f;--textc:#9b4fd6}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:13px/1.4 system-ui,sans-serif;height:100vh;display:grid;
+grid-template-rows:44px 1fr 220px;grid-template-columns:240px 1fr 260px;grid-template-areas:"top top top" "lib stage props" "tl tl tl"}
+header{grid-area:top;display:flex;gap:8px;align-items:center;padding:0 12px;border-bottom:1px solid var(--line);background:var(--panel)}
+header .sp{flex:1}
+button,select,input{background:#222733;color:var(--text);border:1px solid var(--line);border-radius:6px;padding:5px 9px;font:inherit}
+button:hover{border-color:var(--acc)}button.pri{background:var(--acc);border-color:var(--acc);color:#fff}
+#status{color:var(--muted)}#status.dirty{color:var(--warn)}
+aside{background:var(--panel);overflow:auto;padding:10px}
+#lib{grid-area:lib;border-right:1px solid var(--line)}#props{grid-area:props;border-left:1px solid var(--line)}
+h3{margin:4px 0 8px;font-size:12px;text-transform:uppercase;color:var(--muted);letter-spacing:.05em}
+.item{padding:6px 8px;border:1px solid var(--line);border-radius:6px;margin-bottom:5px;cursor:grab;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item small{color:var(--muted)}
+#stageWrap{grid-area:stage;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+#stage{position:relative;background:#000;overflow:hidden;box-shadow:0 0 0 1px var(--line)}
+.el{position:absolute;left:0;top:0;transform-origin:center;cursor:move;user-select:none}
+.el img,.el video{display:block;width:100%;height:100%;object-fit:cover;pointer-events:none}
+.el.text{white-space:pre;font-weight:700;text-shadow:0 2px 6px #000a}
+.el.sel{outline:2px solid var(--acc)}
+.h{position:absolute;width:12px;height:12px;background:#fff;border:2px solid var(--acc);border-radius:50%}
+.h.scale{right:-7px;bottom:-7px;cursor:nwse-resize}.h.rot{left:50%;top:-24px;margin-left:-6px;cursor:grab}
+#tl{grid-area:tl;border-top:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column}
+#tlbar{display:flex;gap:8px;align-items:center;padding:6px 10px;border-bottom:1px solid var(--line)}
+#tracks{flex:1;overflow:auto;position:relative}
+.track{position:relative;height:34px;border-bottom:1px solid var(--line);margin-left:70px}
+.track .lbl{position:absolute;left:-70px;width:66px;top:9px;color:var(--muted);font-size:11px}
+.seg{position:absolute;top:4px;height:26px;border-radius:5px;padding:4px 6px;font-size:11px;overflow:hidden;white-space:nowrap;cursor:grab;color:#fff}
+.seg.sel{outline:2px solid #fff}.seg .edge{position:absolute;right:0;top:0;bottom:0;width:7px;cursor:ew-resize;background:#fff3}
+.seg.video{background:var(--video)}.seg.photo{background:var(--photo)}.seg.audio{background:var(--audio)}.seg.text{background:var(--textc)}.seg.sticker{background:var(--sticker)}.seg.effect{background:var(--effect)}.seg.filter{background:var(--filter)}
+.el.sticker{border:2px dashed var(--sticker);color:var(--sticker);display:flex;align-items:center;justify-content:center;font-size:12px;background:#0006;width:120px;height:120px}
+#fxnote{position:absolute;left:8px;top:8px;font-size:11px;color:#fff;background:#0008;padding:3px 6px;border-radius:4px;pointer-events:none}
+#playhead{position:absolute;top:0;bottom:0;width:2px;background:#ff4d4d;pointer-events:none;z-index:5}
+#ruler{height:18px;margin-left:70px;position:relative;border-bottom:1px solid var(--line);cursor:pointer}
+#ruler span{position:absolute;font-size:10px;color:var(--muted);top:2px}
+label{display:block;margin:8px 0 3px;color:var(--muted);font-size:11px}
+#props input,#props textarea{width:100%}textarea{background:#222733;color:var(--text);border:1px solid var(--line);border-radius:6px;padding:5px;font:inherit}
+#connect{position:fixed;inset:0;background:#000c;display:none;align-items:center;justify-content:center;z-index:20}
+#connect .box{background:var(--panel);padding:20px;border-radius:10px;width:420px;border:1px solid var(--line)}
+#connect input{width:100%;margin-bottom:8px}
+@media (max-width:800px){body{grid-template-columns:1fr;grid-template-rows:44px 1fr 200px auto;grid-template-areas:"top" "stage" "tl" "props"}#lib{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <a href="index.html" style="color:var(--muted);text-decoration:none">← Studio</a> <strong>🎬 Video Editor</strong>
+  <select id="draftSel" title="Project CapCut"></select>
+  <button id="undo" title="Ctrl+Z">↶ Undo</button><button id="redo" title="Ctrl+Y">↷ Redo</button>
+  <span class="sp"></span><span id="status">-</span>
+  <button id="discard">Batalkan perubahan</button>
+  <button id="deploy" class="pri">🚀 Deploy ke CapCut</button>
+</header>
+<aside id="lib">
+  <h3>Tambah elemen</h3>
+  <div class="item" draggable="true" data-new="text">🔤 Teks baru</div>
+  <h3>Media di komputer <button id="libRefresh" style="padding:1px 6px">⟳</button></h3>
+  <input id="libSearch" placeholder="Cari file..." style="width:100%;margin-bottom:6px">
+  <div id="libList"></div>
+</aside>
+<div id="stageWrap"><div id="stage"></div></div>
+<aside id="props"><h3>Properti</h3><div id="propBody" style="color:var(--muted)">Pilih elemen di canvas atau timeline.</div></aside>
+<section id="tl">
+  <div id="tlbar"><button id="play">▶ Play</button><span id="time">0.00s</span><span class="sp" style="flex:1"></span>
+    Zoom <input id="zoom" type="range" min="20" max="300" value="80"></div>
+  <div id="ruler"></div>
+  <div id="tracks"><div id="playhead"></div></div>
+</section>
+<div id="connect"><div class="box">
+  <h3>Hubungkan ke bridge lokal</h3>
+  <p style="color:var(--muted)">Jalankan <code>creative-mcp editor</code> di komputer Anda lalu buka link yang dicetak, atau isi manual:</p>
+  <input id="cBridge" placeholder="http://127.0.0.1:8765"><input id="cToken" placeholder="token">
+  <button class="pri" id="cGo">Hubungkan</button>
+</div></div>
+<script>
+const $ = s => document.querySelector(s);
+const hp = new URLSearchParams(location.hash.slice(1));
+let BRIDGE = hp.get('bridge') || localStorage.getItem('bridge') || (location.protocol === 'http:' ? location.origin : '');
+let TOKEN = hp.get('token') || localStorage.getItem('token') || '';
+let DRAFT = hp.get('draft') || '';
+let S = null, sel = null, t = 0, playing = false, pxs = 80, version = 0, dirty = false;
+const undoStack = [], redoStack = [];
+const media = {};
+
+async function api(path, opt = {}) {
+  const r = await fetch(BRIDGE + path, {...opt, headers: {'X-Bridge-Token': TOKEN, 'Content-Type': 'application/json'}});
+  const j = await r.json(); if (!r.ok) throw new Error(j.error || r.status); return j;
+}
+const mediaUrl = p => `${BRIDGE}/media?token=${encodeURIComponent(TOKEN)}&path=${encodeURIComponent(p)}`;
+const status = (m, d) => { $('#status').textContent = m; $('#status').className = d ? 'dirty' : ''; };
+const uid = () => crypto.randomUUID().toUpperCase();
+
+async function boot() {
+  if (!BRIDGE || !TOKEN) { $('#connect').style.display = 'flex'; return; }
+  localStorage.setItem('bridge', BRIDGE); localStorage.setItem('token', TOKEN);
+  try {
+    const drafts = await api('/api/drafts');
+    $('#draftSel').innerHTML = drafts.map(d => `<option>${d.name}</option>`).join('');
+    if (!DRAFT && drafts.length) DRAFT = drafts[0].name;
+    $('#draftSel').value = DRAFT;
+    await load(); loadLib(); setInterval(pollRemote, 1000);
+  } catch (e) { status('Bridge error: ' + e.message, true); $('#connect').style.display = 'flex'; }
+}
+$('#cGo').onclick = () => { BRIDGE = $('#cBridge').value.replace(/\/$/, ''); TOKEN = $('#cToken').value; $('#connect').style.display = 'none'; boot(); };
+$('#draftSel').onchange = async e => { DRAFT = e.target.value; sel = null; undoStack.length = 0; await load(); };
+
+async function load() {
+  S = await api('/api/scene?draft=' + encodeURIComponent(DRAFT));
+  version = S.version || 0; dirty = version > 0;
+  status(dirty ? 'Ada perubahan belum di-deploy' : 'Sinkron dengan CapCut', dirty);
+  render();
+}
+// Live sync: changes made by the AI (MCP tools) show up here automatically.
+async function pollRemote() {
+  if (!DRAFT || dragging) return;
+  try { const v = (await api('/api/version?draft=' + encodeURIComponent(DRAFT))).version;
+    if (v > version) { S = await api('/api/scene?draft=' + encodeURIComponent(DRAFT)); version = v; dirty = true; status('Diperbarui oleh AI', true); render(); }
+  } catch {}
+}
+let saveTimer;
+function commit(pushUndo = true) {
+  if (pushUndo) { undoStack.push(snapshotBefore); redoStack.length = 0; }
+  dirty = true; status('Menyimpan preview...', true); render();
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async () => { const r = await api('/api/scene', {method: 'PUT', body: JSON.stringify(S)}); version = r.version; status('Preview tersimpan (belum di-deploy)', true); }, 300);
+}
+let snapshotBefore = null;
+const snap = () => { snapshotBefore = JSON.stringify(S); };
+$('#undo').onclick = () => { if (!undoStack.length) return; redoStack.push(JSON.stringify(S)); S = JSON.parse(undoStack.pop()); commit(false); };
+$('#redo').onclick = () => { if (!redoStack.length) return; undoStack.push(JSON.stringify(S)); S = JSON.parse(redoStack.pop()); commit(false); };
+document.addEventListener('keydown', e => {
+  if (e.target.matches('input,textarea')) return;
+  if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); $('#undo').click(); }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'y') { e.preventDefault(); $('#redo').click(); }
+  if (e.key === ' ') { e.preventDefault(); $('#play').click(); }
+  if ((e.key === 'Delete' || e.key === 'Backspace') && sel) { snap(); S.elements = S.elements.filter(x => x.id !== sel); sel = null; commit(); }
+});
+$('#deploy').onclick = async () => {
+  if (!confirm('Tulis semua perubahan ke project CapCut "' + DRAFT + '"? Tutup project di CapCut dulu.')) return;
+  clearTimeout(saveTimer); await api('/api/scene', {method: 'PUT', body: JSON.stringify(S)});
+  const r = await api('/api/deploy?draft=' + encodeURIComponent(DRAFT), {method: 'POST'});
+  status(`Deployed ✓ (${r.elements} elemen, +${r.added}, -${r.removed}) — buka ulang project di CapCut`); await load();
+};
+$('#discard').onclick = async () => { if (confirm('Buang semua perubahan preview?')) { await api('/api/discard?draft=' + encodeURIComponent(DRAFT), {method: 'POST'}); await load(); } };
+
+// ---------- geometry: CapCut x/y are -1..1 (center = 0), y up ----------
+let sw = 0, sh = 0;
+function fitStage() {
+  const wrap = $('#stageWrap').getBoundingClientRect(), ar = S.width / S.height;
+  sh = Math.min(wrap.height - 24, (wrap.width - 24) / ar); sw = sh * ar;
+  Object.assign($('#stage').style, {width: sw + 'px', height: sh + 'px'});
+}
+const toPx = (x, y) => [(x + 1) / 2 * sw, (1 - y) / 2 * sh];
+const fromPx = (px, py) => [px / sw * 2 - 1, 1 - py / sh * 2];
+const trackOf = el => S.tracks.find(tk => tk.id === el.track);
+const visible = el => t >= el.start && t < el.start + el.duration;
+const zOrder = el => { const kinds = {video: 0, photo: 0, sticker: 1, text: 2, audio: -1, effect: -1, filter: -1}; return S.tracks.indexOf(trackOf(el)) + kinds[el.type] * 100; };
+
+function render() { if (!S) return; fitStage(); renderStage(); renderTimeline(); renderProps(); }
+
+function renderStage() {
+  const st = $('#stage'); st.innerHTML = '';
+  for (const el of [...S.elements].sort((a, b) => zOrder(a) - zOrder(b))) {
+    if (el.type === 'audio') { syncAudio(el); continue; }
+    if (el.type === 'effect' || el.type === 'filter') {   // CapCut-rendered: show a badge only
+      if (visible(el)) st.insertAdjacentHTML('beforeend', `<div id="fxnote">✨ ${el.type}: ${el.label}</div>`); continue; }
+    if (!visible(el)) { if (media[el.id]) media[el.id].pause?.(); continue; }
+    const d = document.createElement('div'); d.className = 'el ' + el.type + (sel === el.id ? ' sel' : ''); d.dataset.id = el.id;
+    const scale = el.scale || 1;
+    if (el.type === 'sticker') {
+      if (el.preview && /\.(png|gif|webp|jpe?g)$/i.test(el.preview)) { const im = document.createElement('img'); im.src = mediaUrl(el.preview); d.appendChild(im); }
+      else d.textContent = '⭐ ' + el.label;
+      d.style.width = d.style.height = 120 * scale * sh / 600 + 'px';
+    } else if (el.type === 'text') {
+      d.textContent = el.text; d.style.color = el.color || '#fff'; d.style.fontSize = (el.font_size || 8) * sh / 300 * scale + 'px';
+    } else {
+      const w = sw * scale, h = sh * scale; d.style.width = w + 'px'; d.style.height = h + 'px';
+      d.appendChild(mediaNode(el));
+    }
+    st.appendChild(d);
+    const r = d.getBoundingClientRect(), [cx, cy] = toPx(el.x || 0, el.y || 0);
+    d.style.left = cx - r.width / 2 + 'px'; d.style.top = cy - r.height / 2 + 'px';
+    d.style.transform = `rotate(${el.rotation || 0}deg)`; d.style.opacity = el.alpha ?? 1;
+    if (sel === el.id) { for (const k of ['scale', 'rot']) { const h = document.createElement('div'); h.className = 'h ' + k; h.dataset.h = k; d.appendChild(h); } }
+    d.onpointerdown = e => startStageDrag(e, el, d);
+  }
+}
+function mediaNode(el) {
+  let m = media[el.id];
+  if (!m || m.dataset.src !== el.src) {
+    m = el.type === 'video' ? Object.assign(document.createElement('video'), {muted: false, preload: 'auto', playsInline: true}) : document.createElement('img');
+    m.src = mediaUrl(el.src); m.dataset.src = el.src; media[el.id] = m;
+  }
+  if (el.type === 'video') {
+    const want = t - el.start; m.volume = Math.min(1, el.volume ?? 1);
+    if (Math.abs(m.currentTime - want) > 0.25) m.currentTime = want;
+    if (playing && m.paused) m.play().catch(() => {}); if (!playing && !m.paused) m.pause();
+  }
+  return m;
+}
+function syncAudio(el) {
+  let a = media[el.id];
+  if (!a) { a = media[el.id] = new Audio(mediaUrl(el.src)); }
+  if (!visible(el) || !playing) { a.pause(); return; }
+  const want = t - el.start; if (Math.abs(a.currentTime - want) > 0.3) a.currentTime = want;
+  a.volume = Math.min(1, el.volume ?? 1); if (a.paused) a.play().catch(() => {});
+}
+
+let dragging = false;
+function startStageDrag(e, el, node) {
+  e.preventDefault(); e.stopPropagation(); sel = el.id; snap(); dragging = true;
+  const mode = e.target.dataset.h || 'move', sr = $('#stage').getBoundingClientRect();
+  const nr = node.getBoundingClientRect(), cx = nr.left + nr.width / 2, cy = nr.top + nr.height / 2;
+  const sx = e.clientX, sy = e.clientY, ox = el.x || 0, oy = el.y || 0, os = el.scale || 1;
+  const d0 = Math.hypot(sx - cx, sy - cy);
+  const move = ev => {
+    if (mode === 'move') {
+      const [px, py] = toPx(ox, oy), [nx, ny] = fromPx(px + ev.clientX - sx, py + ev.clientY - sy);
+      el.x = +nx.toFixed(4); el.y = +ny.toFixed(4);
+    } else if (mode === 'scale') { el.scale = +Math.max(0.05, os * Math.hypot(ev.clientX - cx, ev.clientY - cy) / d0).toFixed(3); }
+    else { el.rotation = Math.round(Math.atan2(ev.clientX - cx, cy - ev.clientY) * 180 / Math.PI); }
+    renderStage(); renderProps();
+  };
+  const up = () => { removeEventListener('pointermove', move); removeEventListener('pointerup', up); dragging = false; commit(); };
+  addEventListener('pointermove', move); addEventListener('pointerup', up); render();
+}
+$('#stage').onpointerdown = () => { sel = null; render(); };
+
+// ---------- timeline ----------
+function renderTimeline() {
+  const tr = $('#tracks'); tr.querySelectorAll('.track').forEach(n => n.remove());
+  const total = Math.max(10, ...S.elements.map(e => e.start + e.duration)) + 5;
+  const ruler = $('#ruler'); ruler.innerHTML = ''; ruler.style.width = total * pxs + 'px';
+  const step = pxs > 120 ? 1 : pxs > 40 ? 2 : 5;
+  for (let s = 0; s < total; s += step) ruler.insertAdjacentHTML('beforeend', `<span style="left:${s * pxs}px">${s}s</span>`);
+  for (const tk of S.tracks) {
+    const row = document.createElement('div'); row.className = 'track'; row.dataset.track = tk.id; row.style.width = total * pxs + 'px';
+    row.innerHTML = `<span class="lbl">${tk.type}</span>`;
+    for (const el of S.elements.filter(e => e.track === tk.id)) {
+      const s = document.createElement('div'); s.className = `seg ${el.type}${sel === el.id ? ' sel' : ''}`;
+      s.style.left = el.start * pxs + 'px'; s.style.width = Math.max(8, el.duration * pxs) + 'px';
+      s.textContent = el.type === 'text' ? '🔤 ' + el.text : el.label ? '✨ ' + el.label : (el.src || '').split(/[\\/]/).pop();
+      s.insertAdjacentHTML('beforeend', '<div class="edge"></div>');
+      s.onpointerdown = e => startSegDrag(e, el);
+      row.appendChild(s);
+    }
+    row.ondragover = e => e.preventDefault();
+    row.ondrop = e => dropNew(e, tk);
+    tr.appendChild(row);
+  }
+  $('#playhead').style.left = 70 + t * pxs + 'px';
+  $('#time').textContent = t.toFixed(2) + 's';
+}
+function startSegDrag(e, el) {
+  e.preventDefault(); e.stopPropagation(); sel = el.id; snap(); dragging = true;
+  const trim = e.target.classList.contains('edge'), sx = e.clientX, os = el.start, od = el.duration;
+  const move = ev => {
+    const dt = (ev.clientX - sx) / pxs;
+    if (trim) el.duration = +Math.max(0.1, od + dt).toFixed(2);
+    else {
+      el.start = +Math.max(0, os + dt).toFixed(2);
+      const row = document.elementsFromPoint(ev.clientX, ev.clientY).find(n => n.classList?.contains('track'));
+      const tk = row && S.tracks.find(x => x.id === row.dataset.track);
+      if (tk && compatible(tk.type, el.type)) el.track = tk.id;   // move between tracks
+    }
+    renderTimeline(); renderStage(); renderProps();
+  };
+  const up = () => { removeEventListener('pointermove', move); removeEventListener('pointerup', up); dragging = false; commit(); };
+  addEventListener('pointermove', move); addEventListener('pointerup', up); render();
+}
+const compatible = (trackType, elType) => trackType === (elType === 'photo' ? 'video' : elType);
+$('#ruler').onpointerdown = e => { t = Math.max(0, (e.clientX - $('#ruler').getBoundingClientRect().left) / pxs); render(); };
+$('#zoom').oninput = e => { pxs = +e.target.value; renderTimeline(); };
+
+// drag from library onto timeline (or stage)
+function newElement(data, at) {
+  const type = data.new === 'text' ? 'text' : data.type;
+  let tk = S.tracks.find(x => compatible(x.type, type));
+  if (!tk) { tk = {id: uid(), type: type === 'photo' ? 'video' : type}; S.tracks.push(tk); }
+  return {id: uid(), track: tk.id, type, start: at, duration: type === 'text' ? 3 : 5, x: 0, y: 0, scale: 1, rotation: 0, alpha: 1, volume: 1,
+    ...(type === 'text' ? {text: 'Teks baru', color: '#FFFFFF', font_size: 8} : {src: data.path})};
+}
+function dropNew(e, tk) {
+  e.preventDefault(); const data = JSON.parse(e.dataTransfer.getData('text/plain') || '{}'); if (!data.new && !data.path) return;
+  snap(); const at = Math.max(0, (e.clientX - e.currentTarget.getBoundingClientRect().left) / pxs);
+  const el = newElement(data, +at.toFixed(2)); if (tk && compatible(tk.type, el.type)) el.track = tk.id;
+  S.elements.push(el); sel = el.id; commit();
+}
+$('#stageWrap').ondragover = e => e.preventDefault();
+$('#stageWrap').ondrop = e => {
+  e.preventDefault(); const data = JSON.parse(e.dataTransfer.getData('text/plain') || '{}'); if (!data.new && !data.path) return;
+  snap(); const el = newElement(data, +t.toFixed(2)); const r = $('#stage').getBoundingClientRect();
+  [el.x, el.y] = fromPx(e.clientX - r.left, e.clientY - r.top); S.elements.push(el); sel = el.id; commit();
+};
+document.querySelector('[data-new=text]').ondragstart = e => e.dataTransfer.setData('text/plain', JSON.stringify({new: 'text'}));
+
+let LIB = [];
+async function loadLib(refresh) { LIB = await api('/api/library' + (refresh ? '?refresh=1' : '')); drawLib(); }
+function drawLib() {
+  const q = $('#libSearch').value.toLowerCase(), icon = {video: '🎞️', photo: '🖼️', audio: '🎵'};
+  $('#libList').innerHTML = '';
+  for (const it of LIB.filter(i => i.name.toLowerCase().includes(q)).slice(0, 300)) {
+    const d = document.createElement('div'); d.className = 'item'; d.draggable = true; d.title = it.path;
+    d.innerHTML = `${icon[it.type]} ${it.name}`; d.ondragstart = e => e.dataTransfer.setData('text/plain', JSON.stringify(it));
+    $('#libList').appendChild(d);
+  }
+}
+$('#libSearch').oninput = drawLib; $('#libRefresh').onclick = () => loadLib(true);
+
+// ---------- properties ----------
+function renderProps() {
+  const el = S.elements.find(e => e.id === sel), b = $('#propBody');
+  if (!el) { b.innerHTML = 'Pilih elemen di canvas atau timeline.'; return; }
+  if (b.dataset.id === el.id && b.contains(document.activeElement)) { // keep focus while typing
+    b.querySelectorAll('[data-k]').forEach(i => { if (i !== document.activeElement) i.value = el[i.dataset.k] ?? ''; }); return; }
+  b.dataset.id = el.id;
+  const f = (k, label, type = 'number', step = 0.01) => `<label>${label}</label><input data-k="${k}" type="${type}" step="${step}" value="${el[k] ?? ''}">`;
+  b.innerHTML = `<div><b>${el.type}</b></div>` +
+    (el.type === 'text' ? `<label>Teks</label><textarea data-k="text" rows="3">${el.text}</textarea>${f('color', 'Warna', 'color')}${f('font_size', 'Ukuran font', 'number', 0.5)}` : (el.label ? `<label>Elemen CapCut</label><div>${el.label}</div>` : `<label>File</label><div style="word-break:break-all;color:var(--muted)">${el.src}</div>`)) +
+    f('start', 'Mulai (detik)') + f('duration', 'Durasi (detik)') +
+    (['video', 'photo', 'text', 'sticker'].includes(el.type) ? f('x', 'Posisi X (-1..1)') + f('y', 'Posisi Y (-1..1)') + f('scale', 'Skala') + f('rotation', 'Rotasi (°)', 'number', 1) + f('alpha', 'Opacity (0-1)') : '') +
+    (['video', 'audio'].includes(el.type) ? f('volume', 'Volume', 'number', 0.05) : '') + `<p><button id="delEl">🗑 Hapus elemen</button> <button id="dupEl">⧉ Duplikat</button></p>`;
+  b.querySelectorAll('[data-k]').forEach(i => {
+    i.onfocus = snap;
+    i.oninput = () => { el[i.dataset.k] = i.type === 'number' ? +i.value : i.value; renderStage(); renderTimeline(); };
+    i.onchange = () => commit();
+  });
+  $('#delEl').onclick = () => { snap(); S.elements = S.elements.filter(x => x.id !== el.id); sel = null; commit(); };
+  $('#dupEl').onclick = () => { snap(); const c = {...el, id: uid(), start: el.start + el.duration}; S.elements.push(c); sel = c.id; commit(); };
+}
+
+// ---------- playback ----------
+let last;
+$('#play').onclick = () => { playing = !playing; $('#play').textContent = playing ? '⏸ Pause' : '▶ Play'; last = performance.now(); if (playing) requestAnimationFrame(tick); else renderStage(); };
+function tick(now) {
+  if (!playing) return; t += (now - last) / 1000; last = now;
+  const end = Math.max(0, ...S.elements.map(e => e.start + e.duration)); if (t > end) t = 0;
+  renderStage(); $('#playhead').style.left = 70 + t * pxs + 'px'; $('#time').textContent = t.toFixed(2) + 's';
+  requestAnimationFrame(tick);
+}
+addEventListener('resize', render);
+boot();
+</script>
+</body>
+</html>

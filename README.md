@@ -59,7 +59,21 @@ pip install -e ".[desktop]"
 ```
 Claude Code: `claude mcp add creative -e ENABLE_DESKTOP_CONTROL=1 -- creative-mcp`
 
-## Live Editor (preview sampai puas, lalu deploy)
+## Creative Studio (dashboard)
+```
+creative-mcp studio        # jalankan bridge + buka dashboard di browser
+```
+| Halaman | Isi |
+|---|---|
+| `index.html` — Beranda | Buat baru per ukuran (Post IG, Story, Thumbnail YT, Presentasi, A4, Persegi, Video), desain terakhir, pencarian |
+| `design.html` — Editor desain | Template + 5 palet, elemen bentuk/garis/frame, teks + kombinasi font, upload foto, foto dari komputer, latar; drag & drop, resize, rotasi, snap ke tengah/tepi, edit teks (double-click), layer, multi-halaman, undo/redo, copy-paste, ganti palet satu klik, export PNG, **Kirim ke Canva** (jadi desain Canva yang bisa diedit) |
+| `video.html` — Editor video | Timeline project CapCut + live preview (lihat di bawah) |
+| Template / Library / Canva | Buat video dari template, library elemen CapCut (gratis/VIP), status & desain Canva |
+
+Tanpa bridge (misalnya dibuka di Vercel saja), editor desain tetap jalan dan menyimpan desain di browser.
+Dengan bridge, desain disimpan di `~/.creative-mcp/designs` dan semua fitur komputer (CapCut, media, Canva) aktif.
+
+## Live Editor video (preview sampai puas, lalu deploy)
 ```
 creative-mcp editor [nama_project]     # jalankan bridge + buka editor di browser
 ```
@@ -72,7 +86,7 @@ creative-mcp editor [nama_project]     # jalankan bridge + buka editor di browse
 - AI juga bisa mengedit via `editor_update_elements` — perubahan muncul di browser dalam ±1 detik.
 
 ### Hosting editor di Vercel
-Repo ini sudah berisi `vercel.json`. Di https://vercel.com/new → import repo ini → Deploy (tanpa build).
+Repo ini sudah berisi `vercel.json` (static, tanpa build). Di https://vercel.com/new → import repo ini → Deploy. Dashboard ada di `/`, editor desain di `/design.html`, editor video di `/video.html`.
 Lalu set `CREATIVE_EDITOR_URL=https://<nama>.vercel.app` agar `editor_open` memberi link Vercel.
 Editor di Vercel hanya berisi tampilan; file & project tetap di komputer Anda dan diakses lewat bridge
 `127.0.0.1` dengan token rahasia (di bagian `#` link, tidak dikirim ke server Vercel).

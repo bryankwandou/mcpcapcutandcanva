@@ -293,3 +293,89 @@ def build_pptx(template: str, out_path: str, title: str, subtitle: str = "",
     out.parent.mkdir(parents=True, exist_ok=True)
     prs.save(out)
     return str(out)
+
+
+def design_to_pptx(design: dict, out_dir: str | Path) -> str:
+    """Convert a Studio design (pages of text/rect/ellipse/line/image) into an editable PPTX."""
+    import base64
+    import io
+
+    from PIL import Image as PILImage
+    from pptx import Presentation
+    from pptx.enum.shapes import MSO_SHAPE
+    from pptx.enum.text import PP_ALIGN
+    from pptx.util import Emu
+
+    px = lambda v: Emu(int(float(v) * 9525))  # noqa: E731
+    prs = Presentation()
+    prs.slide_width, prs.slide_height = px(design["width"]), px(design["height"])
+    align = {"left": PP_ALIGN.LEFT, "center": PP_ALIGN.CENTER, "right": PP_ALIGN.RIGHT}
+
+    def color(v):
+        return v if isinstance(v, str) and v.startswith("#") and len(v) == 7 else None
+
+    for page in design["pages"]:
+        s = prs.slides.add_slide(prs.slide_layouts[6])
+        if color(page.get("bg")):
+            s.background.fill.solid()
+            s.background.fill.fore_color.rgb = _rgb(page["bg"])
+        for e in page["elements"]:
+            x, y, w, h = px(e["x"]), px(e["y"]), px(max(e["w"], 1)), px(max(e["h"], 1))
+            t = e["type"]
+            if t in ("rect", "ellipse", "line"):
+                kind = (MSO_SHAPE.OVAL if t == "ellipse" else
+                        MSO_SHAPE.ROUNDED_RECTANGLE if e.get("radius") else MSO_SHAPE.RECTANGLE)
+                sh = s.shapes.add_shape(kind, x, y, w, h)
+                if color(e.get("fill")):
+                    sh.fill.solid()
+                    sh.fill.fore_color.rgb = _rgb(e["fill"])
+                else:
+                    sh.fill.background()
+                if color(e.get("stroke")):
+                    sh.line.color.rgb = _rgb(e["stroke"])
+                    sh.line.width = px(e.get("strokeW", 4))
+                else:
+                    sh.line.fill.background()
+                if kind == MSO_SHAPE.ROUNDED_RECTANGLE:
+                    sh.adjustments[0] = min(0.5, e["radius"] / max(1, min(e["w"], e["h"])))
+            elif t == "text":
+                sh = s.shapes.add_textbox(x, y, w, h)
+                tf = sh.text_frame
+                tf.word_wrap = True
+                for i, line in enumerate(str(e.get("text", "")).split("\n")):
+                    p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
+                    p.alignment = align.get(e.get("align"), PP_ALIGN.LEFT)
+                    r = p.add_run()
+                    r.text = line
+                    r.font.size = px(e.get("fontSize", 32))
+                    r.font.bold = bool(e.get("bold"))
+                    r.font.italic = bool(e.get("italic"))
+                    r.font.name = e.get("font", "Montserrat")
+                    if color(e.get("color")):
+                        r.font.color.rgb = _rgb(e["color"])
+            elif t == "image":
+                src = e.get("src", "")
+                if src.startswith("data:"):
+                    stream = io.BytesIO(base64.b64decode(src.split(",", 1)[1]))
+                elif src.startswith("path:"):
+                    stream = io.BytesIO(Path(src[5:]).read_bytes())
+                else:
+                    continue
+                iw, ih = PILImage.open(stream).size
+                stream.seek(0)
+                sh = s.shapes.add_picture(stream, x, y, w, h)
+                box, img = e["w"] / e["h"], iw / ih  # cover-crop like the editor
+                if img > box:
+                    sh.crop_left = sh.crop_right = (1 - box / img) / 2
+                else:
+                    sh.crop_top = sh.crop_bottom = (1 - img / box) / 2
+            else:
+                continue
+            if e.get("rot"):
+                sh.rotation = float(e["rot"])
+    out = Path(out_dir).expanduser()
+    out.mkdir(parents=True, exist_ok=True)
+    safe = "".join(c if c.isalnum() or c in "-_ " else "_" for c in design.get("title", "design"))
+    f = out / f"{safe or 'design'}-{int(time.time())}.pptx"
+    prs.save(f)
+    return str(f)

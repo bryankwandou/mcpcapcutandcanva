@@ -81,6 +81,13 @@ def editor_open(draft: str) -> dict:
 
 
 @mcp.tool()
+def studio_open() -> dict:
+    """Start the bridge and return the Creative Studio dashboard link (designs, video projects,
+    templates, CapCut library, Canva)."""
+    return bridge.studio_url()
+
+
+@mcp.tool()
 def editor_get_scene(draft: str) -> dict:
     """Read the current preview scene (including unsaved/undeployed edits)."""
     return bridge.get_scene(draft)
@@ -412,15 +419,14 @@ def main() -> None:
         from .oauth import login
         login()
         return
-    if len(sys.argv) > 1 and sys.argv[1] == "editor":
+    if len(sys.argv) > 1 and sys.argv[1] in ("editor", "studio"):
         import time
-        drafts = capcut.list_drafts()
-        name = sys.argv[2] if len(sys.argv) > 2 else (drafts[0]["name"] if drafts else "")
-        for k, v in bridge.editor_url(name).items():
+        args = [a for a in sys.argv[2:] if not a.startswith("--")]
+        urls = bridge.editor_url(args[0]) if args else bridge.studio_url()
+        for k, v in urls.items():
             print(f"{k}: {v}")
         if "--no-open" not in sys.argv:
             import webbrowser
-            urls = bridge.editor_url(name)
             webbrowser.open(urls.get("vercel", urls["local"]))
         print("Bridge berjalan. Ctrl+C untuk berhenti.")
         while True:

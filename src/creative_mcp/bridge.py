@@ -22,6 +22,7 @@ from . import cache, capcut, scene
 
 HOME = cache.HOME
 SCENES = HOME / "scenes"
+DESIGNS = HOME / "designs"
 EDITOR_DIR = Path(__file__).resolve().parent / "editor"
 MEDIA_EXT = {".mp4", ".mov", ".m4v", ".webm", ".mkv", ".jpg", ".jpeg", ".png", ".gif", ".webp",
              ".mp3", ".wav", ".m4a", ".aac", ".ogg"}
@@ -128,6 +129,53 @@ def _allowed_media(path: str) -> bool:
         return False
 
 
+def _design_file(design_id: str) -> Path:
+    return DESIGNS / f"{_safe(design_id)}.json"
+
+
+def list_designs() -> list[dict]:
+    out = []
+    for f in DESIGNS.glob("*.json"):
+        try:
+            d = json.loads(f.read_text(encoding="utf-8"))
+        except ValueError:
+            continue
+        out.append({k: d.get(k) for k in ("id", "title", "width", "height", "updated", "thumb")})
+    return out
+
+
+def catalog() -> dict:
+    """Cheap synchronous catalog for the dashboard (Canva part comes from the MCP cache)."""
+    me = cache.get("canva:me", 86400 * 7) or {}
+    designs = cache.get("canva:designs", 86400) or {}
+    canva = {"user": me.get("profile", {}).get("profile", {}).get("display_name"),
+             "capabilities": me.get("capabilities", {}).get("capabilities", []),
+             "recent_designs": [{"id": d["id"], "title": d.get("title"),
+                                 "edit_url": d.get("urls", {}).get("edit_url")}
+                                for d in designs.get("items", [])[:20]]}
+    if not me:
+        canva["error"] = "Belum ada data Canva di cache. Jalankan tool `catalog` dari AI setelah login."
+    try:
+        drafts = capcut.list_drafts()
+    except Exception:
+        drafts = []
+    return {"canva": canva, "capcut_projects": drafts}
+
+
+def design_to_canva(design: dict) -> dict:
+    import asyncio
+
+    from .canva import CanvaClient
+    from .templates import design_to_pptx
+
+    path = design_to_pptx(design, HOME / "exports")
+    try:
+        res = asyncio.run(CanvaClient().import_file(path, design.get("title")))
+    except Exception as e:
+        return {"pptx": path, "error": str(e)}
+    return {"pptx": path, "canva": res}
+
+
 class Handler(BaseHTTPRequestHandler):
     def log_message(self, *a):
         pass
@@ -135,7 +183,7 @@ class Handler(BaseHTTPRequestHandler):
     def _cors(self):
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Headers", "Content-Type, X-Bridge-Token, Range")
-        self.send_header("Access-Control-Allow-Methods", "GET, PUT, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, OPTIONS")
         self.send_header("Access-Control-Allow-Private-Network", "true")
 
     def _json(self, obj, code=200):
@@ -162,8 +210,11 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):  # noqa: N802
         path, q = self._q()
-        if path in ("/", "/index.html"):
-            return self._file(EDITOR_DIR / "index.html")
+        if not path.startswith(("/api/", "/media")):  # static Studio pages
+            f = (EDITOR_DIR / (path.lstrip("/") or "index.html")).resolve()
+            if f.is_relative_to(EDITOR_DIR) and f.is_file():
+                return self._file(f)
+            return self._json({"error": "not found"}, 404)
         if not self._authed(q):
             return self._json({"error": "bad token"}, 401)
         try:
@@ -177,6 +228,15 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json({"version": v})
             if path == "/api/library":
                 return self._json(library(q.get("refresh") == "1"))
+            if path == "/api/designs":
+                return self._json(list_designs())
+            if path == "/api/design":
+                return self._json(json.loads(_design_file(q["id"]).read_text(encoding="utf-8")))
+            if path == "/api/capcut-library":
+                from . import capcut_library
+                return self._json(capcut_library.list_items())
+            if path == "/api/catalog":
+                return self._json(catalog())
             if path == "/media":
                 if not _allowed_media(q.get("path", "")):
                     return self._json({"error": "not allowed"}, 403)
@@ -195,6 +255,20 @@ class Handler(BaseHTTPRequestHandler):
             return self._json({"error": "bad token"}, 401)
         if path == "/api/scene":
             return self._json(put_scene(self._body()))
+        if path == "/api/design":
+            d = self._body()
+            DESIGNS.mkdir(parents=True, exist_ok=True)
+            _design_file(d["id"]).write_text(json.dumps(d, ensure_ascii=False), encoding="utf-8")
+            return self._json({"ok": True})
+        self._json({"error": "not found"}, 404)
+
+    def do_DELETE(self):  # noqa: N802
+        path, q = self._q()
+        if not self._authed(q):
+            return self._json({"error": "bad token"}, 401)
+        if path == "/api/design":
+            _design_file(q["id"]).unlink(missing_ok=True)
+            return self._json({"ok": True})
         self._json({"error": "not found"}, 404)
 
     def do_POST(self):  # noqa: N802
@@ -206,6 +280,17 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(deploy(q["draft"]))
             if path == "/api/discard":
                 return self._json(discard(q["draft"]))
+            if path == "/api/capcut-library/scan":
+                from . import capcut_library
+                return self._json(capcut_library.scan())
+            if path == "/api/capcut/template":
+                from . import templates
+                b = self._body()
+                return self._json(templates.build_capcut(
+                    b["template"], b["name"], b["media"], b.get("title", ""), b.get("captions"),
+                    b.get("cta", ""), b.get("music"), b.get("palette", "bold")))
+            if path == "/api/design/canva":
+                return self._json(design_to_canva(self._body()))
             self._json({"error": "not found"}, 404)
         except Exception as e:
             self._json({"error": str(e)}, 500)
@@ -253,11 +338,21 @@ def start() -> str:
     return f"http://127.0.0.1:{port()}"
 
 
+def studio_url() -> dict:
+    base = start()
+    frag = urllib.parse.urlencode({"bridge": base, "token": token()})
+    out = {"local": f"{base}/#{frag}"}
+    hosted = os.getenv("CREATIVE_EDITOR_URL")
+    if hosted:
+        out["vercel"] = f"{hosted.rstrip('/')}/#{frag}"
+    return out
+
+
 def editor_url(draft: str) -> dict:
     base = start()
     frag = urllib.parse.urlencode({"bridge": base, "token": token(), "draft": draft})
-    out = {"local": f"{base}/#{frag}"}
+    out = {"local": f"{base}/video.html#{frag}"}
     hosted = os.getenv("CREATIVE_EDITOR_URL")  # e.g. https://my-editor.vercel.app
     if hosted:
-        out["vercel"] = f"{hosted.rstrip('/')}/#{frag}"
+        out["vercel"] = f"{hosted.rstrip('/')}/video.html#{frag}"
     return out
