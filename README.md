@@ -8,6 +8,9 @@ Server MCP (Model Context Protocol) yang menghubungkan Claude/AI ke:
 | **CapCut** | Mengedit file draft CapCut Desktop (`draft_content.json`) | `capcut_*` — buat project, tambah video/foto/audio/teks, geser/trim/transform segmen |
 | **Live desktop** | Kontrol mouse/keyboard + screenshot di komputer Anda | `desktop_*` — screenshot, klik, **drag & drop**, ketik, hotkey, scroll |
 
+| **Live Editor (web)** | Editor browser (lokal atau Vercel) + bridge lokal 127.0.0.1 | `editor_*` — live preview, semua elemen drag & drop, deploy ke CapCut |
+| **Cache katalog** | Cache di `~/.creative-mcp/cache.json` | `catalog` — sekali panggil langsung tahu fitur, desain, template, project & media yang bisa dipakai |
+
 Mode `desktop_*` adalah yang membuat AI bisa "mengedit seperti manusia" secara langsung di jendela
 CapCut/Canva Anda (mirip remote control): AI melihat layar lewat screenshot lalu klik dan drag elemen.
 
@@ -56,7 +59,30 @@ pip install -e ".[desktop]"
 ```
 Claude Code: `claude mcp add creative -e ENABLE_DESKTOP_CONTROL=1 -- creative-mcp`
 
+## Live Editor (preview sampai puas, lalu deploy)
+```
+creative-mcp editor [nama_project]     # jalankan bridge + buka editor di browser
+```
+- **Canvas**: drag elemen untuk pindah posisi, bulatan kanan-bawah = skala, bulatan atas = rotasi.
+- **Timeline**: drag klip untuk geser waktu / pindah track, tarik tepi kanan = trim durasi.
+- Drag file dari panel kiri (media di Videos/Pictures/Music/Downloads/Desktop, atau `CREATIVE_MEDIA_DIRS`)
+  ke canvas/timeline; drag "Teks baru" untuk teks. Undo/Redo (Ctrl+Z/Y), Space = play, Delete = hapus.
+- Semua perubahan disimpan sebagai **preview** (`~/.creative-mcp/scenes/`). Project CapCut asli baru diubah
+  saat klik **🚀 Deploy ke CapCut** (atau tool `editor_deploy`); tutup project di CapCut sebelum deploy.
+- AI juga bisa mengedit via `editor_update_elements` — perubahan muncul di browser dalam ±1 detik.
+
+### Hosting editor di Vercel
+Repo ini sudah berisi `vercel.json`. Di https://vercel.com/new → import repo ini → Deploy (tanpa build).
+Lalu set `CREATIVE_EDITOR_URL=https://<nama>.vercel.app` agar `editor_open` memberi link Vercel.
+Editor di Vercel hanya berisi tampilan; file & project tetap di komputer Anda dan diakses lewat bridge
+`127.0.0.1` dengan token rahasia (di bagian `#` link, tidak dikirim ke server Vercel).
+Gunakan Chrome/Edge/Firefox (Safari memblokir akses https → http://127.0.0.1).
+
+> CapCut **tidak punya API key publik**. "Deploy" menulis langsung ke file project CapCut di komputer Anda
+> (backup `.json.bak` dibuat otomatis).
+
 ## Contoh perintah ke AI
 - "Buat project CapCut `promo` 9:16, masukkan `C:\video\a.mp4` 0–5 detik, tambah teks 'DISKON 50%' di atas."
 - "Screenshot layar, lalu drag stiker pertama di panel kiri CapCut ke tengah canvas."
+- "Lihat catalog, lalu buka editor untuk project `promo` dan geser judul ke atas."
 - "Isi brand template Canva 'Poster Promo' dengan judul X dan export ke PNG."

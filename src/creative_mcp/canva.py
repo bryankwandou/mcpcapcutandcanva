@@ -47,6 +47,9 @@ class CanvaClient:
         save_tokens(self.access_token, self.refresh_token)
 
     async def request(self, method: str, path: str, **kw: Any) -> Any:
+        if method != "GET":  # writes may add designs/assets: drop cached listings
+            from . import cache
+            cache.clear("canva:designs")
         if not self.access_token:
             await self._refresh()
         for attempt in range(2):

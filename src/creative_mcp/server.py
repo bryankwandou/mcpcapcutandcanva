@@ -5,7 +5,7 @@ from typing import Any
 
 from mcp.server.fastmcp import FastMCP, Image
 
-from . import capcut, desktop
+from . import bridge, cache, capcut, desktop
 from .canva import CanvaClient
 from .oauth import load_dotenv
 
@@ -22,6 +22,109 @@ def canva() -> CanvaClient:
     return _canva
 
 
+# -------------------------------------------------------------- Catalog ----
+async def _canva_catalog(refresh: bool) -> dict:
+    c = canva()
+    out: dict[str, Any] = {}
+    try:
+        me = await cache.cached("canva:me", 86400, c.me, refresh)
+        caps = set(me.get("capabilities", {}).get("capabilities", []))
+        out["user"] = me.get("profile", {}).get("profile", {}).get("display_name")
+        out["capabilities"] = sorted(caps)
+        out["usable_tools"] = {
+            "always": ["canva_list_designs", "canva_create_design", "canva_get_design", "canva_get_pages",
+                       "canva_upload_asset", "canva_export", "canva_import_file", "canva_import_url",
+                       "canva_list_folder"],
+            "needs_paid_plan": {"canva_autofill / brand templates": "autofill" in caps,
+                                "canva_resize": "resize" in caps or "trial quota (check trial_information)"},
+        }
+        designs = await cache.cached("canva:designs", 600, lambda: c.list_designs(None, None), refresh)
+        out["recent_designs"] = [{"id": d["id"], "title": d.get("title"), "edit_url": d.get("urls", {}).get("edit_url")}
+                                 for d in designs.get("items", [])[:20]]
+        if "autofill" in caps:
+            bt = await cache.cached("canva:brand_templates", 3600,
+                                    lambda: c.request("GET", "/brand-templates"), refresh)
+            out["brand_templates"] = [{"id": t["id"], "title": t.get("title")} for t in bt.get("items", [])]
+    except Exception as e:
+        out["error"] = str(e)
+    return out
+
+
+@mcp.tool()
+async def catalog(refresh: bool = False) -> dict:
+    """ONE call that shows everything usable right now: Canva account capabilities (what your plan
+    allows), recent designs, brand templates, CapCut projects and local media. Results are cached
+    (Canva profile 24h, designs 10m, media 10m) - pass refresh=True to re-fetch."""
+    out: dict[str, Any] = {"canva": await _canva_catalog(refresh)}
+    try:
+        out["capcut_projects"] = capcut.list_drafts()
+    except Exception as e:
+        out["capcut_projects"] = {"error": str(e)}
+    lib = bridge.library(refresh)
+    out["local_media"] = {"count": len(lib), "sample": lib[:30]}
+    return out
+
+
+@mcp.tool()
+def cache_clear(prefix: str = "") -> dict:
+    """Clear cached data ('' = everything, 'canva:' = only Canva)."""
+    return {"cleared": cache.clear(prefix)}
+
+
+# ---------------------------------------------------------- Live editor ----
+@mcp.tool()
+def editor_open(draft: str) -> dict:
+    """Start the live web editor for a CapCut project and return its link. In the editor every
+    element can be dragged on the canvas (position, scale, rotate) and on the timeline (move, trim,
+    change track). Changes stay a preview until editor_deploy (or the Deploy button)."""
+    return bridge.editor_url(draft)
+
+
+@mcp.tool()
+def editor_get_scene(draft: str) -> dict:
+    """Read the current preview scene (including unsaved/undeployed edits)."""
+    return bridge.get_scene(draft)
+
+
+@mcp.tool()
+def editor_update_elements(draft: str, updates: list[dict[str, Any]]) -> dict:
+    """Edit elements live; the open editor refreshes within a second. Each update is
+    {"id": <element id>, ...fields} with fields among start, duration, x, y, scale, rotation,
+    alpha, volume, text, color, font_size, track. Use {"id": ..., "delete": true} to remove,
+    or {"new": {"type": "text"|"video"|"photo"|"audio", "src"?, "text"?, "start", "duration", ...}} to add."""
+    s = bridge.get_scene(draft)
+    by_id = {e["id"]: e for e in s["elements"]}
+    for u in updates:
+        if "new" in u:
+            el = {"id": capcut._uid(), "x": 0.0, "y": 0.0, "scale": 1.0, "rotation": 0.0, "alpha": 1.0,
+                  "volume": 1.0, **u["new"]}
+            kind = "video" if el["type"] == "photo" else el["type"]
+            tk = next((t for t in s["tracks"] if t["type"] == kind), None)
+            if tk is None:
+                tk = {"id": capcut._uid(), "type": kind}
+                s["tracks"].append(tk)
+            el.setdefault("track", tk["id"])
+            s["elements"].append(el)
+        elif u.get("delete"):
+            s["elements"] = [e for e in s["elements"] if e["id"] != u["id"]]
+        else:
+            by_id[u["id"]].update({k: v for k, v in u.items() if k != "id"})
+    return bridge.put_scene(s)
+
+
+@mcp.tool()
+def editor_deploy(draft: str) -> dict:
+    """Write the previewed edits into the CapCut project (backup kept as .json.bak).
+    Close the project in CapCut first, reopen it afterwards."""
+    return bridge.deploy(draft)
+
+
+@mcp.tool()
+def editor_discard(draft: str) -> dict:
+    """Throw away the preview edits and go back to the CapCut project as saved."""
+    return bridge.discard(draft)
+
+
 # ---------------------------------------------------------------- Canva ----
 @mcp.tool()
 async def canva_whoami() -> dict:
@@ -30,9 +133,11 @@ async def canva_whoami() -> dict:
 
 
 @mcp.tool()
-async def canva_list_designs(query: str | None = None, continuation: str | None = None) -> dict:
-    """Search/list designs in the connected Canva account."""
-    return await canva().list_designs(query, continuation)
+async def canva_list_designs(query: str | None = None, continuation: str | None = None,
+                             refresh: bool = False) -> dict:
+    """Search/list designs in the connected Canva account (cached 10 minutes)."""
+    key = f"canva:designs:{query}:{continuation}"
+    return await cache.cached(key, 600, lambda: canva().list_designs(query, continuation), refresh)
 
 
 @mcp.tool()
@@ -70,7 +175,8 @@ async def canva_export(design_id: str, format: str = "png", pages: list[int] | N
 @mcp.tool()
 async def canva_list_brand_templates(query: str | None = None) -> dict:
     """List brand templates (Canva Pro/Teams/Enterprise)."""
-    return await canva().request("GET", "/brand-templates", params={"query": query} if query else None)
+    return await cache.cached(f"canva:brand_templates:{query}", 3600, lambda: canva().request(
+        "GET", "/brand-templates", params={"query": query} if query else None))
 
 
 @mcp.tool()
@@ -116,7 +222,7 @@ async def canva_list_folder(folder_id: str = "root") -> dict:
 @mcp.tool()
 def capcut_list_drafts() -> list[dict]:
     """List CapCut desktop projects (drafts), newest first."""
-    return capcut.list_drafts()
+    return capcut.list_drafts()  # cheap local scan, always fresh
 
 
 @mcp.tool()
@@ -213,6 +319,19 @@ def main() -> None:
         from .oauth import login
         login()
         return
+    if len(sys.argv) > 1 and sys.argv[1] == "editor":
+        import time
+        drafts = capcut.list_drafts()
+        name = sys.argv[2] if len(sys.argv) > 2 else (drafts[0]["name"] if drafts else "")
+        for k, v in bridge.editor_url(name).items():
+            print(f"{k}: {v}")
+        if "--no-open" not in sys.argv:
+            import webbrowser
+            urls = bridge.editor_url(name)
+            webbrowser.open(urls.get("vercel", urls["local"]))
+        print("Bridge berjalan. Ctrl+C untuk berhenti.")
+        while True:
+            time.sleep(3600)
     mcp.run()
 
 
