@@ -93,6 +93,16 @@ Buat desain lengkap dari foto/video/teks Anda sendiri — bukan template premium
 Catatan: transisi/efek/animasi bawaan CapCut dan elemen Pro Canva tidak dipakai (itu konten berlisensi);
 template ini memakai font umum (default Montserrat — tersedia gratis di Canva) dan aset milik Anda.
 
+## Library elemen CapCut pribadi
+- `capcut_library_scan` — scan semua project CapCut Anda dan kumpulkan stiker, efek, filter, adjustment,
+  transisi, animasi & font yang pernah Anda pakai (tanda `vip` bila CapCut menandainya berbayar).
+- `capcut_library_list` / `capcut_library_apply` — pasang elemen itu ke project lain.
+- `capcut_make_from_template(..., style={"transition": key, "filter": key, "font": key, ...})` — template + gaya
+  dari library Anda. Elemen dari library tampil di Live Editor (stiker bisa di-drag; efek/filter tampil sebagai label,
+  hasil visualnya dirender CapCut).
+- Elemen Canva: `canva_open_editor` membuka desain di browser, lalu AI memakai `desktop_*` untuk mencari &
+  drag elemen apa pun yang tersedia di akun Anda.
+
 ## Contoh perintah ke AI
 - "Buat project CapCut `promo` 9:16, masukkan `C:\video\a.mp4` 0–5 detik, tambah teks 'DISKON 50%' di atas."
 - "Screenshot layar, lalu drag stiker pertama di panel kiri CapCut ke tengah canvas."

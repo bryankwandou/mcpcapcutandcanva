@@ -5,7 +5,7 @@ from typing import Any
 
 from mcp.server.fastmcp import FastMCP, Image
 
-from . import bridge, cache, capcut, desktop, templates
+from . import bridge, cache, capcut, capcut_library, desktop, templates
 from .canva import CanvaClient
 from .oauth import load_dotenv
 
@@ -125,6 +125,33 @@ def editor_discard(draft: str) -> dict:
     return bridge.discard(draft)
 
 
+# ------------------------------------------------------ CapCut library ----
+@mcp.tool()
+def capcut_library_scan(drafts: list[str] | None = None) -> dict:
+    """Scan your CapCut projects (all by default) and collect every sticker, effect, filter,
+    adjustment, transition, animation and font you have used into a personal library."""
+    return capcut_library.scan(drafts)
+
+
+@mcp.tool()
+def capcut_library_list(kind: str | None = None, query: str | None = None,
+                        free_only: bool = False) -> list[dict]:
+    """List library elements. kind: sticker|effect|filter|adjust|transition|animation|font.
+    vip=True means CapCut marked it as paid; free_only hides those."""
+    return capcut_library.list_items(kind, query, free_only)
+
+
+@mcp.tool()
+def capcut_library_apply(draft: str, key: str, start: float | None = None,
+                         duration: float | None = None, segment_id: str | None = None,
+                         x: float = 0.0, y: float = 0.0, scale: float = 1.0) -> dict:
+    """Apply a library element to a project. sticker/effect/filter/adjust need start+duration
+    (sticker also x/y/scale); transition/animation/font need segment_id (transition goes after
+    that clip; font needs a text segment). Close the project in CapCut first."""
+    bridge.discard(draft)  # the draft changed: drop any stale editor preview
+    return capcut_library.apply(draft, key, start, duration, segment_id, x, y, scale)
+
+
 # ------------------------------------------------------------ Templates ----
 @mcp.tool()
 def template_list() -> dict:
@@ -136,12 +163,16 @@ def template_list() -> dict:
 def capcut_make_from_template(template: str, name: str, media: list[str], title: str = "",
                               captions: list[str] | None = None, cta: str = "",
                               music: str | None = None, palette: str = "bold",
-                              clip_seconds: float = 2.5, base_draft: str | None = None) -> dict:
+                              clip_seconds: float = 2.5, base_draft: str | None = None,
+                              style: dict[str, str] | None = None) -> dict:
     """Build a complete CapCut project from your own media and text using an original template
     (promo | slideshow | quotes | youtube_intro). Returns the draft plus an editor link to fine-tune.
-    base_draft: optional existing project to clone the file format from (recommended)."""
+    base_draft: optional existing project to clone the file format from (recommended).
+    style: optional library keys from capcut_library_list, e.g. {"transition": "transition:123",
+    "filter": "...", "font": "...", "text_animation": "...", "clip_animation": "...",
+    "sticker": "...", "effect": "..."}."""
     res = templates.build_capcut(template, name, media, title, captions, cta, music, palette,
-                                 clip_seconds, base_draft)
+                                 clip_seconds, base_draft, style)
     res["editor"] = bridge.editor_url(name)
     return res
 
@@ -317,6 +348,31 @@ def desktop_screenshot(max_width: int = 1600) -> list:
     other desktop tools are in real screen pixels: divide image coordinates by 'scale'."""
     png, info = desktop.screenshot(max_width)
     return [Image(data=png, format="png"), info]
+
+
+@mcp.tool()
+async def canva_open_editor(design_id: str) -> dict:
+    """Open a Canva design in the browser on this computer, ready for desktop_* control.
+    Workflow to use ANY element your account has (free or paid plan): desktop_screenshot ->
+    click 'Elements' in the left panel -> desktop_type the search term -> desktop_drag the
+    result onto the page -> desktop_screenshot to verify. Elements marked with a crown are Pro."""
+    import webbrowser
+
+    d = await canva().request("GET", f"/designs/{design_id}")
+    url = d["design"]["urls"]["edit_url"]
+    webbrowser.open(url)
+    return {"opened": url, "next": "desktop_screenshot"}
+
+
+@mcp.tool()
+def desktop_open_url(url: str) -> str:
+    """Open a URL in the default browser on this computer (e.g. a Canva or CapCut web editor)."""
+    import webbrowser
+
+    if not url.startswith(("https://", "http://127.0.0.1", "http://localhost")):
+        raise ValueError("Hanya URL https atau localhost")
+    webbrowser.open(url)
+    return f"opened {url}"
 
 
 @mcp.tool()

@@ -51,6 +51,9 @@ def from_draft(name: str) -> dict:
                           font_size=m.get("font_size", 8.0))
             elif t["type"] == "audio":
                 el.update(type="audio", src=m.get("path", ""))
+            elif t["type"] in ("sticker", "effect", "filter"):  # CapCut library elements
+                el.update(type=t["type"], src="", label=m.get("name") or m.get("effect_name") or t["type"],
+                          preview=m.get("path") or m.get("icon_url") or "")
             else:
                 el.update(type="photo" if m.get("type") == "photo" else "video", src=m.get("path", ""))
             elements.append(el)

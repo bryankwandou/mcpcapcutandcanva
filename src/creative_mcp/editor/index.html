@@ -6,7 +6,7 @@
 <title>Creative Live Editor</title>
 <style>
 :root{--bg:#0f1115;--panel:#171a21;--line:#2a2f3a;--text:#e6e8ee;--muted:#8b93a7;--acc:#4f8cff;--warn:#ffb020;
---video:#3a6df0;--photo:#1fa37a;--audio:#b0562f;--textc:#9b4fd6}
+--video:#3a6df0;--sticker:#d69e2e;--effect:#c0392b;--filter:#16a085;--photo:#1fa37a;--audio:#b0562f;--textc:#9b4fd6}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font:13px/1.4 system-ui,sans-serif;height:100vh;display:grid;
 grid-template-rows:44px 1fr 220px;grid-template-columns:240px 1fr 260px;grid-template-areas:"top top top" "lib stage props" "tl tl tl"}
@@ -35,7 +35,9 @@ h3{margin:4px 0 8px;font-size:12px;text-transform:uppercase;color:var(--muted);l
 .track .lbl{position:absolute;left:-70px;width:66px;top:9px;color:var(--muted);font-size:11px}
 .seg{position:absolute;top:4px;height:26px;border-radius:5px;padding:4px 6px;font-size:11px;overflow:hidden;white-space:nowrap;cursor:grab;color:#fff}
 .seg.sel{outline:2px solid #fff}.seg .edge{position:absolute;right:0;top:0;bottom:0;width:7px;cursor:ew-resize;background:#fff3}
-.seg.video{background:var(--video)}.seg.photo{background:var(--photo)}.seg.audio{background:var(--audio)}.seg.text{background:var(--textc)}
+.seg.video{background:var(--video)}.seg.photo{background:var(--photo)}.seg.audio{background:var(--audio)}.seg.text{background:var(--textc)}.seg.sticker{background:var(--sticker)}.seg.effect{background:var(--effect)}.seg.filter{background:var(--filter)}
+.el.sticker{border:2px dashed var(--sticker);color:var(--sticker);display:flex;align-items:center;justify-content:center;font-size:12px;background:#0006;width:120px;height:120px}
+#fxnote{position:absolute;left:8px;top:8px;font-size:11px;color:#fff;background:#0008;padding:3px 6px;border-radius:4px;pointer-events:none}
 #playhead{position:absolute;top:0;bottom:0;width:2px;background:#ff4d4d;pointer-events:none;z-index:5}
 #ruler{height:18px;margin-left:70px;position:relative;border-bottom:1px solid var(--line);cursor:pointer}
 #ruler span{position:absolute;font-size:10px;color:var(--muted);top:2px}
@@ -159,7 +161,7 @@ const toPx = (x, y) => [(x + 1) / 2 * sw, (1 - y) / 2 * sh];
 const fromPx = (px, py) => [px / sw * 2 - 1, 1 - py / sh * 2];
 const trackOf = el => S.tracks.find(tk => tk.id === el.track);
 const visible = el => t >= el.start && t < el.start + el.duration;
-const zOrder = el => { const kinds = {video: 0, photo: 0, text: 1, audio: -1}; return S.tracks.indexOf(trackOf(el)) + kinds[el.type] * 100; };
+const zOrder = el => { const kinds = {video: 0, photo: 0, sticker: 1, text: 2, audio: -1, effect: -1, filter: -1}; return S.tracks.indexOf(trackOf(el)) + kinds[el.type] * 100; };
 
 function render() { if (!S) return; fitStage(); renderStage(); renderTimeline(); renderProps(); }
 
@@ -167,10 +169,16 @@ function renderStage() {
   const st = $('#stage'); st.innerHTML = '';
   for (const el of [...S.elements].sort((a, b) => zOrder(a) - zOrder(b))) {
     if (el.type === 'audio') { syncAudio(el); continue; }
+    if (el.type === 'effect' || el.type === 'filter') {   // CapCut-rendered: show a badge only
+      if (visible(el)) st.insertAdjacentHTML('beforeend', `<div id="fxnote">✨ ${el.type}: ${el.label}</div>`); continue; }
     if (!visible(el)) { if (media[el.id]) media[el.id].pause?.(); continue; }
     const d = document.createElement('div'); d.className = 'el ' + el.type + (sel === el.id ? ' sel' : ''); d.dataset.id = el.id;
     const scale = el.scale || 1;
-    if (el.type === 'text') {
+    if (el.type === 'sticker') {
+      if (el.preview && /\.(png|gif|webp|jpe?g)$/i.test(el.preview)) { const im = document.createElement('img'); im.src = mediaUrl(el.preview); d.appendChild(im); }
+      else d.textContent = '⭐ ' + el.label;
+      d.style.width = d.style.height = 120 * scale * sh / 600 + 'px';
+    } else if (el.type === 'text') {
       d.textContent = el.text; d.style.color = el.color || '#fff'; d.style.fontSize = (el.font_size || 8) * sh / 300 * scale + 'px';
     } else {
       const w = sw * scale, h = sh * scale; d.style.width = w + 'px'; d.style.height = h + 'px';
@@ -238,7 +246,7 @@ function renderTimeline() {
     for (const el of S.elements.filter(e => e.track === tk.id)) {
       const s = document.createElement('div'); s.className = `seg ${el.type}${sel === el.id ? ' sel' : ''}`;
       s.style.left = el.start * pxs + 'px'; s.style.width = Math.max(8, el.duration * pxs) + 'px';
-      s.textContent = el.type === 'text' ? '🔤 ' + el.text : (el.src || '').split(/[\\/]/).pop();
+      s.textContent = el.type === 'text' ? '🔤 ' + el.text : el.label ? '✨ ' + el.label : (el.src || '').split(/[\\/]/).pop();
       s.insertAdjacentHTML('beforeend', '<div class="edge"></div>');
       s.onpointerdown = e => startSegDrag(e, el);
       row.appendChild(s);
@@ -315,10 +323,10 @@ function renderProps() {
   b.dataset.id = el.id;
   const f = (k, label, type = 'number', step = 0.01) => `<label>${label}</label><input data-k="${k}" type="${type}" step="${step}" value="${el[k] ?? ''}">`;
   b.innerHTML = `<div><b>${el.type}</b></div>` +
-    (el.type === 'text' ? `<label>Teks</label><textarea data-k="text" rows="3">${el.text}</textarea>${f('color', 'Warna', 'color')}${f('font_size', 'Ukuran font', 'number', 0.5)}` : `<label>File</label><div style="word-break:break-all;color:var(--muted)">${el.src}</div>`) +
+    (el.type === 'text' ? `<label>Teks</label><textarea data-k="text" rows="3">${el.text}</textarea>${f('color', 'Warna', 'color')}${f('font_size', 'Ukuran font', 'number', 0.5)}` : (el.label ? `<label>Elemen CapCut</label><div>${el.label}</div>` : `<label>File</label><div style="word-break:break-all;color:var(--muted)">${el.src}</div>`)) +
     f('start', 'Mulai (detik)') + f('duration', 'Durasi (detik)') +
-    (el.type !== 'audio' ? f('x', 'Posisi X (-1..1)') + f('y', 'Posisi Y (-1..1)') + f('scale', 'Skala') + f('rotation', 'Rotasi (°)', 'number', 1) + f('alpha', 'Opacity (0-1)') : '') +
-    f('volume', 'Volume', 'number', 0.05) + `<p><button id="delEl">🗑 Hapus elemen</button> <button id="dupEl">⧉ Duplikat</button></p>`;
+    (['video', 'photo', 'text', 'sticker'].includes(el.type) ? f('x', 'Posisi X (-1..1)') + f('y', 'Posisi Y (-1..1)') + f('scale', 'Skala') + f('rotation', 'Rotasi (°)', 'number', 1) + f('alpha', 'Opacity (0-1)') : '') +
+    (['video', 'audio'].includes(el.type) ? f('volume', 'Volume', 'number', 0.05) : '') + `<p><button id="delEl">🗑 Hapus elemen</button> <button id="dupEl">⧉ Duplikat</button></p>`;
   b.querySelectorAll('[data-k]').forEach(i => {
     i.onfocus = snap;
     i.oninput = () => { el[i.dataset.k] = i.type === 'number' ? +i.value : i.value; renderStage(); renderTimeline(); };

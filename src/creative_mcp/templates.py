@@ -53,7 +53,9 @@ def _kind(path: str) -> str:
 def build_capcut(template: str, name: str, media: list[str], title: str = "",
                  captions: list[str] | None = None, cta: str = "", music: str | None = None,
                  palette: str = "bold", clip_seconds: float = 2.5,
-                 base_draft: str | None = None) -> dict:
+                 base_draft: str | None = None, style: dict[str, str] | None = None) -> dict:
+    """style (optional, keys from capcut_library_list): {"transition": key, "filter": key,
+    "font": key, "text_animation": key, "clip_animation": key, "sticker": key, "effect": key}"""
     if template not in CAPCUT_TEMPLATES:
         raise ValueError(f"Template tidak dikenal. Pilihan: {list(CAPCUT_TEMPLATES)}")
     pal = PALETTES.get(palette, PALETTES["bold"])
@@ -123,7 +125,39 @@ def build_capcut(template: str, name: str, media: list[str], title: str = "",
                     "src": str(Path(music).expanduser().resolve()), "start": 0, "duration": t,
                     "volume": 0.8, "x": 0, "y": 0, "scale": 1, "rotation": 0, "alpha": 1})
     res = scene.apply_to_draft({"draft": name, "tracks": tracks, "elements": els})
+    if style:
+        res["style"] = _apply_style(name, style, els, t)
     return {"draft": name, "duration": t, **res}
+
+
+def _apply_style(name: str, style: dict[str, str], els: list[dict], total: float) -> list:
+    """Decorate a generated project with elements from your personal CapCut library."""
+    from . import capcut_library as lib
+
+    done = []
+    clips = sorted((e for e in els if e["type"] in ("video", "photo")), key=lambda e: e["start"])
+    texts = [e for e in els if e["type"] == "text"]
+    jobs = []
+    if style.get("transition"):
+        jobs += [(style["transition"], {"segment_id": c["id"]}) for c in clips[:-1]]
+    if style.get("clip_animation"):
+        jobs += [(style["clip_animation"], {"segment_id": c["id"]}) for c in clips]
+    if style.get("font"):
+        jobs += [(style["font"], {"segment_id": e["id"]}) for e in texts]
+    if style.get("text_animation"):
+        jobs += [(style["text_animation"], {"segment_id": e["id"]}) for e in texts]
+    if style.get("filter"):
+        jobs.append((style["filter"], {"start": 0, "duration": total}))
+    if style.get("effect"):
+        jobs.append((style["effect"], {"start": 0, "duration": min(2.0, total)}))
+    if style.get("sticker"):
+        jobs.append((style["sticker"], {"start": 0, "duration": total, "x": 0.6, "y": 0.75, "scale": 0.5}))
+    for key, kw in jobs:
+        try:
+            done.append(lib.apply(name, key, **kw))
+        except Exception as e:  # keep building even if one element can't be applied
+            done.append({"ok": False, "key": key, "error": str(e)})
+    return done
 
 
 # -------------------------------------------------------------- Canva ----
