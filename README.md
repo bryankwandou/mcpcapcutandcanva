@@ -31,10 +31,13 @@ pip install -e ".[desktop]"
 ```
 
 ### Canva
-1. Buat integrasi di https://www.canva.com/developers/integrations (scope: `design:content:read/write`,
+1. Buat app di https://www.canva.com/developers/apps → **Outside Canva**. Generate client secret, tambahkan
+   Redirect URL `http://127.0.0.1:3001/oauth/redirect`, dan pilih scope ( `design:content:read/write`,
    `design:meta:read`, `asset:read/write`, `brandtemplate:meta:read`, `brandtemplate:content:read`, `folder:read`, `profile:read`).
-2. Lakukan OAuth (PKCE) untuk mendapatkan access & refresh token, lalu isi `CANVA_*` (lihat `.env.example`).
-   Token diperbarui otomatis jika `CANVA_CLIENT_ID/SECRET/REFRESH_TOKEN` diisi.
+2. Jalankan `creative-mcp login` di folder project: browser terbuka ke halaman izin Canva, klik **Allow**,
+   lalu token (OAuth PKCE S256) otomatis tersimpan di `.env`. Token diperbarui otomatis, dan refresh token
+   baru (sekali pakai) disimpan kembali ke `.env`.
+3. Akun free: API premium (mis. `canva_resize`) punya *trial quota*; sisa kuota muncul di `trial_information`.
 
 ### Claude Desktop config (`claude_desktop_config.json`)
 ```json

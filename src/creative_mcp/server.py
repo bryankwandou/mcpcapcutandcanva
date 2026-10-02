@@ -7,6 +7,9 @@ from mcp.server.fastmcp import FastMCP, Image
 
 from . import capcut, desktop
 from .canva import CanvaClient
+from .oauth import load_dotenv
+
+load_dotenv()
 
 mcp = FastMCP("creative-mcp")
 _canva: CanvaClient | None = None
@@ -81,6 +84,26 @@ async def canva_autofill(brand_template_id: str, data: dict[str, Any], title: st
     """Generate a new design from a brand template. data example:
     {"headline": {"type": "text", "text": "Promo"}, "photo": {"type": "image", "asset_id": "..."}}"""
     return await canva().autofill(brand_template_id, data, title)
+
+
+@mcp.tool()
+async def canva_resize(design_id: str, preset: str | None = None, width: int | None = None,
+                       height: int | None = None) -> dict:
+    """Copy a design into a new size (premium; free plans get a small trial quota,
+    reported in trial_information)."""
+    return await canva().resize(design_id, preset, width, height)
+
+
+@mcp.tool()
+async def canva_import_file(file_path: str, title: str | None = None) -> dict:
+    """Import a local PDF/PPTX/AI/PSD/Keynote file as a new editable Canva design."""
+    return await canva().import_file(file_path, title)
+
+
+@mcp.tool()
+async def canva_import_url(url: str, title: str, mime_type: str | None = None) -> dict:
+    """Import a file from a public URL as a new editable Canva design."""
+    return await canva().import_url(url, title, mime_type)
 
 
 @mcp.tool()
@@ -184,6 +207,12 @@ def desktop_scroll(amount: int, x: int | None = None, y: int | None = None) -> s
 
 
 def main() -> None:
+    import sys
+
+    if len(sys.argv) > 1 and sys.argv[1] == "login":
+        from .oauth import login
+        login()
+        return
     mcp.run()
 
 
