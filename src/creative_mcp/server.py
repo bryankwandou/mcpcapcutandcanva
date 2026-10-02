@@ -5,7 +5,7 @@ from typing import Any
 
 from mcp.server.fastmcp import FastMCP, Image
 
-from . import bridge, cache, capcut, desktop
+from . import bridge, cache, capcut, desktop, templates
 from .canva import CanvaClient
 from .oauth import load_dotenv
 
@@ -123,6 +123,43 @@ def editor_deploy(draft: str) -> dict:
 def editor_discard(draft: str) -> dict:
     """Throw away the preview edits and go back to the CapCut project as saved."""
     return bridge.discard(draft)
+
+
+# ------------------------------------------------------------ Templates ----
+@mcp.tool()
+def template_list() -> dict:
+    """List the built-in ORIGINAL templates (CapCut + Canva) and color palettes."""
+    return templates.list_templates()
+
+
+@mcp.tool()
+def capcut_make_from_template(template: str, name: str, media: list[str], title: str = "",
+                              captions: list[str] | None = None, cta: str = "",
+                              music: str | None = None, palette: str = "bold",
+                              clip_seconds: float = 2.5, base_draft: str | None = None) -> dict:
+    """Build a complete CapCut project from your own media and text using an original template
+    (promo | slideshow | quotes | youtube_intro). Returns the draft plus an editor link to fine-tune.
+    base_draft: optional existing project to clone the file format from (recommended)."""
+    res = templates.build_capcut(template, name, media, title, captions, cta, music, palette,
+                                 clip_seconds, base_draft)
+    res["editor"] = bridge.editor_url(name)
+    return res
+
+
+@mcp.tool()
+async def canva_make_from_template(template: str, title: str, subtitle: str = "",
+                                   body: list[str] | None = None, images: list[str] | None = None,
+                                   cta: str = "", palette: str = "bold", font: str = "Montserrat",
+                                   out_path: str = "~/creative-mcp-designs",
+                                   import_to_canva: bool = True) -> dict:
+    """Generate a full original design (instagram_post | story | youtube_thumbnail | presentation)
+    with separate, editable elements, and import it into Canva as a normal editable design.
+    For presentation, body items become slides ("Judul: detail")."""
+    path = templates.build_pptx(template, out_path, title, subtitle, body, images, cta, palette, font)
+    out: dict[str, Any] = {"pptx": path}
+    if import_to_canva:
+        out["canva"] = await canva().import_file(path, title)
+    return out
 
 
 # ---------------------------------------------------------------- Canva ----

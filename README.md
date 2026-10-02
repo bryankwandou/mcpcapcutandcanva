@@ -81,8 +81,22 @@ Gunakan Chrome/Edge/Firefox (Safari memblokir akses https → http://127.0.0.1).
 > CapCut **tidak punya API key publik**. "Deploy" menulis langsung ke file project CapCut di komputer Anda
 > (backup `.json.bak` dibuat otomatis).
 
+## Template orisinal (tanpa premium)
+Buat desain lengkap dari foto/video/teks Anda sendiri — bukan template premium orang lain.
+- `template_list` — daftar template & palet warna (`bold`, `fresh`, `elegant`, `neon`, `pastel`).
+- `capcut_make_from_template` — `promo`, `slideshow`, `quotes`, `youtube_intro`: project CapCut jadi
+  (klip, caption, judul, CTA, musik), lalu langsung dapat link Live Editor untuk dirapikan.
+- `canva_make_from_template` — `instagram_post`, `story`, `youtube_thumbnail`, `presentation`:
+  dibuat sebagai PPTX berisi elemen terpisah (teks, bentuk, foto) lalu di-import ke Canva, jadi
+  **setiap elemen bisa diedit & dipindah** di Canva. File PPTX juga disimpan di `~/creative-mcp-designs`.
+
+Catatan: transisi/efek/animasi bawaan CapCut dan elemen Pro Canva tidak dipakai (itu konten berlisensi);
+template ini memakai font umum (default Montserrat — tersedia gratis di Canva) dan aset milik Anda.
+
 ## Contoh perintah ke AI
 - "Buat project CapCut `promo` 9:16, masukkan `C:\video\a.mp4` 0–5 detik, tambah teks 'DISKON 50%' di atas."
 - "Screenshot layar, lalu drag stiker pertama di panel kiri CapCut ke tengah canvas."
+- "Buat video promo dari foto di folder Pictures/produk, judul 'SALE 50%', CTA 'Order sekarang', palet neon."
+- "Buatkan presentasi Canva 5 slide tentang bisnis kopi saya, palet elegant."
 - "Lihat catalog, lalu buka editor untuk project `promo` dan geser judul ke atas."
 - "Isi brand template Canva 'Poster Promo' dengan judul X dan export ke PNG."
