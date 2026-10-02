@@ -9,11 +9,56 @@
 <style>
 /* Light theme for the design editor (page-local token overrides). */
 :root {
-  --bg: #f3f4f6; --surface: #ffffff; --surface-2: #f1f2f5; --well: #e6e8ec; --line: #dadde3;
-  --fg: #1c1e24; --muted: #5a5f6d; --accent: #e8b02a; --accent-ink: #1d1604; --accent-strong: #8a6200;
-  --ok: #1d7a4c; --danger: #c93c3c; --pro: #6b3fc4; --select: #1677c9; --hover: #e9ebef;
+  --bg: #f5f6f8; --surface: #ffffff; --surface-2: #f4f5f7; --well: #eceef2; --line: #e3e5ea;
+  --fg: #16181d; --muted: #646a78; --accent: #e8b02a; --accent-ink: #1d1604; --accent-strong: #8a6200;
+  --ok: #1d7a4c; --danger: #c93c3c; --pro: #6b3fc4; --select: #1677c9; --hover: #eef0f3;
+  --r-sm: 8px; --r-md: 10px; --r-lg: 12px; --sh-1: 0 1px 2px #1018280f, 0 1px 3px #1018281a; --sh-2: 0 4px 12px #1018281a, 0 1px 3px #1018280f;
   color-scheme: light;
 }
+body { font-size: 13.5px; background: var(--well); }
+.btn { border-radius: var(--r-sm); font-size: 13px; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 700; box-shadow: 0 1px 2px #8a620033; }
+.label { font-size: 11px; letter-spacing: .04em; }
+.phicon { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #ffffffc0; pointer-events: none; }
+.phicon svg { width: 30%; height: 30%; max-width: calc(48px / var(--z)); max-height: calc(48px / var(--z)); filter: drop-shadow(0 1px 2px #0003); }
+.el .in { position: relative; }
+.dimlbl { position: absolute; right: 0; bottom: calc(-26px / var(--z)); transform-origin: 100% 0; transform: scale(calc(1 / var(--z))); background: var(--select); color: #fff; font: 600 11px var(--f-mono); padding: 2px 6px; border-radius: 5px; white-space: nowrap; pointer-events: none; z-index: 3; letter-spacing: 0; text-transform: none; text-shadow: none; -webkit-text-stroke: 0; font-style: normal; text-decoration: none; line-height: 1.3; }
+.guide.gap { background: #e0218a; }
+.guide.gap::after { content: attr(data-gap); position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(var(--gz)); background: #e0218a; color: #fff; font: 600 10px var(--f-mono); padding: 1px 4px; border-radius: 4px; }
+body.panning #work, body.panning #work * { cursor: grab !important; }
+body.panning.dragging #work, body.panning.dragging #work * { cursor: grabbing !important; }
+.chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; min-height: 32px; scrollbar-width: none; }
+.chips button { flex: none; border: 1px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 99px; padding: 5px 11px; font-size: 12px; font-weight: 600; }
+.chips button:hover { background: var(--hover); }
+.chips button.on { background: var(--fg); border-color: var(--fg); color: #fff; }
+.tplgrid { display: block; columns: 2; column-gap: 10px; }
+.tplcard { display: block; width: 100%; margin: 0 0 10px; break-inside: avoid; padding: 0; border: 0; background: none; text-align: left; cursor: pointer; position: relative; color: var(--fg); }
+.tplcard canvas { display: block; width: 100%; height: auto; border-radius: var(--r-sm); box-shadow: 0 0 0 1px #0000000f, var(--sh-1); transition: box-shadow 140ms ease; }
+.tplcard:hover canvas { box-shadow: 0 0 0 2px var(--accent), var(--sh-2); }
+.tplcard .pgs { position: absolute; top: 6px; right: 6px; background: #000000b0; color: #fff; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 99px; }
+.tplcard small { display: block; color: var(--muted); font-size: 11px; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tile i.shp { display: block; width: 62%; height: 62%; }
+.tile.stk img { object-fit: contain; padding: 14%; }
+.txtp { display: flex; align-items: center; justify-content: center; min-height: 66px; border-radius: var(--r-md); border: 1px solid var(--line); padding: 10px; cursor: pointer; overflow: hidden; font-size: 20px; line-height: 1.1; text-align: center; }
+.txtp:hover { box-shadow: 0 0 0 2px var(--accent); }
+.stylecard { display: grid; gap: 8px; padding: 10px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface); cursor: pointer; text-align: left; color: var(--fg); }
+.stylecard:hover { box-shadow: 0 0 0 2px var(--accent), var(--sh-1); }
+.stylecard .sw { display: flex; } .stylecard .sw i { flex: 1; height: 22px; } .stylecard .sw i:first-child { border-radius: 6px 0 0 6px; } .stylecard .sw i:last-child { border-radius: 0 6px 6px 0; }
+.stylecard b { font-size: 17px; line-height: 1.1; font-weight: 400; } .stylecard span { font-size: 12px; color: var(--muted); }
+.animgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.animgrid button { display: grid; justify-items: center; gap: 6px; padding: 12px 4px 8px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface); font-size: 11.5px; color: var(--fg); position: relative; }
+.animgrid button:hover { background: var(--hover); }
+.animgrid button.on { border-color: var(--select); box-shadow: 0 0 0 1px var(--select); }
+.animgrid button i { display: block; width: 26px; height: 26px; border-radius: 7px; background: linear-gradient(135deg, var(--accent), #d95d39); }
+.animgrid button:hover i { animation: var(--demo) 900ms ease both infinite; }
+.animgrid .tier { position: absolute; top: 3px; right: 3px; font-size: 8.5px; padding: 1px 4px; }
+@keyframes d-none { to { opacity: 1 } } @keyframes d-fade { from { opacity: 0 } } @keyframes d-slide { from { opacity: 0; transform: translateY(12px) } } @keyframes d-zoom { from { opacity: 0; transform: scale(.4) } }
+@keyframes d-pop { 0% { transform: scale(0) } 70% { transform: scale(1.15) } } @keyframes d-type { from { clip-path: inset(0 100% 0 0) } } @keyframes d-bounce { 0% { transform: translateY(-14px); opacity: 0 } 40% { transform: none; opacity: 1 } 65% { transform: translateY(-5px) } }
+@keyframes d-wipe { from { clip-path: inset(0 0 0 100%) } }
+#present .stage { position: relative; width: min(100vw, calc(100vh * var(--ar))); aspect-ratio: var(--ar); overflow: hidden; }
+#present .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none; }
+.note { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
+
 [hidden] { display: none !important; }
 .btn:hover { border-color: #c4c8d0; background: var(--hover); }
 .btn.ghost:hover { background: var(--hover); }
@@ -27,7 +72,7 @@
 body { display: grid; height: 100%; overflow: hidden;
   grid-template-columns: 76px 340px minmax(0, 1fr); grid-template-rows: 56px 50px minmax(0, 1fr) 44px;
   grid-template-areas: "top top top" "rail side tool" "rail side work" "rail side foot"; }
-header { grid-area: top; display: flex; align-items: center; gap: 6px; padding: 0 10px; background: var(--surface); border-bottom: 1px solid var(--line); min-width: 0; }
+header { grid-area: top; display: flex; align-items: center; gap: 6px; padding: 0 12px; background: var(--surface); border-bottom: 1px solid var(--line); min-width: 0; z-index: 3; }
 header .title { flex: 1; display: flex; justify-content: flex-end; min-width: 0; }
 header .vsep { width: 1px; height: 22px; background: var(--line); margin: 0 4px; flex: none; }
 #fileBtn svg.i:last-child { width: 14px; height: 14px; }
@@ -36,13 +81,14 @@ header .title input { background: transparent; border-color: transparent; text-a
 header .title input:hover, header .title input:focus { border-color: var(--line); background: var(--surface-2); }
 #saved { color: var(--muted); font-size: 12px; white-space: nowrap; }
 #rail { grid-area: rail; background: var(--surface); border-right: 1px solid var(--line); display: flex; flex-direction: column; align-items: center; padding: 8px 0; gap: 2px; overflow: auto; }
-#rail button { width: 66px; padding: 8px 0 6px; background: none; border: 0; border-radius: 8px; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 10.5px; }
-#rail button:hover { color: var(--fg); background: var(--surface-2); }
-#rail button.on { color: var(--fg); background: var(--surface-2); box-shadow: inset 3px 0 0 var(--accent); }
-#side { grid-area: side; background: var(--surface); border-right: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; }
+#rail button { width: 64px; padding: 6px 0 5px; background: none; border: 0; border-radius: var(--r-md); color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 11px; font-weight: 600; }
+#rail button svg { width: 38px; height: 32px; padding: 6px 10px; border-radius: 9px; box-sizing: border-box; transition: background-color 120ms ease, color 120ms ease; }
+#rail button:hover { color: var(--fg); } #rail button:hover svg { background: var(--hover); }
+#rail button.on { color: var(--fg); } #rail button.on svg { background: #fbefd0; color: var(--accent-strong); }
+#side { grid-area: side; background: var(--surface); border-right: 1px solid var(--line); box-shadow: 2px 0 8px #1018280a; z-index: 1; display: flex; flex-direction: column; min-height: 0; }
 #side .ph { display: flex; align-items: center; gap: 6px; padding: 12px 14px 6px; }
-#side .ph h3 { font-size: 15px; flex: 1; }
-#sideBody { padding: 4px 14px 24px; overflow: auto; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; align-content: start; }
+#side .ph h3 { font-size: 16px; font-weight: 800; flex: 1; margin: 0; }
+#sideBody { scrollbar-width: thin; padding: 4px 16px 24px; overflow: auto; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; align-content: start; }
 .tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
 .tiles.three { grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .tiles.masonry { display: block; columns: 2; column-gap: 10px; }
@@ -58,8 +104,8 @@ header .title input:hover, header .title input:focus { border-color: var(--line)
 .sizecard i { display: block; background: #fff; border: 1.5px solid #9aa0ab; border-radius: 3px; }
 .sizecard small { color: var(--muted); font-size: 10.5px; }
 #side .ph #sideBack { margin-left: -6px; }
-.tile { aspect-ratio: 1; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; cursor: grab; overflow: hidden; position: relative; padding: 0; color: var(--fg); font-size: 11px; text-align: center; }
-.tile:hover { border-color: #aeb3bd; box-shadow: 0 2px 10px #0000001a; }
+.tile { aspect-ratio: 1; border-radius: var(--r-md); background: var(--surface-2); border: 1px solid transparent; display: flex; align-items: center; justify-content: center; cursor: grab; overflow: hidden; position: relative; padding: 0; color: var(--fg); font-size: 11px; text-align: center; }
+.tile:hover { border-color: var(--line); background: #fff; box-shadow: var(--sh-2); }
 #ts .tile { background: #2a2c33; border-color: #2a2c33; color: #fff; }
 .tile img { width: 100%; height: 100%; object-fit: cover; }
 .tile .cap { position: absolute; left: 0; right: 0; bottom: 0; padding: 3px 5px; background: #000a; color: #fff; font-size: 10px; }
@@ -99,7 +145,7 @@ header .title input:hover, header .title input:focus { border-color: var(--line)
 #share .btn { justify-content: center; }
 #share .dl { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
 #tip { position: fixed; z-index: 50; background: #1f2128; color: #fff; font: 600 11.5px var(--f-mono); padding: 4px 8px; border-radius: 6px; pointer-events: none; white-space: nowrap; box-shadow: 0 2px 8px #0003; }
-#work { grid-area: work; overflow: auto; background: var(--well); position: relative; min-height: 0; }
+#work { scrollbar-width: thin; grid-area: work; overflow: auto; background: var(--well); position: relative; min-height: 0; }
 #pages { display: flex; flex-direction: column; align-items: center; gap: 26px; padding: 22px 24px 60px; min-width: max-content; }
 .pagehead { display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: 12.5px; margin-bottom: 6px; gap: 8px; }
 .pagehead .pt { display: flex; align-items: center; gap: 4px; min-width: 0; flex: 1; white-space: nowrap; }
@@ -110,7 +156,8 @@ header .title input:hover, header .title input:focus { border-color: var(--line)
 .addpage:hover { border-color: var(--accent-strong); color: var(--accent-strong); background: #fff; }
 .pagehead .row { gap: 2px; }
 .pagehead .btn { padding: 3px; }
-.page { position: relative; overflow: hidden; transform-origin: 0 0; box-shadow: 0 1px 3px #0000001f, 0 6px 22px #00000014; }
+.page { position: relative; overflow: hidden; transform-origin: 0 0; }
+.holder { box-shadow: 0 0 0 1px #0000000a, 0 1px 2px #1018280f, 0 4px 10px #1018280d, 0 18px 40px #10182814; border-radius: 2px; }
 .pagebox.cur .pagehead > span:first-child { color: var(--fg); font-weight: 600; }
 .el { position: absolute; transform-origin: center; user-select: none; touch-action: none; }
 .el:not(.sel):hover::after { content: ""; position: absolute; inset: 0; outline: calc(1px / var(--z)) solid var(--select); opacity: .75; pointer-events: none; }
@@ -154,7 +201,7 @@ header .title input:hover, header .title input:focus { border-color: var(--line)
 #present .pc { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); color: #fffb; font: 12px var(--f-mono); background: #0008; padding: 4px 10px; border-radius: 99px; }
 body.noside { grid-template-columns: 76px 0 minmax(0, 1fr); }
 body.noside #side { display: none; }
-.psearch { width: 100%; padding: 9px 12px !important; border-radius: 10px !important; position: sticky; top: 0; z-index: 2; box-shadow: 0 -6px 0 var(--surface); }
+.psearch { width: 100%; padding: 10px 12px 10px 36px !important; border-radius: var(--r-md) !important; background: var(--surface-2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23646a78' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-3.5-3.5'/%3E%3C/svg%3E") no-repeat 12px 50% !important; border: 1px solid transparent !important; position: sticky; top: 0; z-index: 2; box-shadow: 0 -6px 0 var(--surface); }
 .nores { margin: 0; color: var(--muted); }
 #thumbs { display: flex; gap: 6px; align-items: center; overflow-x: auto; overflow-y: hidden; min-width: 0; flex: 1; padding: 2px; scrollbar-width: thin; }
 #thumbs button { flex: none; padding: 0; border: 2px solid transparent; border-radius: 5px; background: none; line-height: 0; }
@@ -232,6 +279,7 @@ body.noside #side { display: none; }
 <div class="drop-hint" id="dropHint"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="studio.js"></script>
+<script src="design-content.js"></script>
 <script>
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 Object.assign(ICONS, {fwd: 'M12 19V6M6 12l6-6 6 6', bwd: 'M12 5v13M6 12l6 6 6-6', front: 'M5 4h14M12 21V9M7 14l5-5 5 5', backmost: 'M5 20h14M12 3v12M7 10l5 5 5-5',
@@ -257,7 +305,7 @@ $('#fileBtn').innerHTML = `File ${icon('chev')}`; $('#resizeBtn').innerHTML = `$
 $('#shareBtn').innerHTML = `${icon('share')}<span class="lbl"> Bagikan</span>`;
 $('#zout').innerHTML = icon('zoomOut'); $('#zin').innerHTML = icon('zoomIn'); $('#notesBtn').innerHTML = `${icon('note')}<span class="lbl"> Catatan</span>`;
 $('#presentBtn').innerHTML = icon('expand'); $('#notesX').innerHTML = icon('x'); $('#gridX').innerHTML = icon('x');
-const RAIL = [['tpl', 'layout', 'Desain'], ['el', 'shapes', 'Elemen'], ['txt', 'text', 'Teks'], ['brand', 'palette', 'Merek'], ['up', 'upload', 'Upload'], ['pc', 'image', 'Foto'], ['bg', 'fill', 'Latar'], ['layers', 'layers', 'Layer']];
+const RAIL = [['tpl', 'layout', 'Desain'], ['el', 'shapes', 'Elemen'], ['txt', 'text', 'Teks'], ['brand', 'palette', 'Merek'], ['style', 'wand', 'Gaya'], ['up', 'upload', 'Upload'], ['pc', 'image', 'Foto'], ['bg', 'fill', 'Latar'], ['layers', 'layers', 'Layer']];
 $('#rail').innerHTML = RAIL.map(([k, i, l]) => `<button data-r="${k}">${icon(i)}${l}</button>`).join('');
 $$('#rail button').forEach(b => b.onclick = () => { if (b.dataset.r === rail && !ctx && !sideHidden()) return collapseSide(); ctx = null; openRail(b.dataset.r); });
 $('#sideClose').onclick = () => { ctx = null; collapseSide(); };
@@ -307,7 +355,7 @@ const page = () => D.pages[cur];
 const findEl = id => { for (const [pi, p] of D.pages.entries()) { const e = p.elements.find(x => x.id === id); if (e) return [e, p, pi]; } return []; };
 const selected = () => sel.map(id => findEl(id)[0]).filter(Boolean);
 const one = () => sel.length === 1 ? findEl(sel[0])[0] : null;
-const isShape = e => ['rect', 'ellipse', 'line', 'triangle', 'star'].includes(e.type);
+const isShape = e => ['rect', 'ellipse', 'line'].includes(e.type) || !!SHP[e.type];
 const cssFill = f => !f ? 'transparent' : typeof f === 'string' ? f : `linear-gradient(${f.a ?? 135}deg, ${f.c[0]}, ${f.c[1]})`;
 const firstColor = f => typeof f === 'string' ? f : f?.c?.[0] || '#000000';
 const hex = c => /^#[0-9a-f]{6}$/i.test(c || '') ? c : '#000000';
@@ -369,7 +417,7 @@ function elNode(e, pi) {
       textDecoration: e.underline ? 'underline' : 'none', textAlign: e.align, letterSpacing: (e.spacing || 0) + 'px', lineHeight: e.lh || 1.2, textTransform: e.upper ? 'uppercase' : 'none'});
     Object.assign(n.style, textFx(e));
   } else if (e.type === 'image') {
-    const box = document.createElement('div'); box.className = 'imgbox'; box.style.borderRadius = (e.radius || 0) + 'px';
+    const box = document.createElement('div'); box.className = 'imgbox'; box.style.borderRadius = (e.radius || 0) + 'px'; if (e.mask && SHP[e.mask]) box.style.clipPath = cssShapeClip(e.mask, e.w, e.h);
     const im = document.createElement('img'); im.src = imgSrc(e.src); im.crossOrigin = 'anonymous'; im.draggable = false;
     const c = coverBox(e); im.style.cssText = `left:${c.x}px;top:${c.y}px;width:${c.w}px;height:${c.h}px;filter:${cssFilter(e.adj)}`;
     if (!e.ar) im.onload = () => { e.ar = im.naturalWidth / im.naturalHeight; render(); };
@@ -379,13 +427,16 @@ function elNode(e, pi) {
     if (e.type === 'rect') inn.style.borderRadius = Math.min(e.radius || 0, e.w / 2, e.h / 2) + 'px';
     if (e.type === 'ellipse') inn.style.borderRadius = '50%';
     if ((e.type === 'rect' || e.type === 'ellipse') && e.stroke) inn.style.border = `${e.strokeW || 4}px solid ${e.stroke}`;
-    if (POLY[e.type]) inn.style.clipPath = `polygon(${POLY[e.type].map(([a, b]) => `${a * 100}% ${b * 100}%`).join(',')})`;
+    if (SHP[e.type]) inn.style.clipPath = cssShapeClip(e.type, e.w, e.h);
+    if (e.type === 'rect' && e.mask && SHP[e.mask]) { inn.style.clipPath = cssShapeClip(e.mask, e.w, e.h); inn.style.borderRadius = '0'; }
+    if (e.name?.includes('Foto')) inn.innerHTML = `<span class="phicon">${icon('image')}</span>`;
     n.appendChild(inn);
   }
   if (isSel && sel.length === 1 && editing !== e.id && !e.locked) {
     const hs = e.type === 'text' ? ['nw', 'ne', 'sw', 'se', 'e', 'w', 'rot'] : e.type === 'line' ? ['e', 'w', 'rot'] : ['nw', 'ne', 'sw', 'se', 'e', 'w', 'n', 's', 'rot'];
     for (const h of hs) { const d = document.createElement('div'); d.className = 'hd'; d.dataset.h = h; if (h === 'rot') { d.innerHTML = icon('rotate'); d.title = 'Putar'; } n.appendChild(d); }
   }
+  if (isSel && sel.length === 1 && editing !== e.id) n.insertAdjacentHTML('beforeend', `<span class="dimlbl">${Math.round(e.w)} × ${Math.round(e.type === 'text' ? e.h || 0 : e.h)}</span>`);
   if (isSel && e.locked) n.insertAdjacentHTML('beforeend', `<span class="lockbadge">${icon('lock')}</span>`);
   n.onpointerdown = ev => { if (editing === e.id) return; if (ev.button === 2) { ev.stopPropagation(); return; } pointerOnEl(ev, e, pi); };
   return n;
@@ -419,7 +470,8 @@ function pointerOnEl(ev, e, pi) {
   ev.preventDefault(); ev.stopPropagation(); stopEdit();
   const p = D.pages[pi], now = Date.now(), dbl = lastDown.id === e.id && now - lastDown.t < 400; lastDown = ev.target.dataset.h ? {} : {id: e.id, t: now};
   if (dbl && !ev.target.dataset.h) {
-    if (e.type === 'text' && !e.locked) return startEdit(e);
+    if (e.type === 'text' && !e.locked) return startEdit(e, {x: ev.clientX, y: ev.clientY});
+    if (e.chart) { sel = [e.id]; return openCtx('chart'); }
     if (e.type === 'image') { sel = [e.id]; return openCtx('crop'); }
     if (e.name?.includes('Foto')) { sel = [e.id]; return $('#file').click(); }
   }
@@ -434,7 +486,8 @@ function moveDrag(ev, p, pg) {
   const els = selected().filter(e => !e.locked); if (!els.length) return;
   snap(); const sx = ev.clientX, sy = ev.clientY, orig = els.map(e => ({e, x: e.x, y: e.y})), b0 = bbox(els), T = 6 / zoom;
   const others = p.elements.filter(o => !sel.includes(o.id) && !o.hidden);
-  const xs = [0, D.width / 2, D.width, ...others.flatMap(o => [o.x, o.x + o.w / 2, o.x + o.w])], ys = [0, D.height / 2, D.height, ...others.flatMap(o => [o.y, o.y + o.h / 2, o.y + o.h])];
+  const mg = Math.round(Math.min(D.width, D.height) * .05);
+  const xs = [0, mg, D.width / 2, D.width - mg, D.width, ...others.flatMap(o => [o.x, o.x + o.w / 2, o.x + o.w])], ys = [0, mg, D.height / 2, D.height - mg, D.height, ...others.flatMap(o => [o.y, o.y + o.h / 2, o.y + o.h])];
   let moved = false;
   const move = m => {
     let dx = (m.clientX - sx) / zoom, dy = (m.clientY - sy) / zoom; if (!moved && Math.hypot(dx, dy) < 2 / zoom) return; moved = true;
@@ -445,11 +498,12 @@ function moveDrag(ev, p, pg) {
       if (best) { dx += best.d; guide(pg, 'v', best.c); }
       best = null; for (const c of ys) for (const v of by) if (Math.abs(c - v) < T && (!best || Math.abs(c - v) < Math.abs(best.d))) best = {d: c - v, c};
       if (best) { dy += best.d; guide(pg, 'h', best.c); }
+      eqSpacing(pg, others, {x: b0.x + dx, y: b0.y + dy, w: b0.w, h: b0.h}, T, (ddx, ddy) => { dx += ddx; dy += ddy; });
     }
     for (const o of orig) { o.e.x = Math.round(o.x + dx); o.e.y = Math.round(o.y + dy); const n = pg.querySelector(`[data-id="${o.e.id}"]`); if (n) { n.style.left = o.e.x + 'px'; n.style.top = o.e.y + 'px'; } }
-    renderTool();
+    renderTool(); showTip(`X ${Math.round(b0.x + dx)} · Y ${Math.round(b0.y + dy)}`, m);
   };
-  const up = () => { removeEventListener('pointermove', move); removeEventListener('pointerup', up); pg.querySelectorAll('.guide').forEach(g => g.remove()); commit(); };
+  const up = () => { removeEventListener('pointermove', move); removeEventListener('pointerup', up); pg.querySelectorAll('.guide').forEach(g => g.remove()); hideTip(); commit(); };
   addEventListener('pointermove', move); addEventListener('pointerup', up);
 }
 function resizeDrag(ev, e, pg, h) {
@@ -464,6 +518,9 @@ function resizeDrag(ev, e, pg, h) {
     e.x = Math.round(ax < 0 ? o.x + o.w - e.w : o.x); e.y = Math.round(ay < 0 ? o.y + o.h - e.h : o.y);
     Object.assign(node.style, {left: e.x + 'px', top: e.y + 'px', width: e.w + 'px'});
     if (e.type === 'text') node.style.fontSize = e.fontSize + 'px'; else node.style.height = e.h + 'px';
+    if (SHP[e.type]) node.querySelector('.in').style.clipPath = cssShapeClip(e.type, e.w, e.h);
+    if (e.mask && SHP[e.mask]) { const cl = node.querySelector('.imgbox') || node.querySelector('.in'); if (cl) cl.style.clipPath = cssShapeClip(e.mask, e.w, e.h); }
+    const dl = node.querySelector('.dimlbl'); if (dl) dl.textContent = `${e.w} × ${e.type === 'text' ? node.offsetHeight : e.h}`;
     if (e.type === 'image') { const c = coverBox(e), im = node.querySelector('img'); Object.assign(im.style, {left: c.x + 'px', top: c.y + 'px', width: c.w + 'px', height: c.h + 'px'}); }
     showTip(`L ${e.w} × T ${e.type === 'text' ? node.offsetHeight : e.h}`, m); renderTool();
   };
@@ -497,9 +554,30 @@ function guide(pg, dir, pos) {
   const g = document.createElement('div'); g.className = 'guide';
   g.style.cssText = dir === 'v' ? `left:${pos}px;top:0;width:${1.5 / zoom}px;height:100%` : `top:${pos}px;left:0;height:${1.5 / zoom}px;width:100%`; pg.appendChild(g);
 }
-function startEdit(e) {
+// equal-gap snapping: when the moving box sits between two neighbours, snap so both gaps match and mark them
+function eqSpacing(pg, others, b, T, apply) {
+  const ov = (a0, a1, c0, c1) => a0 < c1 && a1 > c0;
+  for (const ax of ['x', 'y']) {
+    const [p, s, q, t] = ax === 'x' ? ['x', 'w', 'y', 'h'] : ['y', 'h', 'x', 'w'];
+    const row = others.filter(o => ov(o[q], o[q] + o[t], b[q], b[q] + b[t]));
+    const L = row.filter(o => o[p] + o[s] <= b[p] + T).sort((m, n) => (n[p] + n[s]) - (m[p] + m[s]))[0], Rn = row.filter(o => o[p] >= b[p] + b[s] - T).sort((m, n) => m[p] - n[p])[0];
+    if (!L || !Rn) continue;
+    const target = (L[p] + L[s] + Rn[p] - b[s]) / 2, d = target - b[p];
+    if (Math.abs(d) < T && target - (L[p] + L[s]) > 4) {
+      apply(ax === 'x' ? d : 0, ax === 'y' ? d : 0); const gap = Math.round(target - (L[p] + L[s])), mid = b[q] + b[t] / 2;
+      for (const [a0, a1] of [[L[p] + L[s], target], [target + b[s], Rn[p]]]) {
+        const g = document.createElement('div'); g.className = 'guide gap';
+        g.style.cssText = ax === 'x' ? `left:${a0}px;top:${mid}px;width:${a1 - a0}px;height:${1.5 / zoom}px` : `top:${a0}px;left:${mid}px;height:${a1 - a0}px;width:${1.5 / zoom}px`;
+        g.dataset.gap = gap; g.style.setProperty('--gz', 1 / zoom); pg.appendChild(g);
+      }
+    }
+  }
+}
+function startEdit(e, at) {
   sel = [e.id]; editing = e.id; render(); snap();
-  const n = $(`.el[data-id="${e.id}"]`); n.textContent = e.text; n.contentEditable = 'true'; n.focus(); getSelection().selectAllChildren(n);
+  const n = $(`.el[data-id="${e.id}"]`); n.textContent = e.text; n.contentEditable = 'true'; n.focus();
+  const r = at && (document.caretRangeFromPoint?.(at.x, at.y));
+  if (r && n.contains(r.startContainer)) { const s2 = getSelection(); s2.removeAllRanges(); s2.addRange(r); } else getSelection().selectAllChildren(n);
   n.oninput = () => { e.text = n.innerText; }; n.onblur = stopEdit;
   n.onkeydown = k => { if (k.key === 'Escape') { k.preventDefault(); k.stopPropagation(); n.blur(); } };
 }
@@ -584,10 +662,10 @@ function renderTool() {
   const txt = (id, label, ic, title = '') => `<button class="btn ghost" id="${id}"${title ? ` title="${title}"` : ''}>${ic ? icon(ic) : ''}${label}</button>`;
   const sep = '<span class="sep"></span>';
   const tail = x => `${sep}${btn('tOpB', 'opacity', 'Transparansi')}${btn('tLock', x.locked ? 'lock' : 'unlock', x.locked ? 'Buka kunci' : 'Kunci')}${btn('tMore', 'more', 'Lainnya')}`;
-  const anim = `<button class="btn ghost soon" id="tAnim" aria-disabled="true" title="Animasi — segera hadir">${icon('anim')}Animasi</button>`;
+  const anim = `<button class="btn ghost" id="tAnim" title="Animasi elemen">${icon('anim')}Animasi</button>`;
   if (!els.length) {
     h = `<button class="btn ghost" id="tBgMore" title="Warna latar halaman"><span class="swfill" style="background:${cssFill(page().bg)}"></span>Latar</button>${sep}
-      ${txt('tRz', 'Ubah ukuran', 'resize')}${sep}<span class="hint">Klik elemen untuk mengedit · Shift+klik untuk memilih beberapa · tarik di area kosong untuk memilih kotak</span>`;
+      ${txt('tRz', 'Ubah ukuran', 'resize')}${txt('tAnim', 'Animasi halaman', 'transition')}${txt('tStyle', 'Gaya', 'wand')}${sep}<span class="hint">Klik elemen untuk mengedit · Shift+klik untuk memilih beberapa · tarik di area kosong untuk memilih kotak</span>`;
   } else if (els.length > 1) {
     const grouped = els.every(x => x.group && x.group === els[0].group);
     h = `<span class="hint">${els.length} elemen</span>${sep}${txt('tGroup', grouped ? 'Pisahkan grup' : 'Grupkan', 'group')}${txt('tPos', 'Posisi', 'position')}${tail({locked: els.every(x => x.locked)})}`;
@@ -603,12 +681,12 @@ function renderTool() {
   } else if (e.type === 'image') {
     h = `${txt('tEditImg', 'Edit foto', 'adjust')}${txt('tCrop', 'Crop', 'crop')}${btn('tFlipH', 'flipH', 'Balik horizontal')}${btn('tFlipV', 'flipV', 'Balik vertikal')}
       <span class="hint">Sudut</span><input type="number" id="tRadius" value="${Math.round(e.radius || 0)}" min="0" aria-label="Sudut membulat">
-      ${sep}${txt('tFx', 'Efek', 'shadow', 'Bayangan')}${anim}${txt('tPos', 'Posisi', 'position')}${txt('tReplace', 'Ganti', 'upload')}${tail(e)}`;
+      ${e.chart ? txt('tChart', 'Edit grafik', 'gauge') : txt('tMask', 'Bingkai', 'shapes')}${sep}${txt('tFx', 'Efek', 'shadow', 'Bayangan')}${anim}${txt('tPos', 'Posisi', 'position')}${txt('tReplace', 'Ganti', 'upload')}${tail(e)}`;
   } else {
     h = `<button class="btn ghost" id="tFill" title="Warna isi" aria-label="Warna isi"><span class="swfill" style="background:${cssFill(e.fill)}"></span></button>
       ${e.type === 'rect' || e.type === 'ellipse' ? `<span class="hint">Garis</span><input type="color" id="tStroke" value="${hex(e.stroke)}" title="Warna garis"><input type="number" id="tStrokeW" value="${e.stroke ? e.strokeW || 4 : 0}" min="0" title="Tebal garis" aria-label="Tebal garis">` : ''}
       ${e.type === 'rect' ? `<span class="hint">Sudut</span><input type="number" id="tRadius" value="${Math.round(Math.min(e.radius || 0, 9999))}" min="0" aria-label="Sudut membulat">` : ''}
-      ${e.name?.includes('Foto') ? txt('tReplace', 'Isi foto', 'image') : ''}
+      ${e.name?.includes('Foto') ? txt('tReplace', 'Isi foto', 'image') + txt('tMask', 'Bingkai', 'shapes') : ''}
       ${btn('tFlipH', 'flipH', 'Balik horizontal')}${sep}${txt('tFx', 'Efek', 'shadow', 'Bayangan')}${anim}${txt('tPos', 'Posisi', 'position')}${tail(e)}`;
   }
   t.innerHTML = tb(h);
@@ -616,8 +694,8 @@ function renderTool() {
   on('tBgMore', 'onclick', () => openCtx('bgfill')); on('tRz', 'onclick', openResize);
   on('tGroup', 'onclick', groupToggle); on('tPos', 'onclick', () => openCtx('pos')); on('tFx', 'onclick', () => openCtx('fx'));
   on('tEditImg', 'onclick', () => openCtx('photo')); on('tCrop', 'onclick', () => openCtx('crop')); on('tFill', 'onclick', () => openCtx('fill')); on('tColor', 'onclick', () => openCtx('tcolor'));
-  on('tReplace', 'onclick', () => $('#file').click()); on('tLock', 'onclick', lockToggle);
-  on('tAnim', 'onclick', () => Studio.toast('Animasi segera hadir.'));
+  on('tReplace', 'onclick', () => $('#file').click()); on('tChart', 'onclick', () => openCtx('chart')); on('tMask', 'onclick', () => openCtx('mask')); on('tLock', 'onclick', lockToggle);
+  on('tAnim', 'onclick', () => openCtx('anim')); on('tStyle', 'onclick', () => openRail('style'));
   on('tMore', 'onclick', ev => { const q = ev.currentTarget.getBoundingClientRect(); openMenu(q.left, q.bottom + 4); });
   on('tOpB', 'onclick', ev => openPop(ev.currentTarget, () => { const v = Math.round((selected()[0]?.opacity ?? 1) * 100);
     return `<label class="field"><span>Transparansi <b class="mono" id="opV">${v}</b></span><input type="range" id="popOp" min="0" max="100" value="${v}"></label>`; },
@@ -716,57 +794,11 @@ function openRail(r, keepScroll) {
   rail = r; ctx = null; showSide(); $('#sideBack').hidden = true;
   $$('#rail button').forEach(b => b.classList.toggle('on', b.dataset.r === r));
   const B = $('#sideBody'), sc = B.scrollTop; B.innerHTML = ''; B.classList.remove('searching'); const T = (s) => $('#sideTitle').textContent = s;
-  if (r === 'tpl') {
-    T('Desain');
-    B.insertAdjacentHTML('beforeend', `<div class="label">Template ${esc(SIZES[D.kind]?.label || 'ukuran ini')}</div><div class="tiles masonry" id="tt" data-sec data-lim="4"></div>
-      <div class="label">Mulai desain baru</div><div class="tiles masonry" id="sz" data-sec data-lim="4"></div>`);
-    for (const [pn, p] of Object.entries(PALETTES)) {
-      const t = makeDesign(D.kind || 'square', pn);
-      const pv = document.createElement('canvas'); renderPageTo(pv, t.pages[0], 150 / t.width, t);
-      const b = tile('', null, () => applyTemplate(pn), `Template palet ${pn} — ganti halaman aktif (bisa diurungkan)`); b.style.aspectRatio = `${t.width}/${t.height}`; b.appendChild(pv); pv.style.width = '100%';
-      b.insertAdjacentHTML('beforeend', `<span class="cap">${pn}</span>`); $('#tt').appendChild(named(b, `template ${pn}`));
-    }
-    for (const [k, z] of Object.entries(SIZES)) {
-      const m = 64 / Math.max(z.w, z.h), b = tile(`<i style="width:${Math.round(z.w * m)}px;height:${Math.round(z.h * m)}px"></i><span>${z.label}</span><small class="mono">${z.w}×${z.h}</small>`, null, () => newDesign(k), `Desain baru: ${z.label}`);
-      b.classList.add('sizecard'); $('#sz').appendChild(named(b, `${z.label} ukuran desain baru`));
-    }
-    searchBox(B, 'Cari template atau ukuran');
-  } else if (r === 'el') {
-    T('Elemen');
-    B.insertAdjacentHTML('beforeend', `<div class="label">Bentuk & garis</div><div class="tiles three" id="sh" data-sec data-lim="6"></div><div class="label">Bingkai foto</div><div class="tiles three" id="fr" data-sec></div><div class="label">Gradien</div><div class="tiles three" id="gr" data-sec data-lim="3"></div>`);
-    const prev = {rect: 'background:#2F5D8A;width:60%;height:60%', round: 'background:#36C5B1;width:70%;height:42%;border-radius:10px', pill: 'background:#E8B02A;width:76%;height:30%;border-radius:99px',
-      ellipse: 'background:#D95D39;width:60%;height:60%;border-radius:50%', triangle: 'background:#2F8F5B;width:60%;height:52%;clip-path:polygon(50% 0,100% 100%,0 100%)',
-      star: `background:#F4C95D;width:62%;height:62%;clip-path:polygon(${POLY.star.map(([a, b]) => `${a * 100}% ${b * 100}%`).join(',')})`, line: 'background:#3a3d46;width:72%;height:4px', frame: 'border:3px solid #3a3d46;width:60%;height:60%'};
-    const NM = {rect: 'Kotak persegi', round: 'Kotak sudut bulat', pill: 'Pil tombol', ellipse: 'Lingkaran elips', triangle: 'Segitiga', star: 'Bintang', line: 'Garis', frame: 'Bingkai garis tepi'};
-    for (const k of Object.keys(prev)) $('#sh').appendChild(named(tile(`<i style="display:block;${prev[k]}"></i>`, {preset: k}, () => add(PRESETS[k]()), NM[k]), NM[k] + ' bentuk'));
-    $('#fr').appendChild(named(tile(`<i style="display:block;background:#C9CCD6;width:64%;height:64%;border-radius:6px"></i><span class="cap">Foto</span>`, {preset: 'photo'}, () => add(PRESETS.photo()), 'Bingkai foto'), 'Bingkai foto kotak'));
-    $('#fr').appendChild(named(tile(`<i style="display:block;background:#C9CCD6;width:64%;height:64%;border-radius:50%"></i><span class="cap">Lingkaran</span>`, null, () => add({...PRESETS.photo(), radius: 9999}), 'Bingkai foto lingkaran'), 'Bingkai foto lingkaran'));
-    for (const g of GRADS) $('#gr').appendChild(named(tile(`<i style="display:block;width:70%;height:70%;border-radius:8px;background:linear-gradient(135deg,${g[0]},${g[1]})"></i>`, null, () => add({...PRESETS.rect(), fill: {g: 'linear', a: 135, c: [...g]}}), 'Gradien'), 'Gradien warna'));
-    searchBox(B, 'Cari elemen');
-  } else if (r === 'txt') {
-    T('Teks');
-    B.insertAdjacentHTML('beforeend', `<button class="btn primary bigbtn" id="addBox" data-name="tambah kotak teks">${icon('text')} Tambah kotak teks</button><div class="label">Gaya teks default</div><div id="dt" style="display:grid;gap:8px" data-sec></div>`);
-    $('#addBox').onclick = () => startEdit(add({...PRESETS.body(), text: 'Teks Anda'}));
-    for (const [k, l, st] of [['heading', 'Tambahkan judul', 'font:800 24px var(--f-display)'], ['sub', 'Tambahkan subjudul', 'font:700 17px var(--f-body)'], ['body', 'Tambahkan sedikit teks isi', 'font:400 13px var(--f-body)']]) {
-      const b = document.createElement('button'); b.className = 'addtext'; b.innerHTML = `<span style="${st}">${l}</span>`; b.draggable = true;
-      b.ondragstart = ev => ev.dataTransfer.setData('text/plain', JSON.stringify({preset: k})); b.onclick = () => startEdit(add(PRESETS[k]())); b.dataset.name = l + ' teks'; $('#dt').appendChild(b);
-    }
-    B.insertAdjacentHTML('beforeend', '<div class="label">Kombinasi font</div><div class="tiles" id="fc" data-sec data-lim="4"></div><div class="label">Efek teks</div><div class="tiles" id="ts" data-sec data-lim="4"></div>');
-    for (const [a, b, c] of [['Bebas Neue', 'Roboto', '#2F5D8A'], ['Playfair Display', 'Montserrat', '#7A4A2A'], ['Bricolage Grotesque', 'Plus Jakarta Sans', '#1D1604'], ['Pacifico', 'Poppins', '#D95D39'], ['DM Serif Display', 'Lora', '#2A1B3D'], ['Oswald', 'Lora', '#13301F']]) {
-      const x = document.createElement('button'); x.className = 'fcard'; x.title = `${a} + ${b}`;
-      x.dataset.name = `${a} ${b} kombinasi font`; x.innerHTML = `<div style="font-family:'${a}';font-size:22px;line-height:1.1;color:${c}">${a.split(' ')[0]}</div><div style="font-family:'${b}';font-size:11px;color:var(--muted)">dengan ${b}</div>`;
-      x.onclick = () => { const g = uid(); snap(); const h = {...PRESETS.heading(), font: a, group: g}; h.x = Math.round((D.width - h.w) / 2); h.y = Math.round(D.height * .38);
-        const s2 = {...PRESETS.body(), font: b, group: g}; s2.x = Math.round((D.width - s2.w) / 2); s2.y = h.y + h.fontSize * 1.5;
-        for (const e of [h, s2]) { e.id = uid(); e.rot = 0; e.opacity = 1; page().elements.push(e); } sel = [h.id, s2.id]; commit(); };
-      $('#fc').appendChild(x);
-    }
-    const styles = [['Neon', {color: '#FFFFFF', effect: 'neon', fx: {color: '#FF4FD8', size: 10}, font: 'Bebas Neue'}, 'text-shadow:0 0 6px #FF4FD8,0 0 14px #FF4FD8;font-family:Bebas Neue'],
-      ['Outline', {color: '#FFFFFF', effect: 'outline', fx: {color: '#111111', size: 10}, font: 'Archivo Black'}, '-webkit-text-stroke:3px #111;paint-order:stroke fill;font-family:Archivo Black'],
-      ['Label', {color: '#1D1604', effect: 'background', fx: {color: '#E8B02A', size: 14}, font: 'Plus Jakarta Sans', bold: true}, 'background:#E8B02A;color:#1D1604;padding:2px 6px;border-radius:4px'],
-      ['Hollow', {color: '#FFFFFF', effect: 'hollow', fx: {size: 6}, font: 'Bricolage Grotesque', bold: true}, 'color:transparent;-webkit-text-stroke:1.5px #fff;font-family:Bricolage Grotesque;font-weight:800']];
-    for (const [n, o, css] of styles) { const t = named(tile(`<span style="font-size:24px;${css}">${n}</span>`, null, () => add({...PRESETS.heading(), ...o, text: n.toUpperCase()}), n), n + ' gaya teks efek'); t.style.cssText = 'background:#2a2c33;border-color:#2a2c33;color:#fff;aspect-ratio:1.25'; $('#ts').appendChild(t); }
-    searchBox(B, 'Cari teks atau font');
-  } else if (r === 'up') {
+  if (r === 'tpl') { T('Desain'); panelTemplates(B); }
+  else if (r === 'el') { T('Elemen'); panelElements(B); }
+  else if (r === 'txt') { T('Teks'); panelText(B); }
+  else if (r === 'style') { T('Gaya'); panelStyles(B); }
+  else if (r === 'up') {
     T('Upload');
     B.insertAdjacentHTML('beforeend', `<button class="btn primary bigbtn" id="upBtn" data-name="upload file">${icon('upload')} Upload file</button>
       <p style="margin:0;color:var(--muted)">Bisa juga seret file ke canvas atau tempel (Ctrl+V).</p><div class="label">Upload terakhir</div><div class="tiles masonry" id="ul" data-sec data-lim="6"></div>`);
@@ -775,18 +807,7 @@ function openRail(r, keepScroll) {
     uploads.forEach((u, i) => $('#ul').appendChild(named(tile(`<img src="${u.src}" alt="">`, u, () => placeImage(u.src, u.ar), `Upload ${i + 1}`), `upload gambar ${i + 1}`)));
     uploads.forEach((u, i) => { const t = $('#ul').children[i]; if (t) t.style.aspectRatio = String(u.ar || 1); });
     searchBox(B, 'Cari upload');
-  } else if (r === 'pc') {
-    T('Foto');
-    B.insertAdjacentHTML('beforeend', `<div class="label">${Studio.connected ? 'Foto di komputer' : 'Gambar contoh'}</div><div class="tiles masonry" id="pc" data-sec data-lim="6"></div>`);
-    if (!Studio.connected) {
-      B.insertAdjacentHTML('afterbegin', `<p style="margin:0;color:var(--muted)">Foto di komputer Anda muncul di sini setelah Studio terhubung (jalankan <span class="mono">creative-mcp studio</span>). Di bawah ini gambar contoh buatan Studio, bukan foto stok.</p>`);
-      [['Pantai', '#36C5B1', '#1F6FB2', 720, 540], ['Kopi', '#7A4A2A', '#E8B02A', 540, 720], ['Senja', '#FF8C5A', '#2A1B3D', 720, 540], ['Daun', '#2F8F5B', '#EAF5EC', 600, 600], ['Kota', '#545454', '#B48CFF', 540, 720], ['Pasar', '#D95D39', '#F4C95D', 720, 480], ['Sawah', '#2F8F5B', '#F4C95D', 720, 540], ['Malam', '#2A1B3D', '#1F6FB2', 540, 720]].forEach(([n, a, b, w, h]) => {
-        const src = demoImage(n, a, b, w, h), t = tile(`<img src="${src}" alt="${n}"><span class="cap">Contoh</span>`, {src, ar: w / h}, () => placeImage(src, w / h), n); t.style.aspectRatio = `${w}/${h}`; $('#pc').appendChild(named(t, n + ' foto contoh'));
-      });
-    } else Studio.api('/api/library').then(lib => { lib.filter(i => i.type === 'photo').slice(0, 150).forEach(i => {
-      const src = 'path:' + i.path; $('#pc').appendChild(named(tile(`<img loading="lazy" src="${Studio.mediaUrl(i.path)}" alt="">`, {src, ar: 1}, () => placeImage(src, 1), i.name), i.name || 'foto'));
-    }); if (rail === 'pc' && !ctx) sections(B); }).catch(err => Studio.toast(err.message));
-    searchBox(B, 'Cari foto');
+  } else if (r === 'pc') { T('Foto'); panelPhotos(B);
   } else if (r === 'bg') { T('Latar'); fillEditor(B, () => page().bg, v => page().bg = v); searchBox(B, 'Cari warna (mis. #E8B02A)'); }
   else if (r === 'brand') {
     T('Merek');
@@ -825,7 +846,10 @@ function renderCtx() {
   const B = $('#sideBody'), e = one(), els = selected(), T = s => $('#sideTitle').textContent = s; B.innerHTML = ''; B.classList.remove('searching'); $('#sideBack').hidden = false;
   $$('#rail button').forEach(b => b.classList.remove('on'));
   if (ctx === 'bgfill') { T('Warna latar'); return fillEditor(B, () => page().bg, v => page().bg = v); }
+  if (ctx === 'anim') return panelAnim(B, T);
   if (!els.length) { ctx = null; return openRail(rail); }
+  if (ctx === 'chart' && e?.chart) return panelChart(B, T, e);
+  if (ctx === 'mask' && e) return panelMask(B, T, e);
   if (ctx === 'fill') { T('Warna isi'); return fillEditor(B, () => e?.fill, v => { for (const x of selected()) x.fill = v; }, {none: true}); }
   if (ctx === 'tcolor') { T('Warna teks'); return fillEditor(B, () => e?.color || '#000000', v => { for (const x of selected()) if (x.type === 'text') x.color = v; }, {solid: true}); }
   if (ctx === 'pos') {
@@ -873,6 +897,7 @@ function renderCtx() {
     for (const [n, f] of Object.entries(FILTERS)) { const t = tile(`<img src="${imgSrc(e.src)}" alt="" style="filter:${cssFilter(f)}"><span class="cap">${n}</span>`, null, () => setAll(x => x.adj = {...ADJ0, ...f})); $('#flt').appendChild(t); }
     B.querySelectorAll('[data-k]').forEach(i => bindInput(i, v => { for (const x of selected()) x.adj = {...ADJ0, ...x.adj, [i.dataset.k]: v}; }));
     $('#adjReset').onclick = () => setAll(x => x.adj = {...ADJ0});
+    photoExtras(B, e);
   } else if (ctx === 'crop' && e?.type === 'image') {
     T('Crop');
     const c = {zoom: 1, ox: 0, oy: 0, ...e.crop};
@@ -1017,7 +1042,7 @@ addEventListener('keydown', ev => {
   else if (c && (ev.key === '=' || ev.key === '+')) { ev.preventDefault(); setZoom(zoom * 1.2); }
   else if (c && ev.key === '-') { ev.preventDefault(); setZoom(zoom / 1.2); }
 });
-$('#work').addEventListener('wheel', ev => { if (ev.ctrlKey || ev.metaKey) { ev.preventDefault(); setZoom(zoom * (ev.deltaY < 0 ? 1.1 : 1 / 1.1)); } }, {passive: false});
+$('#work').addEventListener('wheel', ev => { if (ev.ctrlKey || ev.metaKey) { ev.preventDefault(); wheelZoom(ev); } }, {passive: false});
 $('#work').addEventListener('pointerdown', ev => { if (ev.target === $('#work') || ev.target === $('#pages')) { stopEdit(); if (sel.length) { sel = []; render(); } } });
 
 // ---------- drawing pages to canvas (export, thumbnails, previews) ----------
@@ -1035,7 +1060,7 @@ function wrapLines(x, text, maxW) {
 function renderPageTo(canvas, p, k = 1, doc = D, {transparent = false} = {}) { // synchronous version for previews (images drawn when cached)
   canvas.width = Math.max(1, Math.round(doc.width * k)); canvas.height = Math.max(1, Math.round(doc.height * k));
   const x = canvas.getContext('2d'); x.scale(k, k); if (!transparent) { x.fillStyle = canvasFill(x, p.bg, doc.width, doc.height); x.fillRect(0, 0, doc.width, doc.height); }
-  for (const e of p.elements) if (!e.hidden) drawEl(x, e, k, null);
+  for (const e of p.elements) if (!e.hidden) drawEl(x, e, k, e.type === 'image' ? readyImg(imgSrc(e.src), () => queuePreviewRedraw()) : null);
   return canvas;
 }
 async function renderPage(p, k = 1, opts = {}) {
@@ -1051,17 +1076,20 @@ function drawEl(x, e, k, img) {
   x.save(); x.globalAlpha = e.opacity ?? 1;
   x.translate(e.x + e.w / 2, e.y + e.h / 2); x.rotate((e.rot || 0) * Math.PI / 180); x.scale(e.flipX ? -1 : 1, e.flipY ? -1 : 1); x.translate(-e.w / 2, -e.h / 2);
   if (e.shadow?.on && e.type !== 'text') { x.shadowColor = e.shadow.color; x.shadowBlur = e.shadow.blur * k; x.shadowOffsetX = e.shadow.x * k; x.shadowOffsetY = e.shadow.y * k; }
-  const path = () => { x.beginPath();
+  const mk = e.type === 'rect' || e.type === 'image' ? (e.mask && SHP[e.mask] ? e.mask : null) : SHP[e.type] ? e.type : null;
+  const path = () => { if (mk) { const p2 = new Path2D(shapePath(mk, e.w, e.h)); x.beginPath(); return p2; } x.beginPath();
     if (e.type === 'ellipse') x.ellipse(e.w / 2, e.h / 2, e.w / 2, e.h / 2, 0, 0, Math.PI * 2);
     else if (POLY[e.type]) POLY[e.type].forEach(([a, b], i) => i ? x.lineTo(a * e.w, b * e.h) : x.moveTo(a * e.w, b * e.h));
     else x.roundRect(0, 0, e.w, e.h, Math.min(e.radius || 0, e.w / 2, e.h / 2));
     x.closePath(); };
+  const rule = mk && SHP_EVENODD.has(mk) ? 'evenodd' : 'nonzero';
+  const fillP = () => { const p2 = path(); p2 ? x.fill(p2, rule) : x.fill(); }, clipP = () => { const p2 = path(); p2 ? x.clip(p2, rule) : x.clip(); };
   if (isShape(e)) {
-    path(); if (e.fill) { x.fillStyle = canvasFill(x, e.fill, e.w, e.h); x.fill(); }
-    if (e.stroke && (e.type === 'rect' || e.type === 'ellipse')) { x.shadowColor = 'transparent'; x.lineWidth = e.strokeW || 4; x.strokeStyle = e.stroke; x.save(); path(); x.clip(); x.lineWidth *= 2; x.stroke(); x.restore(); }
+    if (e.fill) { x.fillStyle = canvasFill(x, e.fill, e.w, e.h); fillP(); }
+    if (e.stroke && (e.type === 'rect' || e.type === 'ellipse')) { x.shadowColor = 'transparent'; x.lineWidth = e.strokeW || 4; x.strokeStyle = e.stroke; x.save(); clipP(); x.lineWidth *= 2; const p2 = path(); p2 ? x.stroke(p2) : x.stroke(); x.restore(); }
   } else if (e.type === 'image') {
-    if (e.shadow?.on) { path(); x.fillStyle = '#000'; x.fill(); x.shadowColor = 'transparent'; }
-    if (img) { path(); x.clip(); const c = coverBox({...e, ar: e.ar || img.width / img.height}); x.filter = cssFilter(e.adj, k); x.drawImage(img, c.x, c.y, c.w, c.h); x.filter = 'none'; }
+    if (e.shadow?.on && !/^data:image\/svg/.test(e.src || '')) { x.fillStyle = '#000'; fillP(); x.shadowColor = 'transparent'; }
+    if (img) { clipP(); const c = coverBox({...e, ar: e.ar || img.width / img.height}); x.filter = cssFilter(e.adj, k); x.drawImage(img, c.x, c.y, c.w, c.h); x.filter = 'none'; }
   } else if (e.type === 'text') {
     const f = {color: '#000000', size: 8, ...e.fx}, s = f.size, pad = e.effect === 'background' ? s : 0;
     if (e.effect === 'background') { x.fillStyle = f.color; x.beginPath(); x.roundRect(0, 0, e.w, e.h, s / 2); x.fill(); }
@@ -1228,10 +1256,11 @@ $('#gridX').onclick = closeGrid;
 
 // ---------- presentation ----------
 let presenting = false, slideTok = 0;
-async function showSlide() {
+async function showSlide(dir = 0) {
   const tok = ++slideTok, ov = $('#present'), k = Math.min(2, Math.max(.2, Math.min(screen.width / D.width, screen.height / D.height) * (devicePixelRatio || 1)));
-  const c = await renderPage(D.pages[cur], k); if (tok !== slideTok || !presenting) return;
-  ov.querySelector('canvas')?.remove(); ov.prepend(c); ov.querySelector('.pc').textContent = `${cur + 1} / ${D.pages.length} · ← → untuk pindah · Esc untuk keluar`;
+  const st = await buildStage(D.pages[cur], k); if (tok !== slideTok || !presenting) return;
+  ov.querySelectorAll('.stage').forEach(x => x.remove()); ov.prepend(st); ov.querySelector('.pc').textContent = `${cur + 1} / ${D.pages.length} · ← → untuk pindah · Esc untuk keluar`;
+  playTransition(st, D.pages[cur].trans, dir); playStage(st, D.pages[cur]);
 }
 async function present() {
   stopEdit(); closePop(); presenting = true; const ov = $('#present'); ov.hidden = false; showSlide();
@@ -1239,7 +1268,7 @@ async function present() {
   catch { Studio.toast('Layar penuh tidak diizinkan di sini, presentasi tampil di jendela. Tekan Esc untuk keluar.', 4000); }
 }
 function endPresent() { if (!presenting) return; presenting = false; $('#present').hidden = true; if (document.fullscreenElement) document.exitFullscreen().catch(() => {}); render(); }
-function slide(d) { const n = Math.max(0, Math.min(D.pages.length - 1, cur + d)); if (n !== cur) { cur = n; sel = []; showSlide(); } }
+function slide(d) { const n = Math.max(0, Math.min(D.pages.length - 1, cur + d)); if (n !== cur) { cur = n; sel = []; showSlide(d); } }
 $('#presentBtn').onclick = present;
 $('#present').onclick = ev => slide(ev.clientX < innerWidth / 3 ? -1 : 1);
 document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement && presenting) endPresent(); });
@@ -1260,7 +1289,7 @@ addEventListener('pointerdown', ev => {
   if (!$('#share').hidden && !ev.target.closest('#share, #shareBtn')) closeShare();
 }, true);
 addEventListener('resize', () => { closePop(); closeShare(); render(); });
-boot();
 </script>
+<script src="design-features.js"></script>
 </body>
 </html>
