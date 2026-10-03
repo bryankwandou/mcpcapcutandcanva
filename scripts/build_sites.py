@@ -13,9 +13,9 @@ for name, page in SITES.items():
     for f in ("studio.css", "studio.js", "features.html", "features.json"):
         shutil.copy(src / f, out / f)
     for f in src.glob(f"{page.split('.')[0]}-*.js"):  # page-specific helper scripts (e.g. video-rich.js)
-        shutil.copy(f, out / f.name)
+        (out / f.name).write_text(f.read_text(encoding="utf-8").replace(f"'{page}'", "'index.html'"), encoding="utf-8")
     # the editor itself is the site's home page
-    (out / "index.html").write_text((src / page).read_text(encoding="utf-8"), encoding="utf-8")
+    (out / "index.html").write_text((src / page).read_text(encoding="utf-8").replace(f"'{page}'", "'index.html'"), encoding="utf-8")
     (out / "vercel.json").write_text(json.dumps({"$schema": "https://openapi.vercel.sh/vercel.json", "framework": None,
                                                  "buildCommand": "", "installCommand": "", "outputDirectory": "."}, indent=2) + "\n")
     print("built", out)

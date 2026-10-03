@@ -53,7 +53,7 @@ function applyTemplatePages(tp) {
 }
 async function templateAsNew(tp) {
   const z = SIZES[tp.kind], d = {id: uid(), title: tp.t.title.slice(0, 40), kind: tp.kind, palette: D.palette || 'kunyit', width: z.w, height: z.h, pages: buildTemplate(tp, z.w, z.h), fonts: [], updated: Date.now()};
-  try { await Studio.saveDesign(d); Studio.go('design.html', {id: d.id}); } catch (err) { Studio.toast('Gagal membuat desain: ' + err.message, 5000); }
+  try { await Studio.saveDesign(d); Studio.go('index.html', {id: d.id}); } catch (err) { Studio.toast('Gagal membuat desain: ' + err.message, 5000); }
 }
 function useTemplate(tp) {
   const z = SIZES[tp.kind]; if (tp.kind === D.kind || (z.w === D.width && z.h === D.height)) return applyTemplatePages(tp);

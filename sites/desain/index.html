@@ -1164,7 +1164,7 @@ function openResize() {
     }
     Object.assign(d, {width: t.w, height: t.h, kind: t.kind}); return d; };
   q('#rzThis').onclick = () => { snap(); const d = scaled(D, target()); Object.assign(D, d); m.close(); fit(); commit(); };
-  q('#rzCopy').onclick = async () => { const t = target(), d = scaled(D, t); d.id = uid(); d.title = `${D.title} (${t.w}×${t.h})`; await Studio.saveDesign(d); m.close(); Studio.go('design.html', {id: d.id}); };
+  q('#rzCopy').onclick = async () => { const t = target(), d = scaled(D, t); d.id = uid(); d.title = `${D.title} (${t.w}×${t.h})`; await Studio.saveDesign(d); m.close(); Studio.go('index.html', {id: d.id}); };
 }
 async function sendCanva() {
   if (!Studio.connected) return Studio.modal(`<h3>Kirim ke Canva</h3><p>Fitur ini memakai akun Canva Anda lewat bridge di komputer. Jalankan <span class="mono">creative-mcp login</span> sekali, lalu buka Studio dengan <span class="mono">creative-mcp studio</span>.</p><p>Desain dikirim sebagai file PPTX dan menjadi desain Canva biasa yang semua elemennya bisa diedit.</p><div class="actions"><button class="btn primary" onclick="this.closest('.modal-back').remove()">Mengerti</button></div>`);
@@ -1187,11 +1187,11 @@ function newDesign(kind) {
     return;
   }
   const d = makeDesign(kind, D.palette || 'kunyit');
-  Studio.saveDesign(d).then(() => Studio.go('design.html', {id: d.id})).catch(err => Studio.toast('Gagal membuat desain: ' + err.message, 5000));
+  Studio.saveDesign(d).then(() => Studio.go('index.html', {id: d.id})).catch(err => Studio.toast('Gagal membuat desain: ' + err.message, 5000));
 }
 async function copyDesign() {
   const d = JSON.parse(JSON.stringify(D)); d.id = uid(); d.title = `${D.title} (salinan)`; d.updated = Date.now();
-  try { await Studio.saveDesign(d); Studio.toast('Salinan dibuat'); Studio.go('design.html', {id: d.id}); } catch (err) { Studio.toast('Gagal menyalin: ' + err.message, 5000); }
+  try { await Studio.saveDesign(d); Studio.toast('Salinan dibuat'); Studio.go('index.html', {id: d.id}); } catch (err) { Studio.toast('Gagal menyalin: ' + err.message, 5000); }
 }
 $('#fileBtn').onclick = ev => {
   if (!$('#cmenu').hidden && $('#cmenu').dataset.owner === 'file') return closeMenu();
