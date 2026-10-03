@@ -11,11 +11,19 @@ import {
 
 export type ChatRole = "user" | "assistant";
 
+export type MessageMeta = {
+  model?: string;
+  ms?: number;
+  kernelChars?: number;
+  error?: boolean;
+};
+
 export type ChatMessage = {
   id: string;
   role: ChatRole;
   content: string;
   createdAt: number;
+  meta?: MessageMeta;
 };
 
 export type Session = {
@@ -65,6 +73,8 @@ type State = {
   studioSection: number;
   inspectorOpen: boolean;
   pendingDraft: string;
+  paletteOpen: boolean;
+  kernelOpen: boolean;
   setHydrated: (v: boolean) => void;
   setView: (v: ViewId) => void;
   setLanguage: (v: LanguagePin) => void;
@@ -80,7 +90,10 @@ type State = {
   deleteSession: (id: string) => void;
   setPersona: (p: PersonaId) => void;
   appendMessage: (msg: ChatMessage) => void;
-  patchLastAssistant: (content: string) => void;
+  patchLastAssistant: (content: string, meta?: MessageMeta) => void;
+  dropLastExchange: () => string | null;
+  setPaletteOpen: (v: boolean) => void;
+  setKernelOpen: (v: boolean) => void;
   renameActive: (title: string) => void;
   setStudioQuery: (q: string) => void;
   setStudioSection: (n: number) => void;
@@ -108,6 +121,8 @@ export const useStation = create<State>()(
       studioSection: 1,
       inspectorOpen: true,
       pendingDraft: "",
+      paletteOpen: false,
+      kernelOpen: false,
       setHydrated: (v) => set({ hydrated: v }),
       setView: (view) => set({ view }),
       setLanguage: (language) => set({ language }),
@@ -163,14 +178,33 @@ export const useStation = create<State>()(
           }),
         });
       },
-      patchLastAssistant: (content) => {
+      setPaletteOpen: (paletteOpen) => set({ paletteOpen }),
+      setKernelOpen: (kernelOpen) => set({ kernelOpen }),
+      dropLastExchange: () => {
+        let prompt: string | null = null;
+        set({
+          sessions: get().sessions.map((s) => {
+            if (s.id !== get().activeSessionId) return s;
+            const messages = [...s.messages];
+            while (messages.length && messages[messages.length - 1]?.role === "assistant") messages.pop();
+            const last = messages[messages.length - 1];
+            if (last?.role === "user") {
+              prompt = last.content;
+              messages.pop();
+            }
+            return { ...s, messages, updatedAt: Date.now() };
+          }),
+        });
+        return prompt;
+      },
+      patchLastAssistant: (content, meta) => {
         set({
           sessions: get().sessions.map((s) => {
             if (s.id !== get().activeSessionId) return s;
             const messages = [...s.messages];
             for (let i = messages.length - 1; i >= 0; i--) {
               if (messages[i]?.role === "assistant") {
-                messages[i] = { ...messages[i], content };
+                messages[i] = { ...messages[i], content, meta: meta ? { ...messages[i].meta, ...meta } : messages[i].meta };
                 break;
               }
             }

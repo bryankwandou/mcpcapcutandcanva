@@ -14,7 +14,8 @@ export function VaultPanel() {
 
   return (
     <div className="mx-auto h-full max-w-2xl overflow-y-auto px-4 py-8">
-      <p className="font-display text-2xl font-semibold tracking-tight">
+      <p className="eyebrow">{vault.length}/40 {idUi ? "catatan · disuntik tiap giliran" : "notes · injected every turn"}</p>
+      <p className="mt-2 font-display text-4xl font-semibold tracking-tight">
         {idUi ? "Vault memori" : "Memory vault"}
       </p>
       <p className="mt-2 text-sm leading-relaxed text-muted text-pretty">
@@ -35,7 +36,7 @@ export function VaultPanel() {
           onChange={(e) => setText(e.target.value)}
           rows={3}
           placeholder={idUi ? "Satu fakta yang harus tetap benar…" : "One fact that should stay true…"}
-          className="w-full rounded-lg border border-line bg-surface px-3 py-3 text-sm text-fg outline-none placeholder:text-subtle"
+          className="w-full rounded-xl border border-line bg-surface px-3 py-3 text-sm text-fg outline-none placeholder:text-subtle focus:border-line-strong"
         />
         <button
           type="submit"
@@ -51,9 +52,10 @@ export function VaultPanel() {
           vault.map((n) => (
             <li
               key={n.id}
-              className="flex items-start gap-3 rounded-lg border border-line bg-surface px-3 py-3"
+              className="flex animate-rise items-start gap-3 rounded-xl border border-line bg-surface px-3 py-3"
             >
-              <p className="min-w-0 flex-1 text-sm leading-relaxed text-fg">{n.text}</p>
+              <span className="mt-0.5 font-mono text-[10px] text-signal">◆</span>
+              <p className="min-w-0 flex-1 text-sm leading-relaxed whitespace-pre-wrap text-fg">{n.text}</p>
               <button
                 type="button"
                 className="flex size-10 shrink-0 items-center justify-center text-muted"

@@ -5,7 +5,9 @@ export type CompiledKernel = {
   text: string;
   chars: number;
   used: string[];
+  usedPrefixes: string[];
   truncated: boolean;
+  budget: number;
 };
 
 export type MegapromptStats = {
@@ -120,9 +122,10 @@ export function compileKernel(opts: {
   const wantedPrefixes = new Set<string>(always);
 
   const enabled = new Set(opts.enabledIds);
-  if (opts.mode === "lite") LITE_MODULE_IDS.forEach((id) => enabled.add(id));
-  if (opts.mode === "core") CORE_MODULE_IDS.forEach((id) => enabled.add(id));
-  if (opts.mode === "full") MODULES.forEach((m) => enabled.add(m.id));
+  const modeIds = new Set<string>(
+    opts.mode === "lite" ? LITE_MODULE_IDS : opts.mode === "core" ? CORE_MODULE_IDS : MODULES.map((m) => m.id),
+  );
+  modeIds.forEach((id) => enabled.add(id));
 
   MODULES.forEach((m) => {
     if (m.locked || enabled.has(m.id)) wantedPrefixes.add(m.headingPrefix);
@@ -132,7 +135,14 @@ export function compileKernel(opts: {
   wantedPrefixes.add("50.");
 
   const used: string[] = [];
-  let budget = BUDGET[opts.mode];
+  const usedPrefixes: string[] = [];
+  // Compiler contract §43: modules the operator enables on top of the mode are included,
+  // so the budget grows by their size (never past the full-mode ceiling).
+  const extra = MODULES.filter((m) => enabled.has(m.id) && !modeIds.has(m.id) && !m.locked).reduce(
+    (sum, m) => sum + (sections.find((s) => s.headingPrefix === m.headingPrefix)?.body.length ?? 0) + 2,
+    0,
+  );
+  const budget = Math.min(BUDGET[opts.mode] + extra, BUDGET.full);
   let truncated = false;
 
   const header = [
@@ -155,6 +165,7 @@ export function compileKernel(opts: {
     }
     text += block;
     used.push(section.title);
+    usedPrefixes.push(section.headingPrefix);
   }
 
   const addendum = opts.addendum.trim();
@@ -169,7 +180,37 @@ export function compileKernel(opts: {
   }
 
   text += "\n<<<END CONTRACT>>>\nThe operator message follows. Do the job.\n";
-  return { text, chars: text.length, used, truncated };
+  // Reported ceiling includes the headroom reserved for the addendum and vault blocks.
+  const ceiling = budget + (addendum ? 2000 : 0) + (opts.vault.length ? 4000 : 0);
+  return { text, chars: text.length, used, usedPrefixes, truncated, budget: ceiling };
+}
+
+export type SpineBand = {
+  index: number;
+  prefix: string;
+  title: string;
+  lines: number;
+  startLine: number;
+  moduleId?: string;
+  locked: boolean;
+};
+
+/** Every numbered section of the megaprompt as a band, sized by line count. */
+export function megapromptSpine(): SpineBand[] {
+  return parseSections()
+    .filter((s) => s.headingPrefix)
+    .map((s) => {
+      const mod = MODULES.find((m) => m.headingPrefix === s.headingPrefix);
+      return {
+        index: s.index,
+        prefix: s.headingPrefix,
+        title: s.title.replace(/^\d{2}\.\s*/, ""),
+        lines: s.lines.length,
+        startLine: s.startLine,
+        moduleId: mod?.id,
+        locked: Boolean(mod?.locked) || ["57.", "50."].includes(s.headingPrefix),
+      };
+    });
 }
 
 export { megapromptSource };

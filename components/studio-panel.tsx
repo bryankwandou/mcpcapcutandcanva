@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { megapromptStats, megapromptText, parseSections } from "@/lib/megaprompt";
+import { KernelSpine } from "@/components/kernel-spine";
+import { megapromptSpine, megapromptStats, megapromptText, parseSections } from "@/lib/megaprompt";
 import { cn } from "@/lib/cn";
 import { useStation } from "@/lib/store";
 
@@ -22,6 +23,11 @@ export function StudioPanel() {
     ? sections.filter((s) => s.title.toLowerCase().includes(q) || s.body.toLowerCase().includes(q))
     : sections;
   const active = sections.find((s) => s.index === studioSection) ?? sections[0];
+  const bands = useMemo(() => megapromptSpine(), []);
+  const lit = useMemo(
+    () => new Set(q ? filtered.map((s) => s.headingPrefix).filter(Boolean) : [active?.headingPrefix ?? ""]),
+    [q, filtered, active],
+  );
 
   async function copy(which: "full" | "section") {
     const text = which === "full" ? megapromptText() : (active?.body ?? "");
@@ -66,6 +72,9 @@ export function StudioPanel() {
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col">
+        <div className="border-b border-line px-4 pt-3 pb-2">
+          <KernelSpine bands={bands} lit={lit} thickness={22} onPick={(b) => setStudioSection(b.index)} />
+        </div>
         <div className="flex flex-wrap items-center gap-2 border-b border-line px-3 py-2">
           <select
             className="h-10 max-w-full rounded-md border border-line bg-surface px-2 font-mono text-[11px] text-fg md:hidden"
@@ -99,9 +108,16 @@ export function StudioPanel() {
               const n = (active.startLine + i).toString();
               const hit = q && line.toLowerCase().includes(q);
               return (
-                <div key={i} className={cn("flex gap-4", hit && "bg-elevated")}>
+                <div key={i} className={cn("flex gap-4", hit && "bg-signal/10", line.startsWith("## ") && "text-accent")}>
                   <span className="w-10 shrink-0 select-none text-right text-subtle tabular-nums">{n}</span>
-                  <span className="min-w-0 whitespace-pre-wrap break-words text-fg">{line || " "}</span>
+                  <span
+                    className={cn(
+                      "min-w-0 whitespace-pre-wrap break-words",
+                      line.startsWith("#") ? "font-medium text-accent" : line.startsWith("- ") ? "text-fg/90" : "text-fg/80",
+                    )}
+                  >
+                    {line || " "}
+                  </span>
                 </div>
               );
             })}

@@ -1,22 +1,30 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import {
   BookOpen,
   Command,
+  Download,
   MessageSquare,
+  PanelRight,
   Plus,
+  ScanEye,
   ScrollText,
-  Settings2,
   SquareTerminal,
+  Trash2,
+  X,
 } from "lucide-react";
-import { getEngineStatus } from "@/lib/engine-status";
+import { AxiomGlyph, Lamp } from "@/components/axiom-mark";
+import { getEngineStatus, type EngineStatus } from "@/lib/engine-status";
 import { compileKernel, megapromptStats } from "@/lib/megaprompt";
 import { PERSONAS, type ViewId } from "@/lib/catalog";
 import { cn } from "@/lib/cn";
 import { useStation } from "@/lib/store";
 import { ChatPanel } from "./chat-panel";
+import { CommandPalette } from "./command-palette";
 import { Inspector } from "./inspector";
+import { KernelDialog } from "./kernel-dialog";
 import { PlaybooksPanel } from "./playbooks-panel";
 import { StudioPanel } from "./studio-panel";
 import { VaultPanel } from "./vault-panel";
@@ -40,21 +48,23 @@ export function StationShell() {
   const sessions = useStation((s) => s.sessions);
   const activeSessionId = useStation((s) => s.activeSessionId);
   const selectSession = useStation((s) => s.selectSession);
+  const deleteSession = useStation((s) => s.deleteSession);
   const newChat = useStation((s) => s.newChat);
   const compileMode = useStation((s) => s.compileMode);
   const enabledModules = useStation((s) => s.enabledModules);
   const addendum = useStation((s) => s.addendum);
   const vault = useStation((s) => s.vault);
-  const [engine, setEngine] = useState<boolean | null>(null);
+  const setPaletteOpen = useStation((s) => s.setPaletteOpen);
+  const setKernelOpen = useStation((s) => s.setKernelOpen);
+  const [engine, setEngine] = useState<EngineStatus | null>(null);
   const [railOpen, setRailOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [booted, setBooted] = useState(false);
 
   useEffect(() => {
     void Promise.resolve(useStation.persist.rehydrate()).then(() => setHydrated(true));
+    void getEngineStatus().then(setEngine);
   }, [setHydrated]);
-
-  useEffect(() => {
-    void getEngineStatus().then((r) => setEngine(r.ready));
-  }, []);
 
   const stats = useMemo(() => megapromptStats(), []);
   const session = sessions.find((s) => s.id === activeSessionId) ?? sessions[0];
@@ -71,42 +81,73 @@ export function StationShell() {
     [compileMode, enabledModules, session?.persona, language, vault, addendum],
   );
 
-  const id = language === "en" ? false : true;
+  const exportSession = useCallback(() => {
+    const s = useStation.getState();
+    const sess = s.sessions.find((x) => x.id === s.activeSessionId);
+    if (!sess) return;
+    const md = [
+      `# ${sess.title}`,
+      "",
+      `_AXIOM operator station · persona ${sess.persona} · ${new Date(sess.updatedAt).toISOString()}_`,
+      "",
+      ...sess.messages.flatMap((m) => [`### ${m.role === "user" ? "Operator" : "AXIOM"}`, "", m.content, ""]),
+    ].join("\n");
+    const url = URL.createObjectURL(new Blob([md], { type: "text/markdown" }));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `axiom-${sess.title.replace(/[^\w-]+/g, "-").slice(0, 40) || "session"}.md`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, []);
 
-  if (!hydrated) {
-    return (
-      <div className="flex min-h-dvh items-center justify-center bg-bg">
-        <p className="font-display text-sm tracking-[0.22em] text-muted">AXIOM</p>
-      </div>
-    );
+  const id = language !== "en";
+
+  if (!hydrated || !booted) {
+    return <BootScreen ready={hydrated} engine={engine} lines={stats.lines} sections={stats.sections} kernelChars={kernel.chars} mode={compileMode} onDone={() => setBooted(true)} />;
   }
 
+  const title =
+    view === "chat"
+      ? session?.title
+      : view === "studio"
+        ? id
+          ? "Studio megaprompt"
+          : "Megaprompt studio"
+        : view === "vault"
+          ? id
+            ? "Vault memori"
+            : "Memory vault"
+          : id
+            ? "Playbook"
+            : "Playbooks";
+
   return (
-    <div className="flex h-dvh overflow-hidden bg-bg text-fg">
+    <div className="flex h-dvh animate-fade overflow-hidden bg-bg text-fg">
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-30 flex w-[17.5rem] flex-col border-r border-line bg-surface transition-transform duration-200 md:static md:translate-x-0",
+          "fixed inset-y-0 left-0 z-40 flex w-[17rem] flex-col border-r border-line bg-surface transition-transform duration-200 md:static md:translate-x-0",
           railOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0",
         )}
       >
-        <div className="flex items-center gap-3 px-4 pt-5 pb-4">
-          <div className="flex size-9 items-center justify-center rounded-lg border border-line-strong bg-elevated">
-            <span className="font-display text-sm font-semibold tracking-tight">A</span>
-          </div>
-          <div className="min-w-0">
-            <p className="font-display text-[15px] font-semibold leading-none tracking-tight">AXIOM</p>
-            <p className="mt-1 font-mono text-[10px] tracking-[0.18em] text-muted uppercase">
-              Operator station
-            </p>
-          </div>
-        </div>
+        <Link href="/" className="flex items-center gap-3 px-4 pt-5 pb-4">
+          <span className="flex size-9 items-center justify-center rounded-[10px] border border-line-strong bg-gradient-to-b from-elevated to-inset text-accent">
+            <AxiomGlyph className="size-5" />
+          </span>
+          <span className="min-w-0">
+            <span className="block font-display text-[19px] leading-none font-semibold tracking-[0.16em]">AXIOM</span>
+            <span className="mt-1 block font-mono text-[9.5px] tracking-[0.2em] text-subtle uppercase">Operator station</span>
+          </span>
+        </Link>
 
         <button
           type="button"
-          onClick={newChat}
-          className="mx-3 mb-3 flex h-11 items-center justify-center gap-2 rounded-lg bg-accent text-sm font-medium text-accent-fg"
+          onClick={() => {
+            newChat();
+            setRailOpen(false);
+          }}
+          className="mx-3 mb-3 flex h-10 items-center justify-center gap-2 rounded-lg bg-accent text-sm font-medium text-accent-fg transition-opacity hover:opacity-90"
         >
-          <Plus className="size-4" strokeWidth={1.75} />
+          <Plus className="size-4" strokeWidth={2} />
           {id ? "Sesi baru" : "New session"}
         </button>
 
@@ -123,8 +164,8 @@ export function StationShell() {
                   setRailOpen(false);
                 }}
                 className={cn(
-                  "flex h-14 flex-col items-center justify-center gap-1 rounded-md text-[10px] tracking-wide uppercase",
-                  on ? "bg-elevated text-fg" : "text-muted hover:text-fg",
+                  "flex h-14 flex-col items-center justify-center gap-1 rounded-lg text-[9.5px] tracking-wider uppercase transition-colors",
+                  on ? "bg-elevated text-fg" : "text-muted hover:bg-elevated/50 hover:text-fg",
                 )}
               >
                 <Icon className="size-4" strokeWidth={1.6} />
@@ -134,60 +175,67 @@ export function StationShell() {
           })}
         </nav>
 
-        <p className="mt-5 px-4 font-mono text-[10px] tracking-[0.16em] text-subtle uppercase">
-          {id ? "Sesi" : "Sessions"}
-        </p>
+        <p className="eyebrow mt-6 px-4">{id ? "Sesi" : "Sessions"}</p>
         <div className="mt-2 min-h-0 flex-1 overflow-y-auto px-2 pb-4">
           {sessions.map((s) => (
-            <button
+            <div
               key={s.id}
-              type="button"
-              onClick={() => {
-                selectSession(s.id);
-                setRailOpen(false);
-              }}
               className={cn(
-                "mb-0.5 flex w-full flex-col rounded-md px-2.5 py-2 text-left",
-                s.id === activeSessionId ? "bg-elevated" : "hover:bg-elevated/60",
+                "group mb-0.5 flex items-center rounded-lg",
+                s.id === activeSessionId ? "bg-elevated" : "hover:bg-elevated/50",
               )}
             >
-              <span className="truncate text-[13px] text-fg">{s.title}</span>
-              <span className="mt-0.5 font-mono text-[10px] text-subtle">
-                {PERSONAS.find((p) => p.id === s.persona)?.name} · {s.messages.length}
-              </span>
-            </button>
+              <button
+                type="button"
+                onClick={() => {
+                  selectSession(s.id);
+                  setRailOpen(false);
+                }}
+                className="flex min-w-0 flex-1 flex-col px-2.5 py-2 text-left"
+              >
+                <span className="truncate text-[13px] text-fg">{s.title}</span>
+                <span className="mt-0.5 font-mono text-[10px] text-subtle">
+                  {PERSONAS.find((p) => p.id === s.persona)?.name} · {s.messages.length} msg
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => deleteSession(s.id)}
+                className="mr-1 flex size-8 shrink-0 items-center justify-center rounded-md text-subtle opacity-0 group-hover:opacity-100 hover:text-danger"
+                aria-label={id ? "Hapus sesi" : "Delete session"}
+              >
+                <Trash2 className="size-3.5" />
+              </button>
+            </div>
           ))}
         </div>
 
-        <div className="border-t border-line px-4 py-3">
-          <div className="flex items-center justify-between gap-2">
-            <span className="flex items-center gap-2 font-mono text-[10px] tracking-[0.14em] text-muted uppercase">
-              <span
-                className={cn(
-                  "size-1.5 rounded-full",
-                  engine ? "bg-signal" : engine === false ? "bg-warn" : "bg-subtle",
-                )}
-              />
-              {engine ? "Engine live" : engine === false ? "Demo mode" : "…"}
+        <div className="space-y-2 border-t border-line px-4 py-3">
+          <button
+            type="button"
+            onClick={() => setPaletteOpen(true)}
+            className="flex w-full items-center gap-2 rounded-lg border border-line px-2.5 py-2 text-xs text-muted hover:border-line-strong hover:text-fg"
+          >
+            <Command className="size-3.5" />
+            {id ? "Palet perintah" : "Command palette"}
+            <span className="kbd ml-auto">⌘K</span>
+          </button>
+          <div className="flex items-center justify-between gap-2 font-mono text-[10px] tracking-[0.12em] text-muted uppercase">
+            <span className="flex items-center gap-2">
+              <Lamp tone={engine?.ready ? "signal" : engine ? "warn" : "off"} live={!engine} />
+              {engine?.ready ? "Engine live" : engine ? "Demo mode" : "…"}
             </span>
-            <span className="font-mono text-[10px] text-subtle tabular-nums">
-              {stats.lines.toLocaleString()} ln
-            </span>
+            <span className="text-subtle tabular-nums">{stats.lines.toLocaleString()} ln</span>
           </div>
         </div>
       </aside>
 
       {railOpen ? (
-        <button
-          type="button"
-          aria-label="Close menu"
-          className="fixed inset-0 z-20 bg-bg/60 md:hidden"
-          onClick={() => setRailOpen(false)}
-        />
+        <button type="button" aria-label="Close menu" className="fixed inset-0 z-30 bg-bg/60 md:hidden" onClick={() => setRailOpen(false)} />
       ) : null}
 
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-        <header className="flex h-14 items-center gap-2 border-b border-line px-3 md:px-5">
+        <header className="flex h-14 shrink-0 items-center gap-2 border-b border-line px-3 md:px-5">
           <button
             type="button"
             className="flex size-10 items-center justify-center rounded-md text-muted md:hidden"
@@ -197,63 +245,162 @@ export function StationShell() {
             <Command className="size-5" />
           </button>
           <div className="min-w-0 flex-1">
-            <p className="truncate font-display text-sm font-semibold tracking-tight">
-              {view === "chat"
-                ? session?.title
-                : view === "studio"
-                  ? id
-                    ? "Studio megaprompt"
-                    : "Megaprompt studio"
-                  : view === "vault"
-                    ? id
-                      ? "Vault memori"
-                      : "Memory vault"
-                    : id
-                      ? "Playbook"
-                      : "Playbooks"}
-            </p>
-            <p className="truncate font-mono text-[10px] text-subtle">
-              kernel {kernel.chars.toLocaleString()}c
-              {kernel.truncated ? " · truncated" : ""} · {compileMode}
+            <p className="truncate text-sm font-medium tracking-tight">{title}</p>
+            <p className="truncate font-mono text-[10px] text-subtle tabular-nums">
+              kernel {kernel.chars.toLocaleString()}c · {kernel.used.length} §{kernel.truncated ? " · truncated" : ""} · {compileMode}
             </p>
           </div>
-          <div className="flex items-center gap-1">
-            {(["auto", "id", "en"] as const).map((pin) => (
-              <button
-                key={pin}
-                type="button"
-                onClick={() => setLanguage(pin)}
-                className={cn(
-                  "h-8 rounded-md px-2 font-mono text-[10px] tracking-wider uppercase",
-                  language === pin ? "bg-elevated text-fg" : "text-muted",
-                )}
-              >
-                {pin}
-              </button>
-            ))}
-            <button
-              type="button"
-              onClick={() => setInspectorOpen(!inspectorOpen)}
-              className="ml-1 hidden size-10 items-center justify-center rounded-md text-muted lg:flex"
-              aria-label="Inspector"
+          <div className="flex items-center gap-0.5">
+            <div className="mr-1 hidden items-center rounded-lg bg-inset p-0.5 sm:flex">
+              {(["auto", "id", "en"] as const).map((pin) => (
+                <button
+                  key={pin}
+                  type="button"
+                  onClick={() => setLanguage(pin)}
+                  className={cn(
+                    "h-7 rounded-md px-2 font-mono text-[10px] tracking-wider uppercase",
+                    language === pin ? "bg-elevated text-fg" : "text-subtle hover:text-fg",
+                  )}
+                >
+                  {pin}
+                </button>
+              ))}
+            </div>
+            <HeaderButton label={id ? "Lihat kernel" : "View kernel"} onClick={() => setKernelOpen(true)}>
+              <ScanEye className="size-4" />
+            </HeaderButton>
+            <HeaderButton label={id ? "Ekspor sesi" : "Export session"} onClick={exportSession}>
+              <Download className="size-4" />
+            </HeaderButton>
+            <HeaderButton
+              label="Inspector"
+              onClick={() => {
+                if (window.matchMedia("(min-width: 1024px)").matches) setInspectorOpen(!inspectorOpen);
+                else setDrawerOpen(true);
+              }}
             >
-              <Settings2 className="size-4" />
-            </button>
+              <PanelRight className="size-4" />
+            </HeaderButton>
           </div>
         </header>
 
         <div className="flex min-h-0 flex-1">
           <main className="min-h-0 min-w-0 flex-1">
-            {view === "chat" ? <ChatPanel engineReady={engine} /> : null}
+            {view === "chat" ? <ChatPanel engineReady={engine ? engine.ready : null} kernelChars={kernel.chars} /> : null}
             {view === "studio" ? <StudioPanel /> : null}
             {view === "vault" ? <VaultPanel /> : null}
             {view === "playbooks" ? <PlaybooksPanel /> : null}
           </main>
           {inspectorOpen ? (
-            <div className="hidden min-h-0 w-[20rem] shrink-0 border-l border-line lg:block">
-              <Inspector engineReady={engine} kernel={kernel} stats={stats} />
+            <div className="hidden min-h-0 w-[20rem] shrink-0 border-l border-line bg-surface/40 lg:block">
+              <Inspector engine={engine} kernel={kernel} stats={stats} />
             </div>
           ) : null}
+        </div>
+      </div>
+
+      {drawerOpen ? (
+        <div className="fixed inset-0 z-40 lg:hidden">
+          <button type="button" aria-label="Close" className="absolute inset-0 bg-bg/70 animate-fade" onClick={() => setDrawerOpen(false)} />
+          <div className="absolute inset-y-0 right-0 flex w-[min(22rem,92vw)] flex-col border-l border-line bg-surface animate-fade">
+            <div className="flex items-center justify-between border-b border-line px-4 py-3">
+              <p className="eyebrow">Inspector</p>
+              <button type="button" onClick={() => setDrawerOpen(false)} className="flex size-8 items-center justify-center rounded-md text-muted" aria-label="Close">
+                <X className="size-4" />
+              </button>
+            </div>
+            <div className="min-h-0 flex-1">
+              <Inspector engine={engine} kernel={kernel} stats={stats} />
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      <CommandPalette onExport={exportSession} />
+      <KernelDialog kernel={kernel} />
+    </div>
+  );
+}
+
+function HeaderButton({ label, onClick, children }: { label: string; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      title={label}
+      aria-label={label}
+      className="flex size-9 items-center justify-center rounded-lg text-muted transition-colors hover:bg-elevated hover:text-fg"
+    >
+      {children}
+    </button>
+  );
+}
+
+const BOOT_KEY = "axiom-booted";
+
+function BootScreen({
+  ready,
+  engine,
+  lines,
+  sections,
+  kernelChars,
+  mode,
+  onDone,
+}: {
+  ready: boolean;
+  engine: EngineStatus | null;
+  lines: number;
+  sections: number;
+  kernelChars: number;
+  mode: string;
+  onDone: () => void;
+}) {
+  const [step, setStep] = useState(0);
+  const rows: [string, string][] = [
+    ["megaprompt", `${lines.toLocaleString()} lines`],
+    ["sections", `${sections} parsed`],
+    ["constitution", "locked"],
+    ["kernel", `${mode} · ${kernelChars.toLocaleString()}c`],
+    ["engine", engine ? (engine.ready ? engine.models[0] ?? "live" : "demo mode") : "probing…"],
+    ["signal lamp", "on"],
+  ];
+
+  useEffect(() => {
+    if (!ready) return;
+    let seen = false;
+    try {
+      seen = sessionStorage.getItem(BOOT_KEY) === "1";
+      sessionStorage.setItem(BOOT_KEY, "1");
+    } catch {}
+    if (seen) {
+      onDone();
+      return;
+    }
+    const timers = rows.map((_, i) => window.setTimeout(() => setStep(i + 1), 160 + i * 170));
+    timers.push(window.setTimeout(onDone, 160 + rows.length * 170 + 450));
+    return () => timers.forEach(clearTimeout);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready]);
+
+  return (
+    <div className="grain flex min-h-dvh items-center justify-center bg-bg px-6" onClick={() => ready && onDone()}>
+      <div className="w-full max-w-sm">
+        <div className="flex items-center gap-3 text-accent">
+          <AxiomGlyph className="size-8" />
+          <span className="font-display text-3xl font-semibold tracking-[0.2em]">AXIOM</span>
+        </div>
+        <div className="mt-8 space-y-1.5 font-mono text-[11px]">
+          {rows.map(([k, v], i) => (
+            <div key={k} className={cn("flex items-center gap-2 transition-opacity duration-200", i < step ? "opacity-100" : "opacity-0")}>
+              <span className="text-signal">›</span>
+              <span className="text-muted">{k}</span>
+              <span className="flex-1 overflow-hidden text-line-strong">{".".repeat(40)}</span>
+              <span className="text-fg">{v}</span>
+            </div>
+          ))}
+        </div>
+        <div className="mt-6 h-px overflow-hidden bg-line">
+          <div className="h-full bg-signal transition-[width] duration-200" style={{ width: `${(step / rows.length) * 100}%` }} />
         </div>
       </div>
     </div>
