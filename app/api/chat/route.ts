@@ -1,80 +1,191 @@
-export const runtime = "edge";
+import { compileKernel } from "@/lib/megaprompt";
+import type { CompileMode, LanguagePin, PersonaId } from "@/lib/catalog";
 
-type Msg = { role: "user" | "assistant" | "system"; content: string };
+type InMessage = { role: "user" | "assistant"; content: string };
 
-const SYSTEM =
-  "You are Nova, a sharp, witty and maximally helpful assistant. Answer clearly, use markdown when it helps, and keep a touch of humor.";
+type Body = {
+  messages: InMessage[];
+  persona: PersonaId;
+  language: LanguagePin;
+  compileMode: CompileMode;
+  enabledModules: string[];
+  vault: string[];
+  addendum: string;
+  temperature: number;
+  maxTokens: number;
+};
 
-const MODELS = ["grok-4", "grok-3", "grok-3-mini"];
+const MODELS = ["grok-4.5", "grok-4", "grok-3"] as const;
 
-function demoStream(question: string) {
-  const text =
-    `**Mode demo aktif** — \`XAI_API_KEY\` belum diatur, jadi ini jawaban contoh.\n\n` +
-    `Anda bertanya: _"${question.slice(0, 200)}"_\n\n` +
-    `Begitu API key ditambahkan di Vercel, Nova akan menjawab langsung dari model Grok lewat xAI API dengan streaming real-time. 🚀`;
-  const enc = new TextEncoder();
-  const words = text.split(/(\s+)/);
-  return new ReadableStream({
-    async start(c) {
-      for (const w of words) {
-        c.enqueue(enc.encode(w));
-        await new Promise((r) => setTimeout(r, 18));
-      }
-      c.close();
-    },
-  });
+export const runtime = "nodejs";
+export const maxDuration = 60;
+
+export async function POST(request: Request) {
+        const apiKey = process.env.XAI_API_KEY;
+
+        let body: Body;
+        try {
+          body = (await request.json()) as Body;
+        } catch {
+          return Response.json({ error: "Invalid request." }, { status: 400 });
+        }
+
+        const messages = Array.isArray(body.messages) ? body.messages.slice(-16) : [];
+        if (!messages.length) {
+          return Response.json({ error: "Empty thread." }, { status: 400 });
+        }
+
+        const maxTokens = clamp(Number(body.maxTokens) || 1800, 256, 4096);
+        const temperature = clamp(Number(body.temperature) || 0.6, 0, 1.2);
+        const kernel = compileKernel({
+          mode: body.compileMode ?? "core",
+          enabledIds: Array.isArray(body.enabledModules) ? body.enabledModules.slice(0, 80) : [],
+          persona: body.persona ?? "operator",
+          language: body.language ?? "auto",
+          vault: Array.isArray(body.vault) ? body.vault.slice(0, 40).map((v) => String(v).slice(0, 500)) : [],
+          addendum: String(body.addendum ?? "").slice(0, 4000),
+        });
+
+        const payloadMessages = [
+          { role: "system" as const, content: kernel.text.slice(0, 100_000) },
+          ...messages.map((m) => ({
+            role: m.role,
+            content: String(m.content ?? "").slice(0, 12_000),
+          })),
+        ];
+
+        if (!apiKey) return demoResponse(messages[messages.length - 1]?.content ?? "", kernel);
+
+        const encoder = new TextEncoder();
+        const stream = new ReadableStream({
+          async start(controller) {
+            const send = (obj: unknown) => {
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify(obj)}\n\n`));
+            };
+            try {
+              const { res, model } = await completeWithFallback({
+                apiKey,
+                payloadMessages,
+                temperature,
+                maxTokens,
+              });
+              if (!res.ok || !res.body) {
+                const errText = await res.text().catch(() => "");
+                send({
+                  error: `xAI error ${res.status}${errText ? `: ${errText.slice(0, 280)}` : ""}`,
+                });
+                controller.close();
+                return;
+              }
+              send({ meta: { model, kernelChars: kernel.chars, truncated: kernel.truncated } });
+              const reader = res.body.getReader();
+              const decoder = new TextDecoder();
+              let buffer = "";
+              while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                buffer += decoder.decode(value, { stream: true });
+                const chunks = buffer.split("\n");
+                buffer = chunks.pop() ?? "";
+                for (const line of chunks) {
+                  const trimmed = line.trim();
+                  if (!trimmed.startsWith("data:")) continue;
+                  const data = trimmed.slice(5).trim();
+                  if (data === "[DONE]") {
+                    send({ done: true });
+                    controller.close();
+                    return;
+                  }
+                  try {
+                    const json = JSON.parse(data) as {
+                      choices?: { delta?: { content?: string } }[];
+                    };
+                    const delta = json.choices?.[0]?.delta?.content;
+                    if (delta) send({ token: delta });
+                  } catch {
+                    // ignore malformed sse line
+                  }
+                }
+              }
+              send({ done: true });
+              controller.close();
+            } catch (err) {
+              send({ error: err instanceof Error ? err.message : "Engine failed." });
+              controller.close();
+            }
+          },
+        });
+
+        return new Response(stream, {
+          headers: {
+            "Content-Type": "text/event-stream; charset=utf-8",
+            "Cache-Control": "no-cache, no-transform",
+            Connection: "keep-alive",
+          },
+        });
+
 }
 
-export async function POST(req: Request) {
-  let body: { messages?: Msg[]; model?: string };
-  try {
-    body = await req.json();
-  } catch {
-    return new Response("Bad JSON", { status: 400 });
-  }
-  const messages = (body.messages ?? [])
-    .filter((m) => (m.role === "user" || m.role === "assistant") && typeof m.content === "string")
-    .slice(-30)
-    .map((m) => ({ role: m.role, content: m.content.slice(0, 20000) }));
-  if (!messages.length) return new Response("No messages", { status: 400 });
+function clamp(n: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, n));
+}
 
-  const headers = { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-cache" };
-  const key = process.env.XAI_API_KEY;
-  if (!key) return new Response(demoStream(messages[messages.length - 1].content), { headers });
-
-  const model = MODELS.includes(body.model ?? "") ? body.model! : process.env.XAI_MODEL || "grok-4";
-  const upstream = await fetch("https://api.x.ai/v1/chat/completions", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ model, stream: true, messages: [{ role: "system", content: SYSTEM }, ...messages] }),
-  });
-  if (!upstream.ok || !upstream.body) {
-    const err = await upstream.text().catch(() => "");
-    return new Response(`⚠️ xAI API error ${upstream.status}: ${err.slice(0, 300)}`, { status: 502, headers });
-  }
-
-  // Convert OpenAI-style SSE into a plain text stream of content deltas.
-  const dec = new TextDecoder();
-  const enc = new TextEncoder();
-  let buf = "";
-  const stream = upstream.body.pipeThrough(
-    new TransformStream<Uint8Array, Uint8Array>({
-      transform(chunk, c) {
-        buf += dec.decode(chunk, { stream: true });
-        const lines = buf.split("\n");
-        buf = lines.pop() ?? "";
-        for (const line of lines) {
-          const t = line.trim();
-          if (!t.startsWith("data:")) continue;
-          const data = t.slice(5).trim();
-          if (data === "[DONE]") continue;
-          try {
-            const delta = JSON.parse(data).choices?.[0]?.delta?.content;
-            if (delta) c.enqueue(enc.encode(delta));
-          } catch {}
-        }
+async function completeWithFallback(opts: {
+  apiKey: string;
+  payloadMessages: { role: string; content: string }[];
+  temperature: number;
+  maxTokens: number;
+}) {
+  let last: Response | null = null;
+  let used: string = MODELS[0];
+  for (const model of MODELS) {
+    used = model;
+    last = await fetch("https://api.x.ai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${opts.apiKey}`,
       },
-    })
-  );
-  return new Response(stream, { headers });
+      body: JSON.stringify({
+        model,
+        stream: true,
+        temperature: opts.temperature,
+        max_tokens: opts.maxTokens,
+        messages: opts.payloadMessages,
+      }),
+    });
+    if (last.ok) return { res: last, model };
+    if (last.status !== 404 && last.status !== 400) return { res: last, model };
+  }
+  return { res: last ?? new Response("no model", { status: 500 }), model: used };
+}
+
+function demoResponse(question: string, kernel: { chars: number; used: string[]; truncated: boolean }) {
+  const q = question.replace(/\s+/g, " ").slice(0, 160);
+  const text = [
+    "**Demo mode.** `XAI_API_KEY` is not set on this deployment, so AXIOM is answering with a scripted reply.",
+    "",
+    `Job received: "${q}"`,
+    "",
+    "What would have been sent to the engine:",
+    `- Kernel: **${kernel.chars.toLocaleString()}** chars compiled from **${kernel.used.length}** megaprompt sections${kernel.truncated ? " (truncated by budget)" : ""}`,
+    `- Sections: ${kernel.used.slice(0, 6).join(" · ")}${kernel.used.length > 6 ? " …" : ""}`,
+    "",
+    "Add `XAI_API_KEY` in Vercel → Project → Settings → Environment Variables and redeploy to go live.",
+  ].join("\n");
+  const encoder = new TextEncoder();
+  const tokens = text.split(/(\s+)/);
+  const stream = new ReadableStream({
+    async start(controller) {
+      const send = (obj: unknown) => controller.enqueue(encoder.encode(`data: ${JSON.stringify(obj)}\n\n`));
+      send({ meta: { model: "demo", kernelChars: kernel.chars, truncated: kernel.truncated } });
+      for (const t of tokens) {
+        send({ token: t });
+        await new Promise((r) => setTimeout(r, 14));
+      }
+      send({ done: true });
+      controller.close();
+    },
+  });
+  return new Response(stream, { headers: { "Content-Type": "text/event-stream; charset=utf-8", "Cache-Control": "no-cache, no-transform" } });
 }
