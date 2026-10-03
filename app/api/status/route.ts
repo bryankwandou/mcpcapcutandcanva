@@ -1,17 +1,19 @@
 import { megapromptStats } from "@/lib/megaprompt";
-import { engineReady, modelChain } from "@/lib/server/xai";
+import { describeEngine, serverEngine } from "@/lib/server/engine";
 
 export const dynamic = "force-dynamic";
 
 export function GET() {
-  const ready = engineReady();
+  const engine = describeEngine(serverEngine());
   return Response.json(
     {
-      ready,
-      mode: ready ? "live" : "demo",
-      models: ready ? modelChain() : [],
+      ready: Boolean(engine),
+      mode: engine ? "live" : "demo",
+      engine,
+      models: engine?.models ?? [],
+      byok: process.env.ALLOW_BYOK !== "false",
       megaprompt: megapromptStats(),
-      version: "1.1.0",
+      version: "1.2.0",
     },
     { headers: { "Cache-Control": "no-store" } },
   );

@@ -44,6 +44,7 @@ export function CommandPalette({ onExport }: { onExport: () => void }) {
     };
     const list: Item[] = [
       { id: "new", group: "Session", label: "New session", hint: "fresh thread", run: () => (st().newChat(), close()) },
+      { id: "engine", group: "Session", label: "Connect engine / API key", hint: "xAI, Groq, Gemini, OpenAI, Claude…", run: () => (st().setEngineOpen(true), close()) },
       { id: "kernel", group: "Session", label: "View compiled kernel", hint: "what the engine receives", run: () => (st().setKernelOpen(true), close()) },
       { id: "export", group: "Session", label: "Export session as Markdown", run: () => (onExport(), close()) },
       { id: "insp", group: "Session", label: "Toggle inspector", run: () => (st().setInspectorOpen(!st().inspectorOpen), close()) },

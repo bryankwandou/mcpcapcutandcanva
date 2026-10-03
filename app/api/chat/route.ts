@@ -1,7 +1,7 @@
 import { compileKernel, type CompiledKernel } from "@/lib/megaprompt";
 import { MODULES, PERSONAS, type CompileMode, type LanguagePin, type PersonaId } from "@/lib/catalog";
 import { clientKey, rateLimit } from "@/lib/server/rate-limit";
-import { engineReady, openStream, readTokens } from "@/lib/server/xai";
+import { EngineError, openEngineStream, requestEngine } from "@/lib/server/engine";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -63,7 +63,9 @@ export async function POST(request: Request) {
     "X-Accel-Buffering": "no",
   };
 
-  if (!engineReady()) {
+  const { engine, error } = requestEngine(request);
+  if (error) return Response.json({ error }, { status: 400 });
+  if (!engine) {
     return new Response(demoStream(messages[messages.length - 1]!.content, kernel, language, persona, sse), { headers });
   }
 
@@ -71,28 +73,28 @@ export async function POST(request: Request) {
     async start(controller) {
       const started = Date.now();
       try {
-        const { res, model } = await openStream({
-          messages: [{ role: "system", content: kernel.text.slice(0, 100_000) }, ...messages],
+        const { model, tokens } = await openEngineStream(engine, {
+          system: kernel.text.slice(0, 100_000),
+          messages,
           temperature,
           maxTokens,
           signal: request.signal,
         });
-        if (!res.ok || !res.body) {
-          const errText = await res.text().catch(() => "");
-          controller.enqueue(sse({ error: `Engine error ${res.status}${errText ? `: ${errText.slice(0, 280)}` : ""}` }));
-          controller.close();
-          return;
-        }
-        controller.enqueue(sse({ meta: { model, kernelChars: kernel.chars, sections: kernel.used.length, truncated: kernel.truncated } }));
+        controller.enqueue(
+          sse({
+            meta: { model, provider: engine.provider, source: engine.source, kernelChars: kernel.chars, sections: kernel.used.length, truncated: kernel.truncated },
+          }),
+        );
         let chars = 0;
-        for await (const token of readTokens(res.body)) {
+        for await (const token of tokens) {
           chars += token.length;
           controller.enqueue(sse({ token }));
         }
         controller.enqueue(sse({ done: true, ms: Date.now() - started, chars }));
       } catch (err) {
         if (!request.signal.aborted) {
-          controller.enqueue(sse({ error: err instanceof Error ? err.message : "Engine failed." }));
+          const message = err instanceof EngineError || err instanceof Error ? err.message : "Engine failed.";
+          controller.enqueue(sse({ error: message }));
         }
       } finally {
         try {
@@ -148,8 +150,8 @@ function demoReply(q: string, kernel: CompiledKernel, id: boolean, persona: Pers
   const cmd = /^\/(\w+)/.exec(q.trim())?.[1]?.toLowerCase();
   const job = q.replace(/^\/\w+\s*/, "").replace(/\s+/g, " ").trim().slice(0, 140) || (id ? "(kosong)" : "(empty)");
   const footer = id
-    ? `\n\n---\n_Mode demo · kernel ${kernel.chars.toLocaleString()}c dari ${kernel.used.length} seksi · persona ${persona}. Pasang \`XAI_API_KEY\` di Vercel agar engine menjawab langsung._`
-    : `\n\n---\n_Demo mode · kernel ${kernel.chars.toLocaleString()}c from ${kernel.used.length} sections · persona ${persona}. Set \`XAI_API_KEY\` on Vercel to put the live engine behind this._`;
+    ? `\n\n---\n_Mode demo · kernel ${kernel.chars.toLocaleString()}c dari ${kernel.used.length} seksi · persona ${persona}. Hubungkan key apa pun (xAI, Groq, Gemini, OpenAI, Claude, …) lewat **Engine** di inspector agar engine menjawab langsung._`
+    : `\n\n---\n_Demo mode · kernel ${kernel.chars.toLocaleString()}c from ${kernel.used.length} sections · persona ${persona}. Connect any key (xAI, Groq, Gemini, OpenAI, Claude, …) under **Engine** in the inspector to go live._`;
 
   const en: Record<string, string> = {
     decide: `**Call:** pick the option you can reverse cheaply, ship it, and set a date to re-check.\n\n| Option | Upside | Cost | Reversible |\n|---|---|---|---|\n| A — simplest path | ships today | ceiling later | yes |\n| B — durable path | scales | a week of plumbing | partly |\n\n**Sacrifice:** B's headroom, for now.\n**Kill-criterion:** if the simple path breaks twice in a month, migrate.\n\nJob read as: _${job}_`,

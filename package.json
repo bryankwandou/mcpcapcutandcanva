@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.131.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.510.0",
     "next": "15.5.4",

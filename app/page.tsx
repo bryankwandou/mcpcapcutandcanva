@@ -4,6 +4,7 @@ import { ArrowRight, Command, Cpu, Database, FileText, Layers, ScanEye, Sparkles
 import { AxiomAvatar, AxiomGlyph, Lamp } from "@/components/axiom-mark";
 import { SpineShowcase } from "@/components/landing/spine-showcase";
 import { CORE_MODULE_IDS, MODULES, PERSONAS, SLASH_COMMANDS } from "@/lib/catalog";
+import { PROVIDERS } from "@/lib/engine/providers";
 import { compileKernel, megapromptSpine, megapromptStats, parseSections } from "@/lib/megaprompt";
 
 export const dynamic = "force-static";
@@ -164,7 +165,7 @@ export default function Landing() {
             { icon: FileText, t: "Megaprompt", d: `${stats.lines.toLocaleString()} lines · ${stats.sections} sections · ID + EN.` },
             { icon: Layers, t: "Compiler", d: "Locked constitution + enabled modules + persona overlay + vault + addendum." },
             { icon: Cpu, t: "Kernel", d: `≈${(modes.core.chars / 1000).toFixed(0)}k chars in core mode. Viewable, copyable, auditable.` },
-            { icon: Sparkles, t: "Engine", d: "Grok-class model via the xAI API, streamed token by token, with model fallback." },
+            { icon: Sparkles, t: "Engine", d: "Any key — Grok, Groq, Gemini, OpenAI, Claude and more — streamed, with model fallback." },
           ].map((s, i) => (
             <div key={s.t} className="relative bg-bg p-6">
               <span className="font-mono text-[10px] text-subtle">0{i + 1}</span>
@@ -174,6 +175,21 @@ export default function Landing() {
               {i < 3 ? <ArrowRight className="absolute top-6 right-5 hidden size-4 text-line-strong md:block" /> : null}
             </div>
           ))}
+        </div>
+
+        <div className="mt-10 flex flex-col gap-4 rounded-2xl border border-line bg-surface/40 px-6 py-5 md:flex-row md:items-center">
+          <div className="shrink-0">
+            <p className="eyebrow">Model-agnostic</p>
+            <p className="mt-1 font-display text-2xl font-semibold">Bring any key.</p>
+          </div>
+          <div className="flex flex-wrap gap-1.5 md:ml-auto md:justify-end">
+            {PROVIDERS.map((p) => (
+              <span key={p.id} className="rounded-full border border-line px-3 py-1 text-xs text-muted">
+                {p.name}
+              </span>
+            ))}
+            <span className="rounded-full border border-dashed border-line px-3 py-1 text-xs text-subtle">any OpenAI-compatible URL</span>
+          </div>
         </div>
       </section>
 
@@ -303,7 +319,7 @@ export default function Landing() {
               { icon: Layers, t: "Live inspector", d: "Toggle modules, watch the spine and budget react, tune temperature." },
               { icon: FileText, t: "Megaprompt studio", d: "All sections, searchable, line-numbered, with an operator addendum." },
               { icon: Database, t: "Memory vault", d: "Facts that should stay true, injected after the kernel on every turn." },
-              { icon: Sparkles, t: "Demo mode", d: "No API key? The station still runs on scripted AXIOM replies." },
+              { icon: Sparkles, t: "Any engine", d: "Paste an xAI, Groq, Gemini, OpenAI or Claude key; provider auto-detected. No key? Demo mode." },
             ].map((f) => (
               <div key={f.t} className="flex gap-4">
                 <f.icon className="mt-0.5 size-5 shrink-0 text-signal" strokeWidth={1.5} />
@@ -339,7 +355,7 @@ export default function Landing() {
           <span className="flex items-center gap-2">
             <AxiomGlyph className="size-4 text-muted" /> AXIOM operator station
           </span>
-          <span>Independent project. Not affiliated with xAI. Engine: any Grok-class model via the public xAI API.</span>
+          <span>Independent project. Not affiliated with xAI or any model provider. Bring your own key.</span>
         </div>
       </footer>
     </main>

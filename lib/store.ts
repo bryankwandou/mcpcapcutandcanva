@@ -8,6 +8,7 @@ import {
   type PersonaId,
   type ViewId,
 } from "./catalog";
+import type { ProviderId } from "./engine/providers";
 
 export type ChatRole = "user" | "assistant";
 
@@ -33,6 +34,13 @@ export type Session = {
   updatedAt: number;
   persona: PersonaId;
   messages: ChatMessage[];
+};
+
+export type EngineSettings = {
+  /** "server" = use whatever the deployment is configured with (or demo). */
+  provider: ProviderId | "server";
+  key: string;
+  model: string;
 };
 
 export type VaultNote = {
@@ -75,6 +83,8 @@ type State = {
   pendingDraft: string;
   paletteOpen: boolean;
   kernelOpen: boolean;
+  engineOpen: boolean;
+  engine: EngineSettings;
   setHydrated: (v: boolean) => void;
   setView: (v: ViewId) => void;
   setLanguage: (v: LanguagePin) => void;
@@ -94,6 +104,8 @@ type State = {
   dropLastExchange: () => string | null;
   setPaletteOpen: (v: boolean) => void;
   setKernelOpen: (v: boolean) => void;
+  setEngineOpen: (v: boolean) => void;
+  setEngine: (v: EngineSettings) => void;
   renameActive: (title: string) => void;
   setStudioQuery: (q: string) => void;
   setStudioSection: (n: number) => void;
@@ -123,6 +135,8 @@ export const useStation = create<State>()(
       pendingDraft: "",
       paletteOpen: false,
       kernelOpen: false,
+      engineOpen: false,
+      engine: { provider: "server", key: "", model: "" },
       setHydrated: (v) => set({ hydrated: v }),
       setView: (view) => set({ view }),
       setLanguage: (language) => set({ language }),
@@ -180,6 +194,8 @@ export const useStation = create<State>()(
       },
       setPaletteOpen: (paletteOpen) => set({ paletteOpen }),
       setKernelOpen: (kernelOpen) => set({ kernelOpen }),
+      setEngineOpen: (engineOpen) => set({ engineOpen }),
+      setEngine: (engine) => set({ engine }),
       dropLastExchange: () => {
         let prompt: string | null = null;
         set({
@@ -238,6 +254,7 @@ export const useStation = create<State>()(
         sessions: s.sessions,
         activeSessionId: s.activeSessionId,
         inspectorOpen: s.inspectorOpen,
+        engine: s.engine,
       }),
       onRehydrateStorage: () => (state) => {
         state?.setHydrated(true);
@@ -245,6 +262,12 @@ export const useStation = create<State>()(
     },
   ),
 );
+
+/** Headers that carry a browser-held key to this deployment's proxy. Empty when using the server engine. */
+export function engineHeaders(e: EngineSettings): Record<string, string> {
+  if (e.provider === "server" || !e.key) return {};
+  return { "x-axiom-provider": e.provider, "x-axiom-key": e.key, ...(e.model ? { "x-axiom-model": e.model } : {}) };
+}
 
 export function activeSession() {
   const s = useStation.getState();

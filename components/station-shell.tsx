@@ -23,6 +23,7 @@ import { cn } from "@/lib/cn";
 import { useStation } from "@/lib/store";
 import { ChatPanel } from "./chat-panel";
 import { CommandPalette } from "./command-palette";
+import { EngineDialog, engineSummary } from "./engine-dialog";
 import { Inspector } from "./inspector";
 import { KernelDialog } from "./kernel-dialog";
 import { PlaybooksPanel } from "./playbooks-panel";
@@ -56,6 +57,8 @@ export function StationShell() {
   const vault = useStation((s) => s.vault);
   const setPaletteOpen = useStation((s) => s.setPaletteOpen);
   const setKernelOpen = useStation((s) => s.setKernelOpen);
+  const setEngineOpen = useStation((s) => s.setEngineOpen);
+  const engineSettings = useStation((s) => s.engine);
   const [engine, setEngine] = useState<EngineStatus | null>(null);
   const [railOpen, setRailOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -67,6 +70,7 @@ export function StationShell() {
   }, [setHydrated]);
 
   const stats = useMemo(() => megapromptStats(), []);
+  const summary = engineSummary(engineSettings, engine);
   const session = sessions.find((s) => s.id === activeSessionId) ?? sessions[0];
   const kernel = useMemo(
     () =>
@@ -103,7 +107,7 @@ export function StationShell() {
   const id = language !== "en";
 
   if (!hydrated || !booted) {
-    return <BootScreen ready={hydrated} engine={engine} lines={stats.lines} sections={stats.sections} kernelChars={kernel.chars} mode={compileMode} onDone={() => setBooted(true)} />;
+    return <BootScreen ready={hydrated} engine={engine} summary={engine || engineSettings.key ? summary : null} lines={stats.lines} sections={stats.sections} kernelChars={kernel.chars} mode={compileMode} onDone={() => setBooted(true)} />;
   }
 
   const title =
@@ -220,13 +224,18 @@ export function StationShell() {
             {id ? "Palet perintah" : "Command palette"}
             <span className="kbd ml-auto">⌘K</span>
           </button>
-          <div className="flex items-center justify-between gap-2 font-mono text-[10px] tracking-[0.12em] text-muted uppercase">
-            <span className="flex items-center gap-2">
-              <Lamp tone={engine?.ready ? "signal" : engine ? "warn" : "off"} live={!engine} />
-              {engine?.ready ? "Engine live" : engine ? "Demo mode" : "…"}
+          <button
+            type="button"
+            onClick={() => setEngineOpen(true)}
+            className="flex w-full items-center justify-between gap-2 rounded-md font-mono text-[10px] tracking-[0.12em] text-muted uppercase hover:text-fg"
+            title={id ? "Ganti engine / API key" : "Switch engine / API key"}
+          >
+            <span className="flex min-w-0 items-center gap-2">
+              <Lamp tone={summary.live ? "signal" : engine ? "warn" : "off"} live={!engine && !engineSettings.key} />
+              <span className="truncate">{summary.live ? summary.label : engine ? "Demo mode" : "…"}</span>
             </span>
-            <span className="text-subtle tabular-nums">{stats.lines.toLocaleString()} ln</span>
-          </div>
+            <span className="shrink-0 text-subtle tabular-nums">{stats.lines.toLocaleString()} ln</span>
+          </button>
         </div>
       </aside>
 
@@ -286,14 +295,14 @@ export function StationShell() {
 
         <div className="flex min-h-0 flex-1">
           <main className="min-h-0 min-w-0 flex-1">
-            {view === "chat" ? <ChatPanel engineReady={engine ? engine.ready : null} kernelChars={kernel.chars} /> : null}
+            {view === "chat" ? <ChatPanel engineReady={summary.live ? true : engine ? false : null} kernelChars={kernel.chars} /> : null}
             {view === "studio" ? <StudioPanel /> : null}
             {view === "vault" ? <VaultPanel /> : null}
             {view === "playbooks" ? <PlaybooksPanel /> : null}
           </main>
           {inspectorOpen ? (
             <div className="hidden min-h-0 w-[20rem] shrink-0 border-l border-line bg-surface/40 lg:block">
-              <Inspector engine={engine} kernel={kernel} stats={stats} />
+              <Inspector summary={summary} kernel={kernel} stats={stats} />
             </div>
           ) : null}
         </div>
@@ -310,13 +319,14 @@ export function StationShell() {
               </button>
             </div>
             <div className="min-h-0 flex-1">
-              <Inspector engine={engine} kernel={kernel} stats={stats} />
+              <Inspector summary={summary} kernel={kernel} stats={stats} />
             </div>
           </div>
         </div>
       ) : null}
 
       <CommandPalette onExport={exportSession} />
+      <EngineDialog status={engine} />
       <KernelDialog kernel={kernel} />
     </div>
   );
@@ -341,6 +351,7 @@ const BOOT_KEY = "axiom-booted";
 function BootScreen({
   ready,
   engine,
+  summary,
   lines,
   sections,
   kernelChars,
@@ -349,6 +360,7 @@ function BootScreen({
 }: {
   ready: boolean;
   engine: EngineStatus | null;
+  summary: { live: boolean; label: string; detail: string } | null;
   lines: number;
   sections: number;
   kernelChars: number;
@@ -361,7 +373,7 @@ function BootScreen({
     ["sections", `${sections} parsed`],
     ["constitution", "locked"],
     ["kernel", `${mode} · ${kernelChars.toLocaleString()}c`],
-    ["engine", engine ? (engine.ready ? engine.models[0] ?? "live" : "demo mode") : "probing…"],
+    ["engine", summary ? (summary.live ? `${summary.label} · ${summary.detail}` : "demo mode") : engine ? "demo mode" : "probing…"],
     ["signal lamp", "on"],
   ];
 

@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
-import { Lock, ScanEye } from "lucide-react";
+import { KeyRound, Lock, ScanEye } from "lucide-react";
+import type { EngineSummary } from "@/components/engine-dialog";
 import { KernelSpine } from "@/components/kernel-spine";
 import { Lamp } from "@/components/axiom-mark";
 import { CORE_MODULE_IDS, LITE_MODULE_IDS, MODULES, type CompileMode } from "@/lib/catalog";
@@ -24,11 +25,12 @@ const MODE_NOTE: Record<CompileMode, string> = {
 };
 
 export function Inspector({
-  engine,
+  summary,
   kernel,
   stats,
 }: {
-  engine: EngineStatus | null;
+  engine?: EngineStatus | null;
+  summary: EngineSummary;
   kernel: CompiledKernel;
   stats: MegapromptStats;
 }) {
@@ -44,6 +46,7 @@ export function Inspector({
   const setKernelOpen = useStation((s) => s.setKernelOpen);
   const setView = useStation((s) => s.setView);
   const setStudioSection = useStation((s) => s.setStudioSection);
+  const setEngineOpen = useStation((s) => s.setEngineOpen);
   const idUi = language !== "en";
   const bands = useMemo(() => megapromptSpine(), []);
   const lit = useMemo(() => new Set(kernel.usedPrefixes), [kernel.usedPrefixes]);
@@ -55,6 +58,27 @@ export function Inspector({
 
   return (
     <div className="flex h-full flex-col overflow-y-auto">
+      <section className="border-b border-line px-4 py-4">
+        <p className="eyebrow">Engine</p>
+        <button
+          type="button"
+          onClick={() => setEngineOpen(true)}
+          className="mt-2 flex w-full items-center gap-3 rounded-xl border border-line bg-inset px-3 py-2.5 text-left transition-colors hover:border-line-strong"
+        >
+          <Lamp tone={summary.live ? "signal" : "warn"} />
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-[13px] text-fg">{summary.label}</span>
+            <span className="block truncate font-mono text-[10px] text-subtle">
+              {summary.detail}
+              {summary.source === "byok" ? " · your key" : summary.source === "server" ? " · server key" : ""}
+            </span>
+          </span>
+          <span className="flex items-center gap-1 rounded-md bg-elevated px-2 py-1 font-mono text-[10px] text-muted">
+            <KeyRound className="size-3" /> {summary.live ? (idUi ? "ganti" : "switch") : idUi ? "hubungkan" : "connect"}
+          </span>
+        </button>
+      </section>
+
       <section className="border-b border-line px-4 py-4">
         <div className="flex items-center justify-between">
           <p className="eyebrow">Kernel compiler</p>
@@ -121,11 +145,6 @@ export function Inspector({
           <dd className="text-right text-fg tabular-nums">{stats.lines.toLocaleString()} ln</dd>
           <dt>{idUi ? "Kata" : "Words"}</dt>
           <dd className="text-right text-fg tabular-nums">{stats.words.toLocaleString()}</dd>
-          <dt>Engine</dt>
-          <dd className="flex items-center justify-end gap-1.5 text-fg">
-            <Lamp tone={engine?.ready ? "signal" : engine ? "warn" : "off"} className="size-1.5" />
-            {engine?.ready ? engine.models[0] : engine ? "demo" : "…"}
-          </dd>
         </dl>
       </section>
 

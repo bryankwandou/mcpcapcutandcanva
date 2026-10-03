@@ -6,7 +6,7 @@ import { AxiomAvatar, Lamp } from "@/components/axiom-mark";
 import { Markdown } from "@/components/markdown";
 import { PERSONAS, PLAYBOOKS, SLASH_COMMANDS } from "@/lib/catalog";
 import { cn } from "@/lib/cn";
-import { useStation, type ChatMessage, type MessageMeta } from "@/lib/store";
+import { engineHeaders, useStation, type ChatMessage, type MessageMeta } from "@/lib/store";
 
 export function ChatPanel({ engineReady, kernelChars }: { engineReady: boolean | null; kernelChars: number }) {
   const sessions = useStation((s) => s.sessions);
@@ -98,7 +98,7 @@ export function ChatPanel({ engineReady, kernelChars }: { engineReady: boolean |
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...engineHeaders(latest.engine) },
         signal: controller.signal,
         body: JSON.stringify({
           messages: history,
