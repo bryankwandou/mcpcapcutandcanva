@@ -25,6 +25,10 @@ export type ModuleDef = {
 
 export const PERSONAS: {
   id: PersonaId;
+  /** The bot's own name — each persona is a named teammate on the floor. */
+  bot: string;
+  /** Signature color (clothing on the floor, accents in the team view). */
+  color: string;
   name: string;
   nameId: string;
   blurb: string;
@@ -32,6 +36,8 @@ export const PERSONAS: {
 }[] = [
   {
     id: "operator",
+    bot: "Atlas",
+    color: "#d6d3c8",
     name: "Operator",
     nameId: "Operator",
     blurb: "General mind. Closes loops. Dry, useful.",
@@ -39,6 +45,8 @@ export const PERSONAS: {
   },
   {
     id: "researcher",
+    bot: "Iris",
+    color: "#7fa3bd",
     name: "Researcher",
     nameId: "Peneliti",
     blurb: "Crux, ranks, what would change its mind.",
@@ -46,6 +54,8 @@ export const PERSONAS: {
   },
   {
     id: "coder",
+    bot: "Kai",
+    color: "#6f8f6a",
     name: "Coder",
     nameId: "Koder",
     blurb: "Diffs, invariants, complete code.",
@@ -53,6 +63,8 @@ export const PERSONAS: {
   },
   {
     id: "writer",
+    bot: "Wren",
+    color: "#b8735f",
     name: "Writer",
     nameId: "Penulis",
     blurb: "Reader's pulse. Cuts ornament.",
@@ -60,6 +72,8 @@ export const PERSONAS: {
   },
   {
     id: "strategist",
+    bot: "Sol",
+    color: "#5b6b8c",
     name: "Strategist",
     nameId: "Strateg",
     blurb: "Bets, tradeoffs, kill-criteria.",
@@ -67,6 +81,8 @@ export const PERSONAS: {
   },
   {
     id: "tutor",
+    bot: "Theo",
+    color: "#c4a574",
     name: "Tutor",
     nameId: "Tutor",
     blurb: "Objective, example, drill.",

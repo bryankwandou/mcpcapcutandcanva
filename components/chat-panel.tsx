@@ -6,7 +6,9 @@ import { AxiomAvatar, Lamp } from "@/components/axiom-mark";
 import { Markdown } from "@/components/markdown";
 import { PERSONAS, PLAYBOOKS, SLASH_COMMANDS } from "@/lib/catalog";
 import { cn } from "@/lib/cn";
-import { engineHeaders, useStation, type ChatMessage, type MessageMeta } from "@/lib/store";
+import { abortSend, regenerateLast, sendJob, useSender } from "@/lib/chat-sender";
+import { emitFloor } from "@/lib/floor-bus";
+import { useStation, type ChatMessage } from "@/lib/store";
 
 export function ChatPanel({ engineReady, kernelChars }: { engineReady: boolean | null; kernelChars: number }) {
   const sessions = useStation((s) => s.sessions);
@@ -16,20 +18,14 @@ export function ChatPanel({ engineReady, kernelChars }: { engineReady: boolean |
   const temperature = useStation((s) => s.temperature);
   const maxTokens = useStation((s) => s.maxTokens);
   const setPersona = useStation((s) => s.setPersona);
-  const appendMessage = useStation((s) => s.appendMessage);
-  const patchLastAssistant = useStation((s) => s.patchLastAssistant);
-  const dropLastExchange = useStation((s) => s.dropLastExchange);
   const addVault = useStation((s) => s.addVault);
   const pendingDraft = useStation((s) => s.pendingDraft);
   const setPendingDraft = useStation((s) => s.setPendingDraft);
   const session = sessions.find((s) => s.id === activeSessionId) ?? sessions[0];
   const persona = PERSONAS.find((p) => p.id === session?.persona) ?? PERSONAS[0];
   const [draft, setDraft] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [phase, setPhase] = useState<"compile" | "stream">("compile");
-  const [error, setError] = useState<string | null>(null);
+  const { busy, phase, error } = useSender();
   const [slashIndex, setSlashIndex] = useState(0);
-  const abortRef = useRef<AbortController | null>(null);
   const scroller = useRef<HTMLDivElement>(null);
   const input = useRef<HTMLTextAreaElement>(null);
   const idUi = language !== "en";
@@ -58,7 +54,7 @@ export function ChatPanel({ engineReady, kernelChars }: { engineReady: boolean |
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && abortRef.current) abortRef.current.abort();
+      if (e.key === "Escape") abortSend();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -73,108 +69,14 @@ export function ChatPanel({ engineReady, kernelChars }: { engineReady: boolean |
 
   useEffect(() => setSlashIndex(0), [slashHint.length]);
 
-  async function send(text: string, opts?: { regenerate?: boolean }) {
-    const content = text.trim();
-    if (!content || busy) return;
-    setError(null);
-    if (!opts?.regenerate) setDraft("");
-    appendMessage({ id: crypto.randomUUID(), role: "user", content, createdAt: Date.now() });
-    appendMessage({ id: crypto.randomUUID(), role: "assistant", content: "", createdAt: Date.now() });
-    setBusy(true);
-    setPhase("compile");
-    const controller = new AbortController();
-    abortRef.current = controller;
-    const started = performance.now();
-    const meta: MessageMeta = {};
-
-    const latest = useStation.getState();
-    const sess = latest.sessions.find((s) => s.id === latest.activeSessionId);
-    const history = (sess?.messages ?? [])
-      .slice(0, -1)
-      .filter((m) => m.content.length > 0 && !m.meta?.error)
-      .map((m) => ({ role: m.role, content: m.content }));
-
-    let acc = "";
-    try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", ...engineHeaders(latest.engine) },
-        signal: controller.signal,
-        body: JSON.stringify({
-          messages: history,
-          persona: sess?.persona ?? "operator",
-          language: latest.language,
-          compileMode: latest.compileMode,
-          enabledModules: latest.enabledModules,
-          vault: latest.vault.map((v) => v.text),
-          addendum: latest.addendum,
-          temperature: latest.temperature,
-          maxTokens: latest.maxTokens,
-        }),
-      });
-      if (!res.ok || !res.body) {
-        const j = (await res.json().catch(() => null)) as { error?: string } | null;
-        throw new Error(j?.error ?? `HTTP ${res.status}`);
-      }
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let buf = "";
-      for (;;) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buf += decoder.decode(value, { stream: true });
-        const parts = buf.split("\n");
-        buf = parts.pop() ?? "";
-        for (const line of parts) {
-          const trimmed = line.trim();
-          if (!trimmed.startsWith("data:")) continue;
-          const data = trimmed.slice(5).trim();
-          if (!data) continue;
-          let json: { token?: string; error?: string; meta?: { model?: string; kernelChars?: number } };
-          try {
-            json = JSON.parse(data);
-          } catch {
-            continue;
-          }
-          if (json.error) throw new Error(json.error);
-          if (json.meta) {
-            meta.model = json.meta.model;
-            meta.kernelChars = json.meta.kernelChars;
-          }
-          if (json.token) {
-            if (!acc) setPhase("stream");
-            acc += json.token;
-            patchLastAssistant(acc);
-          }
-        }
-      }
-      meta.ms = Math.round(performance.now() - started);
-      patchLastAssistant(
-        acc ||
-          (idUi
-            ? "Engine tidak mengembalikan teks. Coba lagi dengan job yang lebih kecil."
-            : "Engine returned no text. Try again with a smaller job."),
-        meta,
-      );
-    } catch (err) {
-      meta.ms = Math.round(performance.now() - started);
-      if ((err as { name?: string }).name === "AbortError") {
-        patchLastAssistant(acc ? `${acc}\n\n_${idUi ? "(dihentikan)" : "(stopped)"}_` : idUi ? "_(dihentikan)_" : "_(stopped)_", meta);
-      } else {
-        const msg = err instanceof Error ? err.message : "Engine failed.";
-        setError(msg);
-        patchLastAssistant(`⚠ ${msg}`, { ...meta, error: true });
-      }
-    } finally {
-      setBusy(false);
-      abortRef.current = null;
-    }
+  function send(text: string) {
+    if (!text.trim() || busy) return;
+    setDraft("");
+    void sendJob(text);
   }
 
   function regenerate() {
-    if (busy) return;
-    const prompt = dropLastExchange();
-    if (prompt) void send(prompt, { regenerate: true });
+    regenerateLast();
   }
 
   const messages = session?.messages ?? [];
@@ -234,7 +136,10 @@ export function ChatPanel({ engineReady, kernelChars }: { engineReady: boolean |
                 phase={phase}
                 isLast={m.id === lastAssistantId}
                 onRegenerate={regenerate}
-                onSave={(t) => addVault(t.slice(0, 480))}
+                onSave={(t) => {
+                  addVault(t.slice(0, 480));
+                  emitFloor({ type: "vault", text: t });
+                }}
               />
             ))}
           </div>
@@ -303,7 +208,7 @@ export function ChatPanel({ engineReady, kernelChars }: { engineReady: boolean |
             {busy ? (
               <button
                 type="button"
-                onClick={() => abortRef.current?.abort()}
+                onClick={() => abortSend()}
                 className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-elevated text-fg hover:bg-line-strong"
                 aria-label="Stop"
                 title="Stop (Esc)"
